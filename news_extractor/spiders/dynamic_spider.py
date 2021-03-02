@@ -11,7 +11,7 @@ import time
 
 class ArticleDyamicSpider(scrapy.Spider):
     # Initializing log file
-    logfile("article_dynamic.log", maxBytes=1e6, backupCount=3)
+    logfile("logs/article_dynamic.log", maxBytes=1e6, backupCount=3)
     name = "article_dynamic"
     # allowed_domains = ["toscrape.com"]
     custom_settings = {
@@ -64,7 +64,7 @@ class ArticleDyamicSpider(scrapy.Spider):
             logger.error(e)
         finally:
             self.driver.quit()
-        logger.info(f"Logger dynamic..")
+        logger.info("Logger dynamic..")
 
 def use_infinite_scroll_y(driver):
     SCROLL_PAUSE_TIME = 0.5

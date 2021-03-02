@@ -5,7 +5,7 @@ from logzero import logfile, logger
 
 
 class ArticleStaticSpider(scrapy.Spider):
-    logfile("article_static.log", maxBytes=1e6, backupCount=3)
+    logfile("logs/article_static.log", maxBytes=1e6, backupCount=3)
     name = "article_static"
     custom_settings = {
         'ITEM_PIPELINES': {'news_extractor.pipelines.StaticExtractorPipeline': 300},
@@ -16,9 +16,9 @@ class ArticleStaticSpider(scrapy.Spider):
         self.article_items = StaticArticleItem()
 
     def start_requests(self):
-        urls = [
-            "https://www.nytimes.com/2021/02/28/briefing/myanmar-hongkong-vaccine.html",
-            "https://www.nytimes.com/2021/02/28/podcasts/the-daily/genetics-dna-tests-ancestry.html"
+        # urls = [
+        #     "https://www.nytimes.com/2021/02/28/briefing/myanmar-hongkong-vaccine.html",
+        #     "https://www.nytimes.com/2021/02/28/podcasts/the-daily/genetics-dna-tests-ancestry.html"
             # "https://www.nytimes.com/2021/02/25/podcasts/still-processing-best-of-the-archives-whitney-houston.html",
             # "https://www.nytimes.com/2021/02/28/nyregion/cuomo-investigation-sex-harassment.html",
             # "https://www.nytimes.com/2021/02/27/nyregion/cuomo-charlotte-bennett-sexual-harassment.html",
@@ -46,11 +46,12 @@ class ArticleStaticSpider(scrapy.Spider):
             # "https://www.nytimes.com/2021/02/23/magazine/kazuo-ishiguro-klara.html",
             # "https://www.nytimes.com/2021/02/28/business/media/pandemic-streaming-tv-shows.html",
             # "https://www.nytimes.com/2021/02/25/us/female-con-artists-tori-telfer.html"
-        ]
+        # ]
         # url =""
         
-        for url in urls:
+        for url in self.urls:
             yield scrapy.Request(url, self.parse_article)
+            logger.info(f"Link {url} scraped...")
         logger.info("Static article scraper finished...")
 
     def parse_article(self, response):
@@ -98,3 +99,5 @@ class ArticleStaticSpider(scrapy.Spider):
         self.article_items['website'] = website
 
         yield self.article_items
+        logger.info(response.request.headers)
+        

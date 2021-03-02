@@ -132,7 +132,9 @@ AJAXCRAWL_ENABLED = True
 # Configure item pipelines
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
-   'news_extractor.pipelines.NewsExtractorPipeline': 300,
+#    'news_extractor.pipelines.NewsExtractorPipeline': 300,
+    'news_extractor.pipelines.StaticExtractorPipeline': 300,
+    'news_extractor.pipelines.DynamicExtractorPipeline': 300,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)

@@ -7,19 +7,19 @@
 # useful for handling different item types with a single interface
 from itemadapter import ItemAdapter
 
-class NewsExtractorPipeline:
-    def process_item(self, item, spider):
-        return item
+# class NewsExtractorPipeline:
+#     def process_item(self, item, spider):
+#         return item
 
 class StaticExtractorPipeline:
     def __init__(self):
         pass
 
-    def process_items(self, item, spiider):
+    def process_item(self, item, spider):
         print(f"Pipeline of Static Extractor Trigger....")
         try:
-            file = open("article_static.json", "w")
-            file.write(item)
+            file = open("article_static.json", "a")
+            file.write(str(item))
         except Exception as e:
             print(e)
         finally:
@@ -30,11 +30,11 @@ class DynamicExtractorPipeline:
     def __init__(self):
         pass
 
-    def process_items(self, item, spiider):
+    def process_item(self, item, spider):
         print(f"Pipeline of Dyamic Extractor Trigger....")
         try:
-            file = open("article_static.json", "w")
-            file.write(item)
+            file = open("article_static.json", "a")
+            file.write(str(item))
         except Exception as e:
             print(e)
         finally:
