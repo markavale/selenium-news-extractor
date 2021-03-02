@@ -2,12 +2,19 @@
 #
 # See documentation in:
 # https://docs.scrapy.org/en/latest/topics/spider-middleware.html
+import base64
+from urllib.parse import unquote, urlunparse
+from urllib.request import getproxies, proxy_bypass, _parse_proxy
+
+from scrapy.exceptions import NotConfigured
+from scrapy.utils.httpobj import urlparse_cached
+from scrapy.utils.python import to_bytes
 
 from scrapy import signals
 
 # useful for handling different item types with a single interface
 from itemadapter import is_item, ItemAdapter
-
+import requests
 
 class NewsExtractorSpiderMiddleware:
     # Not all methods need to be defined. If a method is not defined,
@@ -69,6 +76,7 @@ class NewsExtractorDownloaderMiddleware:
         return s
 
     def process_request(self, request, spider):
+
         # Called for each request that goes through the downloader
         # middleware.
 
@@ -79,6 +87,28 @@ class NewsExtractorDownloaderMiddleware:
         # - or raise IgnoreRequest: process_exception() methods of
         #   installed downloader middleware will be called
         return None
+        # ignore if proxy is already set
+        # if 'proxy' in request.meta:
+        #     if request.meta['proxy'] is None:
+        #         return
+        #     # extract credentials if present
+        #     creds, proxy_url = self._get_proxy(request.meta['proxy'], '')
+        #     request.meta['proxy'] = proxy_url
+        #     if creds and not request.headers.get('Proxy-Authorization'):
+        #         request.headers['Proxy-Authorization'] = b'Basic ' + creds
+        #     return
+        # elif not self.proxies:
+        #     return
+
+        # parsed = urlparse_cached(request)
+        # scheme = parsed.scheme
+
+        # # 'no_proxy' is only supported by http schemes
+        # if scheme in ('http', 'https') and proxy_bypass(parsed.hostname):
+        #     return
+
+        # if scheme in self.proxies:
+        #     self._set_proxy(request, scheme)
 
     def process_response(self, request, response, spider):
         # Called with the response returned from the downloader.

@@ -34,8 +34,16 @@ links = [
 ]
 
 link2 = [
-    "https://www.nytimes.com/2021/02/25/podcasts/still-processing-best-of-the-archives-whitney-houston.html",
+    # "https://www.nytimes.com/2021/02/25/podcasts/still-processing-best-of-the-archives-whitney-houston.html",
     "https://www.nytimes.com/2021/02/28/nyregion/cuomo-investigation-sex-harassment.html"
+]
+
+dynamic_links = [
+    # "https://www.scmp.com/week-asia/politics/article/3123558/china-behind-mystery-kashmir-ceasefire-between-india-and",
+    # "https://www.scmp.com/news/hong-kong/politics/article/3123660/hong-kongs-kingmakers-will-citys-tycoons-have-their",
+    # "https://www.scmp.com/news/hong-kong/politics/article/3123534/national-security-law-hundreds-supporters-queue-chant-ahead",
+    # "https://www.scmp.com/week-asia/politics/article/3123652/myanmars-protesters-and-military-dig-can-asean-us-or-china-help"
+    "https://www.gmanetwork.com/news/news/nation/777941/philippines-detects-south-african-coronavirus-variant/story/"
 ]
 
 def main():
@@ -43,10 +51,9 @@ def main():
 
     # myspd1 Is a crawl name
     
-    process.crawl('article_static', urls=links)
+    # process.crawl('article_static', urls=links)
     process.crawl('article_static', urls=link2)
-    # process.crawl('')
-    # process.crawl('posts')
+    # process.crawl('article_dynamic', urls=dynamic_links)
 
     process.start()
 

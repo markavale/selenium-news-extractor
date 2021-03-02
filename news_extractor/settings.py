@@ -70,7 +70,7 @@ DOWNLOADER_MIDDLEWARES = {
     
 #    'news_extractor.middlewares.NewsExtractorDownloaderMiddleware': 543,
 
-    # rotating IP proxy
+#     # rotating IP proxy
 #    'rotating_proxies.middlewares.RotatingProxyMiddleware': 800,
 #    'rotating_proxies.middlewares.BanDetectionMiddleware': 800,
 

@@ -2,7 +2,11 @@ import scrapy
 from urllib.parse import urlparse
 from ..items import StaticArticleItem
 from logzero import logfile, logger
-
+from lxml.html import fromstring
+import requests
+from itertools import cycle
+import traceback
+import json
 
 class ArticleStaticSpider(scrapy.Spider):
     logfile("logs/article_static.log", maxBytes=1e6, backupCount=3)
@@ -10,10 +14,36 @@ class ArticleStaticSpider(scrapy.Spider):
     custom_settings = {
         'ITEM_PIPELINES': {'news_extractor.pipelines.StaticExtractorPipeline': 300},
     }
-
     def __init__(self, urls=None):
         self.urls = urls
         self.article_items = StaticArticleItem()
+
+    
+        # proxies = set()
+        # for i in parser.xpath('//tbody/tr')[:10]:
+        #     if i.xpath('.//td[7][contains(text(),"yes")]'):
+        #         proxy = ":".join([i.xpath('.//td[1]/text()')[0], i.xpath('.//td[2]/text()')[0]])
+        #         proxies.add(proxy)
+        # return proxies
+
+
+        # #If you are copy pasting proxy ips, put in the list below
+        # #proxies = ['121.129.127.209:80', '124.41.215.238:45169', '185.93.3.123:8080', '194.182.64.67:3128', '106.0.38.174:8080', '163.172.175.210:3128', '13.92.196.150:8080']
+        # proxies = get_proxies()
+        # proxy_pool = cycle(proxies)
+
+        # url = 'https://httpbin.org/ip'
+        # for i in range(1,11):
+        #     #Get a proxy from the pool
+        #     proxy = next(proxy_pool)
+        #     print("Request #%d"%i)
+        #     try:
+        #         response = requests.get(url,proxies={"http": proxy, "https": proxy})
+        #         print(response.json())
+        #     except:
+        #         #Most free proxies will often get connection errors. You will have retry the entire request using another proxy to work. 
+        #         #We will just skip retries as its beyond the scope of this tutorial and we are only downloading a single url 
+        #         print("Skipping. Connnection error")
 
     def start_requests(self):
         # urls = [
@@ -50,9 +80,17 @@ class ArticleStaticSpider(scrapy.Spider):
         # url =""
         
         for url in self.urls:
-            yield scrapy.Request(url, self.parse_article)
+            proxy = get_proxies(self)
+            # print(proxy)
+            logger.info(str(proxy))
+            yield scrapy.Request(url, self.parse)
+            
             logger.info(f"Link {url} scraped...")
         logger.info("Static article scraper finished...")
+        
+    def parse(self, response):
+        pass
+
 
     def parse_article(self, response):
         # article_authors = []
@@ -98,6 +136,20 @@ class ArticleStaticSpider(scrapy.Spider):
         self.article_items['updated_by'] = 'Python Global Scraper'
         self.article_items['website'] = website
 
+        pub_ip = response.xpath('//body/text()').re('\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}')
+        
+
         yield self.article_items
         logger.info(response.request.headers)
+        logger.debug(response.headers)
+        logger.debug(response.request.meta)
         
+def get_proxies(self):
+        url = 'http://falcon.proxyrotator.com:51337/?apiKey=abATuvzRXHQtWj6eonrck9ZDFLMK84ph'
+        response = requests.get(url)
+        json_data = json.loads(response.text)
+        print(json_data)
+        print(json_data['proxy'])
+        print(json_data['randomUserAgent'])
+
+        return json_data
