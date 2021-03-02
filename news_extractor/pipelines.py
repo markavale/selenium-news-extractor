@@ -17,6 +17,13 @@ class StaticExtractorPipeline:
 
     def process_items(self, item, spiider):
         print(f"Pipeline of Static Extractor Trigger....")
+        try:
+            file = open("article_static.json", "w")
+            file.write(item)
+        except Exception as e:
+            print(e)
+        finally:
+            file.close()
         return item
 
 class DynamicExtractorPipeline:
@@ -25,4 +32,11 @@ class DynamicExtractorPipeline:
 
     def process_items(self, item, spiider):
         print(f"Pipeline of Dyamic Extractor Trigger....")
+        try:
+            file = open("article_static.json", "w")
+            file.write(item)
+        except Exception as e:
+            print(e)
+        finally:
+            file.close()
         return item

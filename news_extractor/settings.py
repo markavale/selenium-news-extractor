@@ -78,22 +78,38 @@ DOWNLOADER_MIDDLEWARES = {
 #    'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': None,
 #    'scrapy_user_agents.middlewares.RandomUserAgentMiddleware': 400,
 
+    'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': None,
+    'scrapy.downloadermiddlewares.retry.RetryMiddleware': None,
+    'scrapy_fake_useragent.middleware.RandomUserAgentMiddleware': 400,
+    'scrapy_fake_useragent.middleware.RetryUserAgentMiddleware': 401,
+
     # SELENIUM
     'scrapy_selenium.SeleniumMiddleware': 800,
 }
+'''
+    ##### ROTATING FAKE USER AGENT ######
+'''
+FAKEUSERAGENT_PROVIDERS = [
+    'scrapy_fake_useragent.providers.FakeUserAgentProvider',  # this is the first provider we'll try
+    'scrapy_fake_useragent.providers.FakerProvider',  # if FakeUserAgentProvider fails, we'll use faker to generate a user-agent string for us
+    'scrapy_fake_useragent.providers.FixedUserAgentProvider',  # fall back to USER_AGENT value
+    #'new_extractor.providers.CustomProvider'
+]
+FAKEUSERAGENT_FALLBACK  = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.106 Safari/537.36"
+
 
 '''
     ###### ROTATING PROXY CONF ######
 '''
-ROTATING_PROXY_LIST = [
-    'proxy1.com:8000',
-    'proxy2.com:8031',
-    # etc....
-]
+# ROTATING_PROXY_LIST = [
+#     'proxy1.com:8000',
+#     'proxy2.com:8031',
+#     # etc....
+# ]
 # ROTATING_PROXY_BAN_POLICY = 'tutorial.policy.MyBanPolicy'
 ROTATING_PROXY_LIST_PATH = 'proxy-list.txt'
 # Command
-COMMANDS_MODULE = 'tutorial.bash'
+# COMMANDS_MODULE = 'tutorial.bash'
 
 ### SELENIUM ###
 SELENIUM_DRIVER_NAME = 'firefox'

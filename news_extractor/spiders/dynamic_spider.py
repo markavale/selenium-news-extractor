@@ -9,16 +9,17 @@ from scrapy.selector import Selector
 from ..items import DynamicArticleItem
 import time
 
-class CountriesSpiderSpider(scrapy.Spider):
+class ArticleDyamicSpider(scrapy.Spider):
     # Initializing log file
     logfile("article_dynamic.log", maxBytes=1e6, backupCount=3)
     name = "article_dynamic"
     # allowed_domains = ["toscrape.com"]
     custom_settings = {
-        'ITEM_PIPELINES': {'new_extractor.pipelines.DynamicExtractorPipeline': 300},
+        'ITEM_PIPELINES': {'news_extractor.pipelines.DynamicExtractorPipeline': 300},
     }
     def __init__(self, links=None):
         self.driver = webdriver.Chrome(executable_path='C:/dev/web-driver/chromedriver.exe')
+        self.items = DynamicArticleItem()
         # self.links = [
         #     "https://www.scmp.com/week-asia/politics/article/3123643/scepticism-over-chinas-sinovac-jab-philippines-rolls-out",
         # ]
@@ -30,36 +31,39 @@ class CountriesSpiderSpider(scrapy.Spider):
         yield scrapy.Request(url=url, callback=self.parse_article)
 
     def parse_aticle(self, response):
-        driver = webdriver.Chrome(executable_path='C:/dev/web-driver/chromedriver.exe')#webdriver.Chrome()  # To open a new browser window and navigate it
+        try:
+            driver = webdriver.Chrome(executable_path='C:/dev/web-driver/chromedriver.exe')#webdriver.Chrome()  # To open a new browser window and navigate it
         
-        # driver = webdriver.Chrome(ChromeDriverManager().install())
-        # Use headless option to not open a new browser window
-        # options = webdriver.ChromeOptions()
-        # options.add_argument("headless")
-        # desired_capabilities = options.to_capabilities()
-        # driver = webdriver.Chrome(desired_capabilities=desired_capabilities)
+            # driver = webdriver.Chrome(ChromeDriverManager().install())
+            # Use headless option to not open a new browser window
+            # options = webdriver.ChromeOptions()
+            # options.add_argument("headless")
+            # desired_capabilities = options.to_capabilities()
+            # driver = webdriver.Chrome(desired_capabilities=desired_capabilities)
 
-        # Getting list of Countries
-        self.driver.get(response.url)
-        # fuction for scrollig web driver to the bottom of the page
-        use_infinite_scroll_y(self.driver)
-        # Implicit wait
-        self.driver.implicitly_wait(10)
-        
-        # Explicit wait
-        wait = WebDriverWait(self.driver, 5)
-        wait.until(EC.presence_of_element_located((By.CLASS_NAME, "info__headline")))
-        # print(driver.page_source)
-        
-        ### Get page source when selenium renders javascript render and use parsing with scrapy
-        scrapy_selector = Selector(text = self.driver.page_source)
-        
-        headline = scrapy_selector.xpath("//h1[contains(@class, 'info__headline ')]/text()").extract()
-        countries_count = 0
-        # Using Scrapy's yield to store output instead of explicitly writing to a JSON file
-        # yield countries
-
-        self.driver.quit()
+            # Getting list of Countries
+            self.driver.get(response.url)
+            # fuction for scrollig web driver to the bottom of the page
+            use_infinite_scroll_y(self.driver)
+            # Implicit wait
+            self.driver.implicitly_wait(10)
+            
+            # Explicit wait
+            wait = WebDriverWait(self.driver, 5)
+            wait.until(EC.presence_of_element_located((By.CLASS_NAME, "info__headline")))
+            # print(driver.page_source)
+            
+            ### Get page source when selenium renders javascript render and use parsing with scrapy
+            scrapy_selector = Selector(text = self.driver.page_source)
+            
+            headline = scrapy_selector.xpath("//h1[contains(@class, 'info__headline ')]/text()").extract()
+            countries_count = 0
+            # Using Scrapy's yield to store output instead of explicitly writing to a JSON file
+            # yield countries
+        except Exception as e:
+            logger.error(e)
+        finally:
+            self.driver.quit()
         logger.info(f"Logger dynamic..")
 
 def use_infinite_scroll_y(driver):
