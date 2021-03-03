@@ -1,0 +1,114 @@
+1614740796562	geckodriver	INFO	Listening on 127.0.0.1:42677
+1614740796566	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "--marionette" "--headless" "-headless" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileMjNmeS"
+*** You are running in headless mode.
+
+(/usr/lib/firefox/firefox:22944): GLib-GObject-CRITICAL **: 11:06:37.492: g_object_set: assertion 'G_IS_OBJECT (object)' failed
+
+(/usr/lib/firefox/firefox:22965): GLib-GObject-CRITICAL **: 11:06:37.589: g_object_set: assertion 'G_IS_OBJECT (object)' failed
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new Error("", "(unknown module)"))
+1614740798289	Marionette	INFO	Listening on port 39843
+1614740798432	Marionette	WARN	TLS certificate errors will be ignored for this session
+
+(/usr/lib/firefox/firefox:23048): GLib-GObject-CRITICAL **: 11:06:38.499: g_object_set: assertion 'G_IS_OBJECT (object)' failed
+1614740803333	Marionette	WARN	Ignoring event 'DOMContentLoaded' because document has an invalid readyState of 'complete'.
+1614740815793	Marionette	WARN	Ignoring event 'pageshow' because document has an invalid readyState of 'uninitialized'.
+JavaScript error: https://ads.allaccess.com.ph/deliveraw.nmi?zoneid=8315&sid=0012&_=1614740800264, line 1: SyntaxError: expected expression, got '<'
+JavaScript error: https://ads.allaccess.com.ph/deliveraw.nmi?zoneid=8070&sid=0012&_=1614740800267, line 1: SyntaxError: expected expression, got '<'
+JavaScript error: https://ads.allaccess.com.ph/deliveraw.nmi?zoneid=8215&sid=0012&_=1614740800263, line 1: SyntaxError: expected expression, got '<'
+JavaScript error: https://ads.allaccess.com.ph/deliveraw.nmi?zoneid=8115&sid=0012&_=1614740800262, line 1: SyntaxError: expected expression, got '<'
+JavaScript warning: https://z.moatads.com/gmanmidfpdisplay183413089896/moatad.js#moatClientLevel1=88868795&moatClientLevel2=424147475&moatClientLevel3=5616803162&moatClientLevel4=138339225764&moatClientSlicer1=343684595&moatClientSlicer2=346126235&zMoatSZ=728x90&zMoatPT=News_Article_Inside_Page&zMoatPS=GNO_News_Article_Leaderboard_2_1&zMoatSite=GMA_News_Online, line 265: WebGL warning: <Create>: Can't use WebGL in headless mode (https://bugzil.la/1375585).
+JavaScript warning: https://z.moatads.com/gmanmidfpdisplay183413089896/moatad.js#moatClientLevel1=88868795&moatClientLevel2=424147475&moatClientLevel3=5616803162&moatClientLevel4=138339225764&moatClientSlicer1=343684595&moatClientSlicer2=346126235&zMoatSZ=728x90&zMoatPT=News_Article_Inside_Page&zMoatPS=GNO_News_Article_Leaderboard_2_1&zMoatSite=GMA_News_Online, line 265: Failed to create WebGL context: WebGL creation failed: 
+* Can't use WebGL in headless mode (https://bugzil.la/1375585).
+JavaScript warning: https://z.moatads.com/gmanmidfpdisplay183413089896/moatad.js#moatClientLevel1=88868795&moatClientLevel2=424147475&moatClientLevel3=5616803162&moatClientLevel4=138339225764&moatClientSlicer1=343684595&moatClientSlicer2=346126235&zMoatSZ=728x90&zMoatPT=News_Article_Inside_Page&zMoatPS=GNO_News_Article_Leaderboard_2_1&zMoatSite=GMA_News_Online, line 265: WebGL warning: <Create>: Can't use WebGL in headless mode (https://bugzil.la/1375585).
+JavaScript warning: https://z.moatads.com/gmanmidfpdisplay183413089896/moatad.js#moatClientLevel1=88868795&moatClientLevel2=424147475&moatClientLevel3=5616803162&moatClientLevel4=138339225764&moatClientSlicer1=343684595&moatClientSlicer2=346126235&zMoatSZ=728x90&zMoatPT=News_Article_Inside_Page&zMoatPS=GNO_News_Article_Leaderboard_2_1&zMoatSite=GMA_News_Online, line 265: Failed to create WebGL context: WebGL creation failed: 
+* Can't use WebGL in headless mode (https://bugzil.la/1375585).
+JavaScript warning: https://pagead2.googlesyndication.com/bg/GJT0WnMclUfjigzc-RvzjNASsAJFjkojKCqU8FDpIb0.js line 1 > eval line 4071 > eval, line 1: WebGL warning: <Create>: Can't use WebGL in headless mode (https://bugzil.la/1375585).
+JavaScript warning: https://pagead2.googlesyndication.com/bg/GJT0WnMclUfjigzc-RvzjNASsAJFjkojKCqU8FDpIb0.js line 1 > eval line 4071 > eval, line 1: Failed to create WebGL context: WebGL creation failed: 
+* Can't use WebGL in headless mode (https://bugzil.la/1375585).
+1614740827834	Marionette	INFO	Stopped listening on port 39843
+JavaScript error: resource://gre/modules/Sqlite.jsm, line 1030: Error: Sqlite.jsm has been shutdown. Cannot open connection to: /tmp/rust_mozprofileMjNmeS/protections.sqlite
+1614740828378	geckodriver	INFO	Listening on 127.0.0.1:51669
+1614740828387	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "--marionette" "--headless" "-headless" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileEZuiSM"
+*** You are running in headless mode.
+
+(/usr/lib/firefox/firefox:23223): GLib-GObject-CRITICAL **: 11:07:09.367: g_object_set: assertion 'G_IS_OBJECT (object)' failed
+
+(/usr/lib/firefox/firefox:23244): GLib-GObject-CRITICAL **: 11:07:09.475: g_object_set: assertion 'G_IS_OBJECT (object)' failed
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new Error("", "(unknown module)"))
+1614740830160	Marionette	INFO	Listening on port 46485
+1614740830205	Marionette	WARN	TLS certificate errors will be ignored for this session
+
+(/usr/lib/firefox/firefox:23325): GLib-GObject-CRITICAL **: 11:07:10.379: g_object_set: assertion 'G_IS_OBJECT (object)' failed
+1614740832696	Marionette	WARN	Ignoring event 'DOMContentLoaded' because document has an invalid readyState of 'complete'.
+JavaScript error: https://ads.allaccess.com.ph/deliveraw.nmi?zoneid=8215&sid=0012&_=1614740830627, line 1: SyntaxError: expected expression, got '<'
+JavaScript error: https://ads.allaccess.com.ph/deliveraw.nmi?zoneid=8115&sid=0012&_=1614740830626, line 1: SyntaxError: expected expression, got '<'
+JavaScript error: https://ads.allaccess.com.ph/deliveraw.nmi?zoneid=8315&sid=0012&_=1614740830628, line 1: SyntaxError: expected expression, got '<'
+JavaScript error: https://ads.allaccess.com.ph/deliveraw.nmi?zoneid=8070&sid=0012&_=1614740830631, line 1: SyntaxError: expected expression, got '<'
+JavaScript warning: https://z.moatads.com/gmanmidfpdisplay183413089896/moatad.js#moatClientLevel1=88868795&moatClientLevel2=424147475&moatClientLevel3=5623954550&moatClientLevel4=138340135131&moatClientSlicer1=343684595&moatClientSlicer2=346128395&zMoatSZ=300x250&zMoatPT=News_Article_Inside_Page&zMoatPS=GNO_News_Mrec_1_1&zMoatSite=GMA_News_Online, line 265: WebGL warning: <Create>: Can't use WebGL in headless mode (https://bugzil.la/1375585).
+JavaScript warning: https://z.moatads.com/gmanmidfpdisplay183413089896/moatad.js#moatClientLevel1=88868795&moatClientLevel2=424147475&moatClientLevel3=5623954550&moatClientLevel4=138340135131&moatClientSlicer1=343684595&moatClientSlicer2=346128395&zMoatSZ=300x250&zMoatPT=News_Article_Inside_Page&zMoatPS=GNO_News_Mrec_1_1&zMoatSite=GMA_News_Online, line 265: Failed to create WebGL context: WebGL creation failed: 
+* Can't use WebGL in headless mode (https://bugzil.la/1375585).
+JavaScript warning: https://z.moatads.com/gmanmidfpdisplay183413089896/moatad.js#moatClientLevel1=88868795&moatClientLevel2=424147475&moatClientLevel3=5623954550&moatClientLevel4=138340135131&moatClientSlicer1=343684595&moatClientSlicer2=346128395&zMoatSZ=300x250&zMoatPT=News_Article_Inside_Page&zMoatPS=GNO_News_Mrec_1_1&zMoatSite=GMA_News_Online, line 265: WebGL warning: <Create>: Can't use WebGL in headless mode (https://bugzil.la/1375585).
+JavaScript warning: https://z.moatads.com/gmanmidfpdisplay183413089896/moatad.js#moatClientLevel1=88868795&moatClientLevel2=424147475&moatClientLevel3=5623954550&moatClientLevel4=138340135131&moatClientSlicer1=343684595&moatClientSlicer2=346128395&zMoatSZ=300x250&zMoatPT=News_Article_Inside_Page&zMoatPS=GNO_News_Mrec_1_1&zMoatSite=GMA_News_Online, line 265: Failed to create WebGL context: WebGL creation failed: 
+* Can't use WebGL in headless mode (https://bugzil.la/1375585).
+JavaScript warning: https://pagead2.googlesyndication.com/bg/GJT0WnMclUfjigzc-RvzjNASsAJFjkojKCqU8FDpIb0.js line 1 > eval line 4099 > eval line 1 > eval, line 1: WebGL warning: <Create>: Can't use WebGL in headless mode (https://bugzil.la/1375585).
+JavaScript warning: https://pagead2.googlesyndication.com/bg/GJT0WnMclUfjigzc-RvzjNASsAJFjkojKCqU8FDpIb0.js line 1 > eval line 4099 > eval line 1 > eval, line 1: Failed to create WebGL context: WebGL creation failed: 
+* Can't use WebGL in headless mode (https://bugzil.la/1375585).
+1614740860344	Marionette	INFO	Stopped listening on port 46485
+JavaScript error: resource://gre/modules/Sqlite.jsm, line 1030: Error: Sqlite.jsm has been shutdown. Cannot open connection to: /tmp/rust_mozprofileEZuiSM/protections.sqlite
+1614740861057	geckodriver	INFO	Listening on 127.0.0.1:33315
+1614740861064	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "--marionette" "--headless" "-headless" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofile1tsWT7"
+*** You are running in headless mode.
+
+(/usr/lib/firefox/firefox:23495): GLib-GObject-CRITICAL **: 11:07:42.382: g_object_set: assertion 'G_IS_OBJECT (object)' failed
+
+(/usr/lib/firefox/firefox:23516): GLib-GObject-CRITICAL **: 11:07:42.534: g_object_set: assertion 'G_IS_OBJECT (object)' failed
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new Error("", "(unknown module)"))
+1614740863347	Marionette	INFO	Listening on port 36561
+1614740863391	Marionette	WARN	TLS certificate errors will be ignored for this session
+
+(/usr/lib/firefox/firefox:23596): GLib-GObject-CRITICAL **: 11:07:43.423: g_object_set: assertion 'G_IS_OBJECT (object)' failed
+1614740864611	Marionette	WARN	Ignoring event 'DOMContentLoaded' because document has an invalid readyState of 'complete'.
+JavaScript error: https://ads.allaccess.com.ph/deliveraw.nmi?zoneid=8115&sid=0012&_=1614740864323, line 1: SyntaxError: expected expression, got '<'
+JavaScript error: https://ads.allaccess.com.ph/deliveraw.nmi?zoneid=8070&sid=0012&_=1614740864328, line 1: SyntaxError: expected expression, got '<'
+JavaScript error: https://ads.allaccess.com.ph/deliveraw.nmi?zoneid=8315&sid=0012&_=1614740864325, line 1: SyntaxError: expected expression, got '<'
+JavaScript error: https://ads.allaccess.com.ph/deliveraw.nmi?zoneid=8215&sid=0012&_=1614740864324, line 1: SyntaxError: expected expression, got '<'
+JavaScript warning: https://z.moatads.com/gmanmidfpdisplay183413089896/moatad.js#moatClientLevel1=88868795&moatClientLevel2=424147475&moatClientLevel3=5613296865&moatClientLevel4=138339510043&moatClientSlicer1=343684595&moatClientSlicer2=346128395&zMoatSZ=300x250&zMoatPT=News_Article_Inside_Page&zMoatPS=GNO_News_Mrec_1_1&zMoatSite=GMA_News_Online, line 265: WebGL warning: <Create>: Can't use WebGL in headless mode (https://bugzil.la/1375585).
+JavaScript warning: https://z.moatads.com/gmanmidfpdisplay183413089896/moatad.js#moatClientLevel1=88868795&moatClientLevel2=424147475&moatClientLevel3=5613296865&moatClientLevel4=138339510043&moatClientSlicer1=343684595&moatClientSlicer2=346128395&zMoatSZ=300x250&zMoatPT=News_Article_Inside_Page&zMoatPS=GNO_News_Mrec_1_1&zMoatSite=GMA_News_Online, line 265: Failed to create WebGL context: WebGL creation failed: 
+* Can't use WebGL in headless mode (https://bugzil.la/1375585).
+JavaScript warning: https://z.moatads.com/gmanmidfpdisplay183413089896/moatad.js#moatClientLevel1=88868795&moatClientLevel2=424147475&moatClientLevel3=5613296865&moatClientLevel4=138339510043&moatClientSlicer1=343684595&moatClientSlicer2=346128395&zMoatSZ=300x250&zMoatPT=News_Article_Inside_Page&zMoatPS=GNO_News_Mrec_1_1&zMoatSite=GMA_News_Online, line 265: WebGL warning: <Create>: Can't use WebGL in headless mode (https://bugzil.la/1375585).
+JavaScript warning: https://z.moatads.com/gmanmidfpdisplay183413089896/moatad.js#moatClientLevel1=88868795&moatClientLevel2=424147475&moatClientLevel3=5613296865&moatClientLevel4=138339510043&moatClientSlicer1=343684595&moatClientSlicer2=346128395&zMoatSZ=300x250&zMoatPT=News_Article_Inside_Page&zMoatPS=GNO_News_Mrec_1_1&zMoatSite=GMA_News_Online, line 265: Failed to create WebGL context: WebGL creation failed: 
+* Can't use WebGL in headless mode (https://bugzil.la/1375585).
+1614740880854	Marionette	WARN	Ignoring event 'DOMContentLoaded' because document has an invalid readyState of 'complete'.
+JavaScript warning: https://pagead2.googlesyndication.com/bg/GJT0WnMclUfjigzc-RvzjNASsAJFjkojKCqU8FDpIb0.js line 1 > eval line 1976 > eval line 1 > eval, line 1: WebGL warning: <Create>: Can't use WebGL in headless mode (https://bugzil.la/1375585).
+JavaScript warning: https://pagead2.googlesyndication.com/bg/GJT0WnMclUfjigzc-RvzjNASsAJFjkojKCqU8FDpIb0.js line 1 > eval line 1976 > eval line 1 > eval, line 1: Failed to create WebGL context: WebGL creation failed: 
+* Can't use WebGL in headless mode (https://bugzil.la/1375585).
+1614740884268	Marionette	INFO	Stopped listening on port 36561
+JavaScript error: resource://gre/modules/Sqlite.jsm, line 1030: Error: Sqlite.jsm has been shutdown. Cannot open connection to: /tmp/rust_mozprofile1tsWT7/protections.sqlite
+1614740884809	geckodriver	INFO	Listening on 127.0.0.1:51227
+1614740884821	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "--marionette" "--headless" "-headless" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofilemlk0Q3"
+*** You are running in headless mode.
+
+(/usr/lib/firefox/firefox:23734): GLib-GObject-CRITICAL **: 11:08:05.861: g_object_set: assertion 'G_IS_OBJECT (object)' failed
+
+(/usr/lib/firefox/firefox:23755): GLib-GObject-CRITICAL **: 11:08:05.978: g_object_set: assertion 'G_IS_OBJECT (object)' failed
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new Error("", "(unknown module)"))
+1614740886759	Marionette	INFO	Listening on port 40203
+
+(/usr/lib/firefox/firefox:23834): GLib-GObject-CRITICAL **: 11:08:06.840: g_object_set: assertion 'G_IS_OBJECT (object)' failed
+1614740886845	Marionette	WARN	TLS certificate errors will be ignored for this session
+1614740890398	Marionette	WARN	Ignoring event 'DOMContentLoaded' because document has an invalid readyState of 'complete'.
+JavaScript error: https://ads.allaccess.com.ph/deliveraw.nmi?zoneid=8215&sid=0012&_=1614740887230, line 1: SyntaxError: expected expression, got '<'
+JavaScript error: https://ads.allaccess.com.ph/deliveraw.nmi?zoneid=8115&sid=0012&_=1614740887229, line 1: SyntaxError: expected expression, got '<'
+JavaScript error: https://ads.allaccess.com.ph/deliveraw.nmi?zoneid=8070&sid=0012&_=1614740887234, line 1: SyntaxError: expected expression, got '<'
+JavaScript error: https://ads.allaccess.com.ph/deliveraw.nmi?zoneid=8315&sid=0012&_=1614740887231, line 1: SyntaxError: expected expression, got '<'
+JavaScript warning: https://z.moatads.com/gmanmidfpdisplay183413089896/moatad.js#moatClientLevel1=4926156436&moatClientLevel2=2752033196&moatClientLevel3=5633444351&moatClientLevel4=138341542182&moatClientSlicer1=343684595&moatClientSlicer2=346126115&zMoatSZ=728x90&zMoatPT=News_Article_Inside_Page&zMoatPS=GNO_News_Article_Leaderboard_1_1&zMoatSite=GMA_News_Online, line 265: WebGL warning: <Create>: Can't use WebGL in headless mode (https://bugzil.la/1375585).
+JavaScript warning: https://z.moatads.com/gmanmidfpdisplay183413089896/moatad.js#moatClientLevel1=4926156436&moatClientLevel2=2752033196&moatClientLevel3=5633444351&moatClientLevel4=138341542182&moatClientSlicer1=343684595&moatClientSlicer2=346126115&zMoatSZ=728x90&zMoatPT=News_Article_Inside_Page&zMoatPS=GNO_News_Article_Leaderboard_1_1&zMoatSite=GMA_News_Online, line 265: Failed to create WebGL context: WebGL creation failed: 
+* Can't use WebGL in headless mode (https://bugzil.la/1375585).
+JavaScript warning: https://z.moatads.com/gmanmidfpdisplay183413089896/moatad.js#moatClientLevel1=4926156436&moatClientLevel2=2752033196&moatClientLevel3=5633444351&moatClientLevel4=138341542182&moatClientSlicer1=343684595&moatClientSlicer2=346126115&zMoatSZ=728x90&zMoatPT=News_Article_Inside_Page&zMoatPS=GNO_News_Article_Leaderboard_1_1&zMoatSite=GMA_News_Online, line 265: WebGL warning: <Create>: Can't use WebGL in headless mode (https://bugzil.la/1375585).
+JavaScript warning: https://z.moatads.com/gmanmidfpdisplay183413089896/moatad.js#moatClientLevel1=4926156436&moatClientLevel2=2752033196&moatClientLevel3=5633444351&moatClientLevel4=138341542182&moatClientSlicer1=343684595&moatClientSlicer2=346126115&zMoatSZ=728x90&zMoatPT=News_Article_Inside_Page&zMoatPS=GNO_News_Article_Leaderboard_1_1&zMoatSite=GMA_News_Online, line 265: Failed to create WebGL context: WebGL creation failed: 
+* Can't use WebGL in headless mode (https://bugzil.la/1375585).
+JavaScript warning: https://pagead2.googlesyndication.com/bg/GJT0WnMclUfjigzc-RvzjNASsAJFjkojKCqU8FDpIb0.js line 1 > eval line 1092 > eval line 1 > eval, line 1: WebGL warning: <Create>: Can't use WebGL in headless mode (https://bugzil.la/1375585).
+JavaScript warning: https://pagead2.googlesyndication.com/bg/GJT0WnMclUfjigzc-RvzjNASsAJFjkojKCqU8FDpIb0.js line 1 > eval line 1092 > eval line 1 > eval, line 1: Failed to create WebGL context: WebGL creation failed: 
+* Can't use WebGL in headless mode (https://bugzil.la/1375585).
+1614740911526	Marionette	INFO	Stopped listening on port 40203
+JavaScript error: resource://gre/modules/Sqlite.jsm, line 1030: Error: Sqlite.jsm has been shutdown. Cannot open connection to: /tmp/rust_mozprofilemlk0Q3/protections.sqlite

@@ -2,6 +2,8 @@
     IMPORTS
 '''
 from shutil import which
+from decouple import config
+import os
 '''
     END IMPORTS
 '''
@@ -33,11 +35,14 @@ ROBOTSTXT_OBEY = True
 # Configure a delay for requests for the same website (default: 0)
 # See https://docs.scrapy.org/en/latest/topics/settings.html#download-delay
 # See also autothrottle settings and docs
-DOWNLOAD_DELAY = 3
+DOWNLOAD_DELAY = 1 # 3
 # The download delay setting will honor only one of:
-#CONCURRENT_REQUESTS_PER_DOMAIN = 16
-#CONCURRENT_REQUESTS_PER_IP = 16
+CONCURRENT_REQUESTS_PER_DOMAIN = 10
+# CONCURRENT_REQUESTS_PER_IP = 10
 
+CONCURRENT_ITEMS = 200
+RETRY_TIMES = 3
+CONNECTION_TIMEOUT = 30
 # Disable cookies (enabled by default)
 COOKIES_ENABLED = False
 
@@ -78,10 +83,10 @@ DOWNLOADER_MIDDLEWARES = {
 #    'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': None,
 #    'scrapy_user_agents.middlewares.RandomUserAgentMiddleware': 400,
 
-    'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': None,
-    'scrapy.downloadermiddlewares.retry.RetryMiddleware': None,
-    'scrapy_fake_useragent.middleware.RandomUserAgentMiddleware': 400,
-    'scrapy_fake_useragent.middleware.RetryUserAgentMiddleware': 401,
+    # 'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': None,
+    # 'scrapy.downloadermiddlewares.retry.RetryMiddleware': None,
+    # 'scrapy_fake_useragent.middleware.RandomUserAgentMiddleware': 400,
+    # 'scrapy_fake_useragent.middleware.RetryUserAgentMiddleware': 401,
 
     # SELENIUM
     'scrapy_selenium.SeleniumMiddleware': 800,
@@ -89,13 +94,13 @@ DOWNLOADER_MIDDLEWARES = {
 '''
     ##### ROTATING FAKE USER AGENT ######
 '''
-FAKEUSERAGENT_PROVIDERS = [
-    'scrapy_fake_useragent.providers.FakeUserAgentProvider',  # this is the first provider we'll try
-    'scrapy_fake_useragent.providers.FakerProvider',  # if FakeUserAgentProvider fails, we'll use faker to generate a user-agent string for us
-    'scrapy_fake_useragent.providers.FixedUserAgentProvider',  # fall back to USER_AGENT value
-    #'new_extractor.providers.CustomProvider'
-]
-FAKEUSERAGENT_FALLBACK  = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.106 Safari/537.36"
+# FAKEUSERAGENT_PROVIDERS = [
+#     'scrapy_fake_useragent.providers.FakeUserAgentProvider',  # this is the first provider we'll try
+#     'scrapy_fake_useragent.providers.FakerProvider',  # if FakeUserAgentProvider fails, we'll use faker to generate a user-agent string for us
+#     'scrapy_fake_useragent.providers.FixedUserAgentProvider',  # fall back to USER_AGENT value
+#     #'new_extractor.providers.CustomProvider'
+# ]
+# FAKEUSERAGENT_FALLBACK  = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.106 Safari/537.36"
 
 
 '''
@@ -139,7 +144,7 @@ ITEM_PIPELINES = {
 
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See https://docs.scrapy.org/en/latest/topics/autothrottle.html
-#AUTOTHROTTLE_ENABLED = True
+AUTOTHROTTLE_ENABLED = True
 # The initial download delay
 #AUTOTHROTTLE_START_DELAY = 5
 # The maximum download delay to be set in case of high latencies
@@ -157,3 +162,10 @@ ITEM_PIPELINES = {
 #HTTPCACHE_DIR = 'httpcache'
 #HTTPCACHE_IGNORE_HTTP_CODES = []
 #HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
+
+
+'''
+        ENV VARIABLES
+'''
+# API_KEY = os.environ.get("API_KEY")
+API_KEY = config('API_KEY')

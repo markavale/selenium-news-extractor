@@ -11,7 +11,7 @@ links = [
     # "https://www.nytimes.com/2021/02/28/health/covid-vaccine-sites.html",
     # "https://www.nytimes.com/2021/02/28/technology/seniors-vaccines-technology.html",
     # "https://www.nytimes.com/2021/02/28/us/schools-reopening-philadelphia-parents.html",
-    # "https://www.nytimes.com/2021/02/28/us/politics/supreme-court-voting-rights-act.html",
+    # "https://www.nytimes.com/2021/02/28/us/politics/supreme-court-voting-rights-act.html"
     # "https://www.nytimes.com/2021/02/28/us/politics/trump-cpac-republicans.html",
     # "https://www.nytimes.com/2021/02/28/us/politics/cpac-straw-poll-2024-presidential-race.html",
     # "https://www.nytimes.com/2021/02/28/us/politics/china-india-hacking-electricity.html",
@@ -34,28 +34,37 @@ links = [
 ]
 
 link2 = [
-    # "https://www.nytimes.com/2021/02/25/podcasts/still-processing-best-of-the-archives-whitney-houston.html",
+    "https://www.nytimes.com/2021/02/25/podcasts/still-processing-best-of-the-archives-whitney-houston.html",
     "https://www.nytimes.com/2021/02/28/nyregion/cuomo-investigation-sex-harassment.html"
 ]
 
 dynamic_links = [
+    "https://www.gmanetwork.com/news/news/nation/778102/vp-robredo-says-woman-in-viral-vaccination-photo-not-her/story/",
+    "https://www.gmanetwork.com/news/news/world/778076/nigeria-receives-nearly-4-million-free-astrazeneca-vaccines-from-covax/story/"
+]
+
+dynamic_links2 = [
     # "https://www.scmp.com/week-asia/politics/article/3123558/china-behind-mystery-kashmir-ceasefire-between-india-and",
     # "https://www.scmp.com/news/hong-kong/politics/article/3123660/hong-kongs-kingmakers-will-citys-tycoons-have-their",
     # "https://www.scmp.com/news/hong-kong/politics/article/3123534/national-security-law-hundreds-supporters-queue-chant-ahead",
-    # "https://www.scmp.com/week-asia/politics/article/3123652/myanmars-protesters-and-military-dig-can-asean-us-or-china-help"
-    "https://www.gmanetwork.com/news/news/nation/777941/philippines-detects-south-african-coronavirus-variant/story/"
+    # "https://www.scmp.com/week-asia/politics/article/3123652/myanmars-protesters-and-military-dig-can-asean-us-or-china-help",
+    "https://www.gmanetwork.com/news/news/nation/777941/philippines-detects-south-african-coronavirus-variant/story/",
+    "https://www.gmanetwork.com/news/news/nation/778111/palace-confident-of-uninterrupted-vaccination-vs-covid-19/story/?just_in"
 ]
+
 
 def main():
     process = CrawlerProcess(get_project_settings())
 
     # myspd1 Is a crawl name
-    
+
     # process.crawl('article_static', urls=links)
-    process.crawl('article_static', urls=link2)
-    # process.crawl('article_dynamic', urls=dynamic_links)
+    # process.crawl('article_static', urls=link2)
+    process.crawl('article_dynamic', urls=dynamic_links)
+    process.crawl('article_dynamic', urls=dynamic_links2)
 
     process.start()
+
 
 if __name__ == "__main__":
     main()

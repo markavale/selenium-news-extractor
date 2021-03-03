@@ -33,7 +33,7 @@ class DynamicExtractorPipeline:
     def process_item(self, item, spider):
         print(f"Pipeline of Dyamic Extractor Trigger....")
         try:
-            file = open("article_static.json", "a")
+            file = open("article_dynamic.json", "a")
             file.write(str(item))
         except Exception as e:
             print(e)
