@@ -24,8 +24,10 @@ mailer = MailSender()
 class ArticleStaticSpider(scrapy.Spider):
     logfile("server.log", maxBytes=1e6, backupCount=3)
     name = "article_static"
+
     custom_settings = {
         'ITEM_PIPELINES': {'news_extractor.pipelines.StaticExtractorPipeline': 300},
+        "FEEDS": {"articles.json": {"format": "json"}},
     }
 
     def __init__(self, urls=None):
@@ -50,8 +52,8 @@ class ArticleStaticSpider(scrapy.Spider):
             }
             # logger.info(str(proxy))
             print(f"------------------------------------ start request {counter} -------------------------------")
-            # yield scrapy.Request(url, self.parse_article,headers=headers, meta=meta, errback=self.errback_httpbin)
-            yield scrapy.Request(url, callback=self.parse_article, errback=self.errback_httpbin)
+            yield scrapy.Request(url, self.parse_article,headers=headers, meta=meta, errback=self.errback_httpbin)
+            # yield scrapy.Request(url, callback=self.parse_article, errback=self.errback_httpbin)
             print("------------------------------------ end start requests ---------------------------")
             logger.info(f"{url} scraped...")
         logger.info("Static article scraper done...")
