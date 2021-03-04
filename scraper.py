@@ -36,7 +36,7 @@ links = [
 ]
 
 link2 = [
-    # "https://www.nytimes.com/2021/02/25/podcasts/still-processing-best-of-the-archives-whitney-houston.html",
+    "https://www.nytimes.com/2021/02/25/podcasts/still-processing-best-of-the-archives-whitney-houston.html",
     "https://www.nytimes.com/2021/02/28/nyregion/cuomo-investigation-sex-harassment.html"
 ]
 
