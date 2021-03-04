@@ -2,7 +2,7 @@ __pycache__/
 article_static.log
 article_dynamic.log
 article.log
-
+.env
 *.json
 article_static.json
 /.vagrant
