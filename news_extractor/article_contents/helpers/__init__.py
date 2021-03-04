@@ -46,7 +46,7 @@ def catch(default, func, handle=lambda e: e, *args, **kwargs):
         
     except Exception as e:
         # log.error(e)
-        print(traceback.format_exc())
+        # print(traceback.format_exc())
         return errors[default]
 
 #---------- RECURSIVE TAG ITERATOR ----------#

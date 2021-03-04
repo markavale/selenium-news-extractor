@@ -1,6 +1,6 @@
 from ..exceptions import HelperError
 from urllib.parse import urlparse
-from tld import get_tld
+# from tld import get_tld
 
 import re
 
@@ -34,3 +34,5 @@ class ArticleURL:
         
         # RE PARSE
         self.parsed_url = urlparse(self.url)
+
+        print("accessed!!")

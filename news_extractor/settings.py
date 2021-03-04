@@ -2,6 +2,7 @@
     IMPORTS
 '''
 from shutil import which
+
 from decouple import config
 import os
 '''
@@ -27,7 +28,7 @@ NEWSPIDER_MODULE = 'news_extractor.spiders'
 #USER_AGENT = 'news_extractor (+http://www.yourdomain.com)'
 
 # Obey robots.txt rules
-ROBOTSTXT_OBEY = True
+ROBOTSTXT_OBEY = False
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
 # CONCURRENT_REQUESTS = 32
@@ -35,53 +36,62 @@ ROBOTSTXT_OBEY = True
 # Configure a delay for requests for the same website (default: 0)
 # See https://docs.scrapy.org/en/latest/topics/settings.html#download-delay
 # See also autothrottle settings and docs
-DOWNLOAD_DELAY = 1 # 3
+DOWNLOAD_DELAY = 0.25
 # The download delay setting will honor only one of:
-CONCURRENT_REQUESTS_PER_DOMAIN = 10
-# CONCURRENT_REQUESTS_PER_IP = 10
+# CONCURRENT_REQUESTS_PER_DOMAIN = 10
+CONCURRENT_REQUESTS_PER_IP = 10
 
-CONCURRENT_ITEMS = 200
+# CONCURRENT_ITEMS = 200
 RETRY_TIMES = 3
 CONNECTION_TIMEOUT = 30
 # Disable cookies (enabled by default)
 COOKIES_ENABLED = False
 
+### custom conf ###
+# LOG_ENABLED = True
+# LOG_LEVEL = 'ERROR'  # to only display errors
 # Disable Telnet Console (enabled by default)
 #TELNETCONSOLE_ENABLED = False
 
 # Override the default request headers:
-#DEFAULT_REQUEST_HEADERS = {
+# DEFAULT_REQUEST_HEADERS = {
 #   'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
 #   'Accept-Language': 'en',
-#}
+# }
 
 DEFAULT_REQUEST_HEADERS = {
-   "Accept": "application/json, text/javascript, */*; q=0.01",
-   "DNT": "1",
-   "Accept-Encoding": "gzip, deflate, br",
-   "Accept-Language":"en-GB,en-US;q=0.9,en;q=0.8",
-#    "x-requested-with": "XMLHttpRequest",
+    "Accept": "application/json, text/javascript, */*; q=0.01",
+    "DNT": "1",
+    "Accept-Encoding": "gzip, deflate, br",
+    "Accept-Language": "en-GB,en-US;q=0.9,en;q=0.8",
+    #    "x-requested-with": "XMLHttpRequest",
 }
 
 # Enable or disable spider middlewares
 # See https://docs.scrapy.org/en/latest/topics/spider-middleware.html
-#SPIDER_MIDDLEWARES = {
+# SPIDER_MIDDLEWARES = {
 #    'news_extractor.middlewares.NewsExtractorSpiderMiddleware': 543,
-#}
+# }
 
 # Enable or disable downloader middlewares
 # See https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
 DOWNLOADER_MIDDLEWARES = {
-    
-#    'news_extractor.middlewares.NewsExtractorDownloaderMiddleware': 543,
 
-#     # rotating IP proxy
-#    'rotating_proxies.middlewares.RotatingProxyMiddleware': 800,
-#    'rotating_proxies.middlewares.BanDetectionMiddleware': 800,
+    # Robots.txt logic
+    # 'news_extractor.middlewares.NewRobotsTxtMiddleware': 100,
+    # 'scrapy.downloadermiddlewares.robotstxt.RobotsTxtMiddleware': None,
 
-   # scrapy rotating fake user agents
-#    'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': None,
-#    'scrapy_user_agents.middlewares.RandomUserAgentMiddleware': 400,
+    # 'news_extractor.middlewares.NewsExtractorDownloaderMiddleware': 543,
+    # 'scrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware': 400,
+    # 'scrapy.resolver.CachingThreadedResolver',
+
+    #     # rotating IP proxy
+    #    'rotating_proxies.middlewares.RotatingProxyMiddleware': 800,
+    #    'rotating_proxies.middlewares.BanDetectionMiddleware': 800,
+
+    # scrapy rotating fake user agents
+    #    'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': None,
+    #    'scrapy_user_agents.middlewares.RandomUserAgentMiddleware': 400,
 
     # 'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': None,
     # 'scrapy.downloadermiddlewares.retry.RetryMiddleware': None,
@@ -89,7 +99,7 @@ DOWNLOADER_MIDDLEWARES = {
     # 'scrapy_fake_useragent.middleware.RetryUserAgentMiddleware': 401,
 
     # SELENIUM
-    'scrapy_selenium.SeleniumMiddleware': 800,
+    # 'scrapy_selenium.SeleniumMiddleware': 800,
 }
 '''
     ##### ROTATING FAKE USER AGENT ######
@@ -112,17 +122,18 @@ DOWNLOADER_MIDDLEWARES = {
 #     # etc....
 # ]
 # ROTATING_PROXY_BAN_POLICY = 'tutorial.policy.MyBanPolicy'
-ROTATING_PROXY_LIST_PATH = 'proxy-list.txt'
+# ROTATING_PROXY_LIST_PATH = 'proxy-list.txt'
 # Command
 # COMMANDS_MODULE = 'tutorial.bash'
 
 ### SELENIUM ###
 SELENIUM_DRIVER_NAME = 'firefox'
 SELENIUM_DRIVER_EXECUTABLE_PATH = which('geckodriver')
-SELENIUM_DRIVER_ARGUMENTS=['-headless']  # '--headless' if using chrome instead of firefox
+# '--headless' if using chrome instead of firefox
+SELENIUM_DRIVER_ARGUMENTS = ['-headless']
 
 ### AJAX CRAWLER ###
-AJAXCRAWL_ENABLED = True
+# AJAXCRAWL_ENABLED = True
 '''
     ###### END ROTATING CONF ######
 '''
@@ -130,14 +141,14 @@ AJAXCRAWL_ENABLED = True
 
 # Enable or disable extensions
 # See https://docs.scrapy.org/en/latest/topics/extensions.html
-#EXTENSIONS = {
+# EXTENSIONS = {
 #    'scrapy.extensions.telnet.TelnetConsole': None,
-#}
+# }
 
 # Configure item pipelines
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
-#    'news_extractor.pipelines.NewsExtractorPipeline': 300,
+    #    'news_extractor.pipelines.NewsExtractorPipeline': 300,
     'news_extractor.pipelines.StaticExtractorPipeline': 300,
     'news_extractor.pipelines.DynamicExtractorPipeline': 300,
 }

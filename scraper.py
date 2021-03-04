@@ -2,8 +2,10 @@ from scrapy.crawler import CrawlerProcess
 from scrapy.utils.project import get_project_settings
 
 links = [
-    "https://www.nytimes.com/2021/02/28/briefing/myanmar-hongkong-vaccine.html",
-    "https://www.nytimes.com/2021/02/28/podcasts/the-daily/genetics-dna-tests-ancestry.html"
+    # "https://www.nytimes.com/2021/02/28/briefing/myanmar-hongkong-vaccine.html"
+    # "http://sailorstarcatcher.net/bpi-celebrates-national-arts-month-with-a-special-treat-for-cardholders-gives-special-offers-at-the-annual-art-in-the-park/",
+    "https://www.gmanetwork.com/news/news/nation/778111/palace-confident-of-uninterrupted-vaccination-vs-covid-19/story/?just_in"
+    # "https://www.nytimes.com/2021/02/28/podcasts/the-daily/genetics-dna-tests-ancestry.html"
     # "https://www.nytimes.com/2021/02/25/podcasts/still-processing-best-of-the-archives-whitney-houston.html",
     # "https://www.nytimes.com/2021/02/28/nyregion/cuomo-investigation-sex-harassment.html",
     # "https://www.nytimes.com/2021/02/27/nyregion/cuomo-charlotte-bennett-sexual-harassment.html",
@@ -34,7 +36,7 @@ links = [
 ]
 
 link2 = [
-    "https://www.nytimes.com/2021/02/25/podcasts/still-processing-best-of-the-archives-whitney-houston.html",
+    # "https://www.nytimes.com/2021/02/25/podcasts/still-processing-best-of-the-archives-whitney-houston.html",
     "https://www.nytimes.com/2021/02/28/nyregion/cuomo-investigation-sex-harassment.html"
 ]
 
@@ -48,7 +50,7 @@ dynamic_links2 = [
     # "https://www.scmp.com/news/hong-kong/politics/article/3123660/hong-kongs-kingmakers-will-citys-tycoons-have-their",
     # "https://www.scmp.com/news/hong-kong/politics/article/3123534/national-security-law-hundreds-supporters-queue-chant-ahead",
     # "https://www.scmp.com/week-asia/politics/article/3123652/myanmars-protesters-and-military-dig-can-asean-us-or-china-help",
-    "https://www.gmanetwork.com/news/news/nation/777941/philippines-detects-south-african-coronavirus-variant/story/",
+    # "https://www.gmanetwork.com/news/news/nation/777941/philippines-detects-south-african-coronavirus-variant/story/",
     "https://www.gmanetwork.com/news/news/nation/778111/palace-confident-of-uninterrupted-vaccination-vs-covid-19/story/?just_in"
 ]
 
@@ -58,10 +60,10 @@ def main():
 
     # myspd1 Is a crawl name
 
-    # process.crawl('article_static', urls=links)
+    process.crawl('article_static', urls=link2)
     # process.crawl('article_static', urls=link2)
-    process.crawl('article_dynamic', urls=dynamic_links)
-    process.crawl('article_dynamic', urls=dynamic_links2)
+    # process.crawl('article_dynamic', urls=dynamic_links)
+    # process.crawl('article_dynamic', urls=dynamic_links2)
 
     process.start()
 

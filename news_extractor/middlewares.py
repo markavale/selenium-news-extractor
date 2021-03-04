@@ -16,6 +16,12 @@ from scrapy import signals
 from itemadapter import is_item, ItemAdapter
 import requests
 
+from urllib import robotparser
+from scrapy.downloadermiddlewares.robotstxt import RobotsTxtMiddleware
+from scrapy.utils.python import to_native_str
+
+from news_extractor.settings import API_KEY
+
 class NewsExtractorSpiderMiddleware:
     # Not all methods need to be defined. If a method is not defined,
     # scrapy acts as if the spider middleware does not modify the
@@ -88,6 +94,7 @@ class NewsExtractorDownloaderMiddleware:
         #   installed downloader middleware will be called
         return None
         # ignore if proxy is already set
+        
         # if 'proxy' in request.meta:
         #     if request.meta['proxy'] is None:
         #         return
@@ -131,3 +138,59 @@ class NewsExtractorDownloaderMiddleware:
 
     def spider_opened(self, spider):
         spider.logger.info('Spider opened: %s' % spider.name)
+
+# class NewRobotsTxtMiddleware(RobotsTxtMiddleware):
+#     def _parse_robots(self, response, netloc):
+#         self.crawler.stats.inc_value('robotstxt/response_count')
+#         self.crawler.stats.inc_value(
+#             'robotstxt/response_status_count/{}'.format(response.status))
+#         rp = robotparser.RobotFileParser(response.url)
+#         body = ''
+#         if hasattr(response, 'text'):
+#             body = response.text
+#         else:  # last effort try
+#             try:
+#                 body = response.body.decode('utf-8')
+#             except UnicodeDecodeError:
+#                 # If we found garbage, disregard it:,
+#                 # but keep the lookup cached (in self._parsers)
+#                 # Running rp.parse() will set rp state from
+#                 # 'disallow all' to 'allow any'.
+#                 self.crawler.stats.inc_value('robotstxt/unicode_error_count')
+#         # stdlib's robotparser expects native 'str' ;
+#         # with unicode input, non-ASCII encoded bytes decoding fails in Python2
+
+#         # Start change: Remove the offending items here.
+#         lines = to_native_str(body).splitlines()
+#         lines.remove('Disallow: /en/')
+#         rp.parse(lines)
+#         # End of change.
+
+#         rp_dfd = self._parsers[netloc]
+#         self._parsers[netloc] = rp
+#         rp_dfd.callback(rp)
+
+def get_proxies():
+    print(f"{API_KEY}")
+    # url = 'http://falcon.proxyrotator.com:51337/'
+    # params = dict(
+    # apiKey=f'{API_KEY}&get=true'
+    # )
+    # try:
+    url = f'http://falcon.proxyrotator.com:51337/?apiKey={API_KEY}&get=true'
+    response = requests.get(url)
+    data = json.loads(response.text)
+    # resp = requests.get(url=url, params=params)
+    # data = json.loads(resp.text)
+    print(data)
+    print(data['proxy'])
+    print(data['randomUserAgent'])
+    # except:
+    #     # Most free proxies will often get connection errors. You will have retry the entire request using another proxy to work.
+    #     # We will just skip retries as its beyond the scope of this tutorial and we are only downloading a single url
+    #     logger.error("Skipping. Connnection error or Proxy API key expired.")
+    #     data = {}
+    #     data['proxy'] = "159.89.221.73:3128"
+    #     data['randomUserAgent'] = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.106 Safari/537.36"
+
+    return data
