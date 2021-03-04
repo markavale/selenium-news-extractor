@@ -35,4 +35,3 @@ class ArticleURL:
         # RE PARSE
         self.parsed_url = urlparse(self.url)
 
-        print("accessed!!")

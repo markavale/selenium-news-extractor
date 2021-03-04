@@ -31,7 +31,7 @@ NEWSPIDER_MODULE = 'news_extractor.spiders'
 ROBOTSTXT_OBEY = False
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
-# CONCURRENT_REQUESTS = 32
+CONCURRENT_REQUESTS = 32
 
 # Configure a delay for requests for the same website (default: 0)
 # See https://docs.scrapy.org/en/latest/topics/settings.html#download-delay
@@ -39,7 +39,7 @@ ROBOTSTXT_OBEY = False
 DOWNLOAD_DELAY = 0.25
 # The download delay setting will honor only one of:
 # CONCURRENT_REQUESTS_PER_DOMAIN = 10
-CONCURRENT_REQUESTS_PER_IP = 10
+CONCURRENT_REQUESTS_PER_IP = 30
 
 # CONCURRENT_ITEMS = 200
 RETRY_TIMES = 3
@@ -82,6 +82,7 @@ DOWNLOADER_MIDDLEWARES = {
     # 'scrapy.downloadermiddlewares.robotstxt.RobotsTxtMiddleware': None,
 
     # 'news_extractor.middlewares.NewsExtractorDownloaderMiddleware': 543,
+    # 'news_extractor.middlewares.CustomProxyMiddleware': 350,
     # 'scrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware': 400,
     # 'scrapy.resolver.CachingThreadedResolver',
 
@@ -180,3 +181,7 @@ AUTOTHROTTLE_ENABLED = True
 '''
 # API_KEY = os.environ.get("API_KEY")
 API_KEY = config('API_KEY')
+
+
+### EMAIL CONFS
+# MAIL_HOST = 

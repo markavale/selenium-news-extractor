@@ -13,10 +13,13 @@ from ..article_contents.source.static import StaticSource
 # from itertools import cycle
 # import traceback
 
+from scrapy.mail import MailSender
+
 from scrapy.spidermiddlewares.httperror import HttpError
 from twisted.internet.error import DNSLookupError
 from twisted.internet.error import TimeoutError, TCPTimedOutError
 
+mailer = MailSender()
 
 class ArticleStaticSpider(scrapy.Spider):
     logfile("server.log", maxBytes=1e6, backupCount=3)
@@ -30,40 +33,41 @@ class ArticleStaticSpider(scrapy.Spider):
         self.article_items = StaticArticleItem()
 
     def start_requests(self):
+        counter = 0
         for url in self.urls:
-            proxy = get_proxies()
+            counter +=1
+            proxy = get_proxy(counter)
             ip = proxy['ip']
             port = proxy['port']
-            print(proxy)
-            meta_proxy = f"https://{ip}:{port}"
+            # print(proxy)
+            meta_proxy = f"http://{ip}:{port}"
             headers = {
                 "User-Agent": proxy['randomUserAgent']
             }
             meta = {
                 "proxy": meta_proxy
+                # "download_slot": meta_proxy
             }
-            logger.info(str(proxy))
-            # yield scrapy.Request(url, self.parse, errback=self.errback_httpbin)
-            yield scrapy.Request(url, callback=self.parse, headers=headers,meta=meta, errback=self.errback_httpbin)
+            # logger.info(str(proxy))
+            print(f"------------------------------------ start request {counter} -------------------------------")
+            # yield scrapy.Request(url, self.parse_article,headers=headers, meta=meta, errback=self.errback_httpbin)
+            yield scrapy.Request(url, callback=self.parse_article, errback=self.errback_httpbin)
+            print("------------------------------------ end start requests ---------------------------")
             logger.info(f"{url} scraped...")
         logger.info("Static article scraper done...")
 
-    def parse(self, response):                                                                                                          
+    def parse(self, response):      
+        print(f"------------------------------------ start parsing ---------------------------")                                                                                              
         src = StaticSource(response.url)
         text_format = src.text
         news = News(response.url, text_format)
         data = news.generate_data()
         
-
         logger.info(response.request.headers)
-        # logger.debug(response.headers)
         logger.debug(response.request.meta)
 
-        print("It went here -------------------------------------------------")
-
-        # data['headers'] = response.request.headers
-        # data['proxy'] = response.request.meta
         print(json.dumps(data, indent=4))
+        print(f"------------------------------------ end parsing ---------------------------")
         # yield data
 
     def parse_article(self, response):
@@ -107,9 +111,6 @@ class ArticleStaticSpider(scrapy.Spider):
         logger.debug(response.headers)
         logger.debug(response.request.meta)
 
-        print(self.article_items)
-
-        print("It went here -------------------------------------------------")
         yield self.article_items
 
     def errback_httpbin(self, failure):
@@ -134,21 +135,24 @@ class ArticleStaticSpider(scrapy.Spider):
                 request = failure.request
                 self.logger.error('TimeoutError on %s', request.url)
 
-def get_proxies():
+def get_proxy(counter):
     print(f"{API_KEY}")
     # url = 'http://falcon.proxyrotator.com:51337/'
     # params = dict(
     # apiKey=f'{API_KEY}&get=true'
     # )
     try:
-        url = f'http://falcon.proxyrotator.com:51337/?apiKey={API_KEY}&get=true'
+        
+        url = f'http://falcon.proxyrotator.com:51337/?apiKey={API_KEY}&get=true&country=PH'
         response = requests.get(url)
         data = json.loads(response.text)
         # resp = requests.get(url=url, params=params)
         # data = json.loads(resp.text)
+        print(f"---------------------------------------- start request proxy rotator {counter}--------------------------------------")
         print(data)
         print(data['proxy'])
         print(data['randomUserAgent'])
+        print(f"---------------------------------------- end proxy rotator {counter}-------------------------------------------------")
     except:
         # Most free proxies will often get connection errors. You will have retry the entire request using another proxy to work.
         # We will just skip retries as its beyond the scope of this tutorial and we are only downloading a single url

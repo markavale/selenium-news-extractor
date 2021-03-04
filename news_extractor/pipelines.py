@@ -16,7 +16,9 @@ class StaticExtractorPipeline:
         pass
 
     def process_item(self, item, spider):
-        print(f"Pipeline of Static Extractor Trigger....")
+        print("Pipeline of static extractor---------------------")
+        # print(f"Pipeline of Static Extrator: {item['article_title']}")
+        print(item)
         try:
             file = open("article_static.json", "a")
             file.write(str(item))

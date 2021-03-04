@@ -70,6 +70,10 @@ class Author:
 
                             possible_auth = " ".join(filtered_auth)
 
+                            ## custom conf ##
+                            
+
+
                             return possible_auth
 
                     continue

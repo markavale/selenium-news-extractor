@@ -1,11 +1,11 @@
 from scrapy.crawler import CrawlerProcess
 from scrapy.utils.project import get_project_settings
-
+import time
 links = [
-    # "https://www.nytimes.com/2021/02/28/briefing/myanmar-hongkong-vaccine.html"
+    # "https://www.nytimes.com/2021/02/28/briefing/myanmar-hongkong-vaccine.html",
     # "http://sailorstarcatcher.net/bpi-celebrates-national-arts-month-with-a-special-treat-for-cardholders-gives-special-offers-at-the-annual-art-in-the-park/",
-    "https://www.gmanetwork.com/news/news/nation/778111/palace-confident-of-uninterrupted-vaccination-vs-covid-19/story/?just_in"
-    # "https://www.nytimes.com/2021/02/28/podcasts/the-daily/genetics-dna-tests-ancestry.html"
+    # "https://www.gmanetwork.com/news/news/nation/778111/palace-confident-of-uninterrupted-vaccination-vs-covid-19/story/?just_in",
+    # "https://www.nytimes.com/2021/02/28/podcasts/the-daily/genetics-dna-tests-ancestry.html",
     # "https://www.nytimes.com/2021/02/25/podcasts/still-processing-best-of-the-archives-whitney-houston.html",
     # "https://www.nytimes.com/2021/02/28/nyregion/cuomo-investigation-sex-harassment.html",
     # "https://www.nytimes.com/2021/02/27/nyregion/cuomo-charlotte-bennett-sexual-harassment.html",
@@ -18,7 +18,7 @@ links = [
     # "https://www.nytimes.com/2021/02/28/us/politics/cpac-straw-poll-2024-presidential-race.html",
     # "https://www.nytimes.com/2021/02/28/us/politics/china-india-hacking-electricity.html",
     # "https://www.nytimes.com/2021/02/28/us/ahmaud-arbery-anniversary.html",
-    # "https://www.nytimes.com/2021/02/28/business/media/cable-tv-streaming-discovery.html",
+    "https://www.nytimes.com/2021/02/28/business/media/cable-tv-streaming-discovery.html"
     # "https://www.nytimes.com/2021/02/28/opinion/voter-suppression-us.html",
     # "https://www.nytimes.com/2021/02/28/opinion/business-economics/private-equity-reckoning.html",
     # "https://www.nytimes.com/2021/02/28/opinion/brazil-covid-vaccines.html",
@@ -36,8 +36,10 @@ links = [
 ]
 
 link2 = [
-    # "https://www.nytimes.com/2021/02/25/podcasts/still-processing-best-of-the-archives-whitney-houston.html",
-    "https://www.nytimes.com/2021/02/28/nyregion/cuomo-investigation-sex-harassment.html"
+    "https://www.nytimes.com/2021/02/25/podcasts/still-processing-best-of-the-archives-whitney-houston.html",
+    "https://www.nytimes.com/2021/02/28/nyregion/cuomo-investigation-sex-harassment.html",
+    "https://www.nytimes.com/2021/02/28/business/media/pandemic-streaming-tv-shows.html",
+    "https://www.nytimes.com/2021/02/25/us/female-con-artists-tori-telfer.html"
 ]
 
 dynamic_links = [
@@ -54,14 +56,21 @@ dynamic_links2 = [
     "https://www.gmanetwork.com/news/news/nation/778111/palace-confident-of-uninterrupted-vaccination-vs-covid-19/story/?just_in"
 ]
 
+diff_links = [
+    "https://news.abs-cbn.com/sports/03/04/21/g-league-despite-loss-jalen-green-praised-for-improved-playmaking",
+    "https://www.gmanetwork.com/news/news/nation/778111/palace-confident-of-uninterrupted-vaccination-vs-covid-19/story/?just_in",
+    "https://www.nytimes.com/2021/02/25/us/female-con-artists-tori-telfer.html"
+
+]
+
 
 def main():
     process = CrawlerProcess(get_project_settings())
 
     # myspd1 Is a crawl name
 
-    process.crawl('article_static', urls=link2)
     # process.crawl('article_static', urls=link2)
+    process.crawl('article_static', urls=links)
     # process.crawl('article_dynamic', urls=dynamic_links)
     # process.crawl('article_dynamic', urls=dynamic_links2)
 
@@ -69,4 +78,7 @@ def main():
 
 
 if __name__ == "__main__":
+    t1 = time.perf_counter()
     main()
+    t2 = time.perf_counter()
+    print(f'Finished in {round(t2-t1, 2)} second(s).....')
