@@ -6,10 +6,13 @@
 
 # useful for handling different item types with a single interface
 from itemadapter import ItemAdapter
-
+import requests, os
 # class NewsExtractorPipeline:
 #     def process_item(self, item, spider):
 #         return item
+
+def api_call():
+    pass
 
 class StaticExtractorPipeline:
     def __init__(self):
@@ -17,15 +20,7 @@ class StaticExtractorPipeline:
 
     def process_item(self, item, spider):
         print("Pipeline of static extractor---------------------")
-        # print(f"Pipeline of Static Extrator: {item['article_title']}")
-        print(item)
-        try:
-            file = open("article_static.json", "a")
-            file.write(str(item))
-        except Exception as e:
-            print(e)
-        finally:
-            file.close()
+        print(item['article_content'])
         return item
 
 class DynamicExtractorPipeline:
@@ -42,3 +37,5 @@ class DynamicExtractorPipeline:
         finally:
             file.close()
         return item
+
+# def api_call():

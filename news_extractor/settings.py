@@ -31,7 +31,7 @@ NEWSPIDER_MODULE = 'news_extractor.spiders'
 ROBOTSTXT_OBEY = False
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
-CONCURRENT_REQUESTS = 32
+# CONCURRENT_REQUESTS = 32
 
 # Configure a delay for requests for the same website (default: 0)
 # See https://docs.scrapy.org/en/latest/topics/settings.html#download-delay
@@ -39,7 +39,7 @@ CONCURRENT_REQUESTS = 32
 DOWNLOAD_DELAY = 0.25
 # The download delay setting will honor only one of:
 # CONCURRENT_REQUESTS_PER_DOMAIN = 10
-CONCURRENT_REQUESTS_PER_IP = 30
+# CONCURRENT_REQUESTS_PER_IP = 10
 
 # CONCURRENT_ITEMS = 200
 RETRY_TIMES = 3
@@ -83,7 +83,8 @@ DOWNLOADER_MIDDLEWARES = {
 
     # 'news_extractor.middlewares.NewsExtractorDownloaderMiddleware': 543,
     # 'news_extractor.middlewares.CustomProxyMiddleware': 350,
-    # 'scrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware': 400,
+    'scrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware': 400,
+    # 'scrapy.contrib.downloadermiddleware.httpproxy.HttpProxyMiddleware': 400,
     # 'scrapy.resolver.CachingThreadedResolver',
 
     #     # rotating IP proxy
@@ -128,6 +129,7 @@ DOWNLOADER_MIDDLEWARES = {
 # COMMANDS_MODULE = 'tutorial.bash'
 
 ### SELENIUM ###
+
 SELENIUM_DRIVER_NAME = 'firefox'
 SELENIUM_DRIVER_EXECUTABLE_PATH = which('geckodriver')
 # '--headless' if using chrome instead of firefox
@@ -156,7 +158,11 @@ ITEM_PIPELINES = {
 
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See https://docs.scrapy.org/en/latest/topics/autothrottle.html
-AUTOTHROTTLE_ENABLED = True
+CONCURRENT_REQUESTS = 100
+CONCURRENT_REQUESTS_PER_DOMAIN = 100
+AUTOTHROTTLE_ENABLED = False
+DOWNLOAD_TIMEOUT = 120
+# LOG_LEVEL = 'ERROR'
 # The initial download delay
 #AUTOTHROTTLE_START_DELAY = 5
 # The maximum download delay to be set in case of high latencies

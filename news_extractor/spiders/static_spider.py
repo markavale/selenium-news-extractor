@@ -16,6 +16,7 @@ from scrapy.mail import MailSender
 from scrapy.spidermiddlewares.httperror import HttpError
 from twisted.internet.error import DNSLookupError
 from twisted.internet.error import TimeoutError, TCPTimedOutError
+from ..helpers.endpoints import media_value
 
 mailer = MailSender()
 
@@ -28,45 +29,43 @@ class ArticleStaticSpider(scrapy.Spider):
         "FEEDS": {"articles.json": {"format": "json"}},
     }
 
-    def __init__(self, urls=None):
-        self.urls = urls
+    def __init__(self, data=None):
+        self.data = data
         self.article_items = StaticArticleItem()
 
     def start_requests(self):
         counter = 0
-        for url in self.urls:
-            counter +=1
-            proxy = get_proxy(counter)
-            ip = proxy['ip']
-            port = proxy['port']
-            # print(proxy)
-            meta_proxy = f"http://{ip}:{port}"
-            headers = {
-                "User-Agent": proxy['randomUserAgent']
-            }
-            meta = {
-                "proxy": meta_proxy
-                # "download_slot": meta_proxy
-            }
-            # logger.info(str(proxy))
-            print(f"------------------------------------ start request {counter} -------------------------------")
+        # print(self.data)
+
+        for d in self.data['data']:
+            # print(d['article_url'])
+            # counter +=1
+            # proxy = get_proxy(counter)
+            # ip = proxy['ip']
+            # port = proxy['port']
+            # # print(proxy)
+            # meta_proxy = f"http://{ip}:{port}"
+            # headers = {
+            #     "User-Agent": proxy['randomUserAgent']
+            # }
+            # meta = {
+            #     "proxy": meta_proxy,
+                #'dont_redirect': True,
+            # }
+            # print(f"------------------------------------ start request {counter} -------------------------------")
             # yield scrapy.Request(url, self.parse,headers=headers, meta=meta, errback=self.errback_httpbin)
-            yield scrapy.Request(url, callback=self.parse, errback=self.errback_httpbin)
-            print("------------------------------------ end start requests ---------------------------")
-            logger.info(f"{url} scraped...")
+            yield scrapy.Request(d['article_url'], callback=self.parse, errback=self.errback_httpbin, cb_kwargs={'article':d})
+            # print("------------------------------------ end start requests ---------------------------")
+            # logger.info(f"{url} scraped...")
         logger.info("Static article scraper done...")
 
-    def parse(self, response):      
-        print(f"------------------------------------ start parsing ---------------------------")
-        # if 'Bandwidth exceeded' in response.body:
-        #     logger.error("---------------------------------- BANDWIDTH EXCEEDED ---------------------------")
-        #     raise CloseSpider('bandwidth_exceeded')                                                                                              
+    def parse(self, response, article):                                                                                              
         src = StaticSource(response.url)
         text_format = src.text
         news = News(response.url, text_format)
-
         data = news.generate_data()
-        
+        media = media_value(global_rank=article["website"]["alexa_rankings"]['global'],local_rank=article["website"]["alexa_rankings"]['local'], website_cost=article['website']["website_cost"], article_images=news.images, article_videos=news.videos, article_content=news.content )
+        print("--------------------------------------------------------------------------------")
         self.article_items['article_title'] = news.title
         self.article_items['article_section'] = []
         self.article_items['article_authors'] = news.authors
@@ -75,8 +74,8 @@ class ArticleStaticSpider(scrapy.Spider):
         self.article_items['article_content'] = news.content
         self.article_items['article_videos'] = news.videos
         self.article_items['article_media_type'] = 'web'
-        self.article_items['article_ad_value'] = 0
-        self.article_items['article_pr_value'] = 0
+        self.article_items['article_ad_value'] = media.json()['data']['advalue']
+        self.article_items['article_pr_value'] = media.json()['data']['prvalue']
         self.article_items['article_language'] = news.language
         self.article_items['article_status'] = "Done"
         self.article_items['article_error_status'] = None
@@ -94,10 +93,7 @@ class ArticleStaticSpider(scrapy.Spider):
 
         
         yield self.article_items
-        # print("------------------------------ data dict ----------------------------------")
-        # print(json.dumps(data, indent=4))
         print(f"------------------------------------ end parsing ---------------------------")
-        # yield data
         
 
     def parse_article(self, response):
@@ -154,41 +150,40 @@ class ArticleStaticSpider(scrapy.Spider):
                 # these exceptions come from HttpError spider middleware
                 # you can get the non-200 response
                 logger.error("HttpError ----------------------------------------------------- HttpError")
+                logger.error(f"Link: {failure.url}")
                 response = failure.value.response
                 self.logger.error('HttpError on %s', response.url)
 
             elif failure.check(DNSLookupError):
                 # this is the original request
                 logger.error("DNSLookupError ----------------------------------------------------- DNSLookupError")
+                logger.error(f"Link: {failure.url}")
                 request = failure.request
                 self.logger.error('DNSLookupError on %s', request.url)
 
             elif failure.check(TimeoutError, TCPTimedOutError):
                 logger.error("TimeoutError ----------------------------------------------------- TimeoutError")
+                logger.error(f"Link: {failure.url}")
                 request = failure.request
                 self.logger.error('TimeoutError on %s', request.url)
 
-def get_proxy(counter):
-    print(f"{API_KEY}")
+def get_proxy():
     # url = 'http://falcon.proxyrotator.com:51337/'
     # params = dict(
     # apiKey=f'{API_KEY}&get=true'
     # )
     try:
-        
         url = f'http://falcon.proxyrotator.com:51337/?apiKey={API_KEY}&get=true&country=PH'
         response = requests.get(url)
         data = json.loads(response.text)
-        # resp = requests.get(url=url, params=params)
-        # data = json.loads(resp.text)
+        resp = requests.get(url=url, params=params)
+        data = json.loads(resp.text)
         print(f"---------------------------------------- start request proxy rotator {counter}--------------------------------------")
         print(data)
         print(data['proxy'])
         print(data['randomUserAgent'])
         print(f"---------------------------------------- end proxy rotator {counter}-------------------------------------------------")
     except:
-        # Most free proxies will often get connection errors. You will have retry the entire request using another proxy to work.
-        # We will just skip retries as its beyond the scope of this tutorial and we are only downloading a single url
         logger.error("Skipping. Connnection error or Proxy API key expired.")
         data = {}
         data['proxy'] = "http://159.89.221.73:3128"
