@@ -1,9 +1,7 @@
 import scrapy
 from ..items import StaticArticleItem
 from logzero import logfile, logger
-import requests
-import json
-import os
+import requests, datetime, json, os
 from news_extractor.settings import API_KEY
 from ..article_contents.news import News
 from ..article_contents.source.static import StaticSource
@@ -52,25 +50,55 @@ class ArticleStaticSpider(scrapy.Spider):
             }
             # logger.info(str(proxy))
             print(f"------------------------------------ start request {counter} -------------------------------")
-            yield scrapy.Request(url, self.parse_article,headers=headers, meta=meta, errback=self.errback_httpbin)
-            # yield scrapy.Request(url, callback=self.parse_article, errback=self.errback_httpbin)
+            # yield scrapy.Request(url, self.parse,headers=headers, meta=meta, errback=self.errback_httpbin)
+            yield scrapy.Request(url, callback=self.parse, errback=self.errback_httpbin)
             print("------------------------------------ end start requests ---------------------------")
             logger.info(f"{url} scraped...")
         logger.info("Static article scraper done...")
 
     def parse(self, response):      
-        print(f"------------------------------------ start parsing ---------------------------")                                                                                              
+        print(f"------------------------------------ start parsing ---------------------------")
+        # if 'Bandwidth exceeded' in response.body:
+        #     logger.error("---------------------------------- BANDWIDTH EXCEEDED ---------------------------")
+        #     raise CloseSpider('bandwidth_exceeded')                                                                                              
         src = StaticSource(response.url)
         text_format = src.text
         news = News(response.url, text_format)
+
         data = news.generate_data()
+        
+        self.article_items['article_title'] = news.title
+        self.article_items['article_section'] = []
+        self.article_items['article_authors'] = news.authors
+        self.article_items['article_publish_date'] = news.publish_date
+        self.article_items['article_images'] = news.images
+        self.article_items['article_content'] = news.content
+        self.article_items['article_videos'] = news.videos
+        self.article_items['article_media_type'] = 'web'
+        self.article_items['article_ad_value'] = 0
+        self.article_items['article_pr_value'] = 0
+        self.article_items['article_language'] = news.language
+        self.article_items['article_status'] = "Done"
+        self.article_items['article_error_status'] = None
+        self.article_items['article_source_from'] = None
+        self.article_items['keyword'] = []
+        self.article_items['article_url'] = news.url
+        self.article_items['date_created'] = datetime.datetime.today().isoformat()
+        self.article_items['date_updated'] = datetime.datetime.today().isoformat()
+        self.article_items['created_by'] = "Python Global Scraper"
+        self.article_items['updated_by'] = "Python Global Scraper"
+
         
         logger.info(response.request.headers)
         logger.debug(response.request.meta)
 
-        print(json.dumps(data, indent=4))
+        
+        yield self.article_items
+        # print("------------------------------ data dict ----------------------------------")
+        # print(json.dumps(data, indent=4))
         print(f"------------------------------------ end parsing ---------------------------")
         # yield data
+        
 
     def parse_article(self, response):
         # article_authors = []
@@ -125,15 +153,18 @@ class ArticleStaticSpider(scrapy.Spider):
             if failure.check(HttpError):
                 # these exceptions come from HttpError spider middleware
                 # you can get the non-200 response
+                logger.error("HttpError ----------------------------------------------------- HttpError")
                 response = failure.value.response
                 self.logger.error('HttpError on %s', response.url)
 
             elif failure.check(DNSLookupError):
                 # this is the original request
+                logger.error("DNSLookupError ----------------------------------------------------- DNSLookupError")
                 request = failure.request
                 self.logger.error('DNSLookupError on %s', request.url)
 
             elif failure.check(TimeoutError, TCPTimedOutError):
+                logger.error("TimeoutError ----------------------------------------------------- TimeoutError")
                 request = failure.request
                 self.logger.error('TimeoutError on %s', request.url)
 
