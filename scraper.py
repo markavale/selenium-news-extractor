@@ -99,6 +99,7 @@ if __name__ == "__main__":
     # print(endpoints())
     t1 = time.perf_counter()
     data = endpoints()
-    main(data)
+    # main(data)
+    main(link2)
     t2 = time.perf_counter()
     print(f'Finished in {round(t2-t1, 2)} second(s).....')

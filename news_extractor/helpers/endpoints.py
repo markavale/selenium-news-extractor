@@ -1,5 +1,6 @@
 import os, json, requests
 from dotenv import load_dotenv
+
 # from pprint import pprint
 load_dotenv()
 
@@ -51,6 +52,6 @@ def media_value(**kwargs):
     req = requests.request('POST','{}article/media_values'.format(_url), data=json.dumps(_query), headers=headers)
     return req#json.dumps(req.json(), indent=4)
     
-    
 
-
+def api_call(article):
+    pass

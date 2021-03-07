@@ -7,12 +7,14 @@
 # useful for handling different item types with a single interface
 from itemadapter import ItemAdapter
 import requests, os
+from news_extractor.helpers.endpoints import api_call
+
+
 # class NewsExtractorPipeline:
 #     def process_item(self, item, spider):
 #         return item
 
-def api_call():
-    pass
+
 
 class StaticExtractorPipeline:
     def __init__(self):
@@ -21,6 +23,7 @@ class StaticExtractorPipeline:
     def process_item(self, item, spider):
         print("Pipeline of static extractor---------------------")
         print(item['article_content'])
+        api_call(item)
         return item
 
 class DynamicExtractorPipeline:
