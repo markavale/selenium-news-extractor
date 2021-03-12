@@ -22,6 +22,7 @@ from scrapy.downloadermiddlewares.robotstxt import RobotsTxtMiddleware
 from scrapy.utils.python import to_native_str
 
 from news_extractor.settings import API_KEY
+import time
 
 class NewsExtractorSpiderMiddleware:
     # Not all methods need to be defined. If a method is not defined,
@@ -98,7 +99,40 @@ class NewsExtractorDownloaderMiddleware:
 
         return None
         
-        
+# Bandwidth tracker middleware
+
+class InOutBandwithStats(object):
+
+    def __init__(self, stats):
+        self.stats = stats
+        self.startedtime = time.time()
+
+    @classmethod
+    def from_crawler(cls, crawler):
+        return cls(crawler.stats)
+
+    def elapsed_seconds(self):
+        return time.time() - self.startedtime
+
+    def process_request(self, request, spider):
+        request_bytes = self.stats.get_value('downloader/request_bytes')
+
+        if request_bytes:
+            outgoing_bytes_per_second = request_bytes / self.elapsed_seconds()
+            self.stats.set_value('downloader/outgoing_bytes_per_second',
+                                 outgoing_bytes_per_second)
+
+    def process_response(self, request, response, spider):
+        response_bytes = self.stats.get_value('downloader/response_bytes')
+
+        if response_bytes:
+            incoming_bytes_per_second = response_bytes / self.elapsed_seconds()
+            self.stats.set_value('downloader/incoming_bytes_per_second',
+                                 incoming_bytes_per_second)
+
+        return response
+
+
         # ignore if proxy is already set
         
         # if 'proxy' in request.meta:
@@ -183,28 +217,3 @@ class NewsExtractorDownloaderMiddleware:
 #         rp_dfd = self._parsers[netloc]
 #         self._parsers[netloc] = rp
 #         rp_dfd.callback(rp)
-
-# def get_proxies():
-#     print(f"{API_KEY}")
-#     # url = 'http://falcon.proxyrotator.com:51337/'
-#     # params = dict(
-#     # apiKey=f'{API_KEY}&get=true'
-#     # )
-#     # try:
-#     url = f'http://falcon.proxyrotator.com:51337/?apiKey={API_KEY}&get=true'
-#     response = requests.get(url)
-#     data = json.loads(response.text)
-#     # resp = requests.get(url=url, params=params)
-#     # data = json.loads(resp.text)
-#     print(data)
-#     print(data['proxy'])
-#     print(data['randomUserAgent'])
-#     # except:
-#     #     # Most free proxies will often get connection errors. You will have retry the entire request using another proxy to work.
-#     #     # We will just skip retries as its beyond the scope of this tutorial and we are only downloading a single url
-#     #     logger.error("Skipping. Connnection error or Proxy API key expired.")
-#     #     data = {}
-#     #     data['proxy'] = "159.89.221.73:3128"
-#     #     data['randomUserAgent'] = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.106 Safari/537.36"
-
-#     return data

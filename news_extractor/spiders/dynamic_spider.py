@@ -9,7 +9,7 @@ from selenium.webdriver.firefox.options import Options
 from scrapy.selector import Selector
 from ..items import DynamicArticleItem
 import time
-from . static_spider import get_proxy
+# from .static_spider import get_proxy
 from ..article_contents.news import News
 
 

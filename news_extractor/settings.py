@@ -2,7 +2,6 @@
     IMPORTS
 '''
 from shutil import which
-
 from decouple import config
 import os
 '''
@@ -25,7 +24,7 @@ NEWSPIDER_MODULE = 'news_extractor.spiders'
 
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
-#USER_AGENT = 'news_extractor (+http://www.yourdomain.com)'
+USER_AGENT = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.106 Safari/537.36"
 
 # Obey robots.txt rules
 ROBOTSTXT_OBEY = False
@@ -36,14 +35,14 @@ ROBOTSTXT_OBEY = False
 # Configure a delay for requests for the same website (default: 0)
 # See https://docs.scrapy.org/en/latest/topics/settings.html#download-delay
 # See also autothrottle settings and docs
-DOWNLOAD_DELAY = 0.25
+DOWNLOAD_DELAY = 3
 # The download delay setting will honor only one of:
 # CONCURRENT_REQUESTS_PER_DOMAIN = 10
 # CONCURRENT_REQUESTS_PER_IP = 10
 
 # CONCURRENT_ITEMS = 200
-RETRY_TIMES = 3
-CONNECTION_TIMEOUT = 30
+# RETRY_TIMES = 3
+
 # Disable cookies (enabled by default)
 COOKIES_ENABLED = False
 
@@ -81,8 +80,15 @@ DOWNLOADER_MIDDLEWARES = {
     # 'news_extractor.middlewares.NewRobotsTxtMiddleware': 100,
     # 'scrapy.downloadermiddlewares.robotstxt.RobotsTxtMiddleware': None,
 
+    # Bandwidth tracker
+    'news_extractor.middlewares.InOutBandwithStats': 990,
+
+    # Retry middleware
+    'scrapy.downloadermiddlewares.retry.RetryMiddleware': 120,
+
     # 'news_extractor.middlewares.NewsExtractorDownloaderMiddleware': 543,
     # 'news_extractor.middlewares.CustomProxyMiddleware': 350,
+    
     'scrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware': 400,
     # 'scrapy.contrib.downloadermiddleware.httpproxy.HttpProxyMiddleware': 400,
     # 'scrapy.resolver.CachingThreadedResolver',
@@ -144,9 +150,9 @@ SELENIUM_DRIVER_ARGUMENTS = ['-headless']
 
 # Enable or disable extensions
 # See https://docs.scrapy.org/en/latest/topics/extensions.html
-# EXTENSIONS = {
-#    'scrapy.extensions.telnet.TelnetConsole': None,
-# }
+EXTENSIONS = {
+   'scrapy.extensions.telnet.TelnetConsole': None,
+}
 
 # Configure item pipelines
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
@@ -156,15 +162,25 @@ ITEM_PIPELINES = {
     'news_extractor.pipelines.DynamicExtractorPipeline': 300,
 }
 
-# Enable and configure the AutoThrottle extension (disabled by default)
-# See https://docs.scrapy.org/en/latest/topics/autothrottle.html
+
+CONCURRENT_ITEMS = 100 # => Maximum number of concurrent items (per response) to process in parallel in item pipelines.
 CONCURRENT_REQUESTS = 100
 CONCURRENT_REQUESTS_PER_DOMAIN = 100
 AUTOTHROTTLE_ENABLED = False
-DOWNLOAD_TIMEOUT = 120
-REDIRECT_ENABLED = False
+DOWNLOAD_TIMEOUT = 120 # 2 Mins
+CONNECTION_TIMEOUT = 60 # 1 min
+
+# TELNETCONSOLE_ENABLED=False
+
+REDIRECT_ENABLED = True
+# REDIRECT_MAX_TIMES = 4
+
 # LOG_LEVEL = 'ERROR'
 # The initial download delay
+# Enable and configure the AutoThrottle extension (disabled by default)
+# See https://docs.scrapy.org/en/latest/topics/autothrottle.html
+# AUTOTHROTTLE_TARGET_CONCURRENCY = 50
+
 #AUTOTHROTTLE_START_DELAY = 5
 # The maximum download delay to be set in case of high latencies
 #AUTOTHROTTLE_MAX_DELAY = 60
@@ -172,7 +188,7 @@ REDIRECT_ENABLED = False
 # each remote server
 #AUTOTHROTTLE_TARGET_CONCURRENCY = 1.0
 # Enable showing throttling stats for every response received:
-#AUTOTHROTTLE_DEBUG = False
+AUTOTHROTTLE_DEBUG = True
 
 # Enable and configure HTTP caching (disabled by default)
 # See https://docs.scrapy.org/en/latest/topics/downloader-middleware.html#httpcache-middleware-settings
