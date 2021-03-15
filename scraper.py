@@ -5,7 +5,7 @@ import os, math, json, time
 from news_extractor.helpers.api import endpoints
 import concurrent.futures
 from pprint import pprint
-from news_extractor.helpers.api import total_spider_api_call, spider_log
+from news_extractor.helpers.api import total_spider_api_call, spider_log, get_all_processing_artilces
 from logs.main_log import init_log
 from news_extractor.pipelines import StaticExtractorPipeline
 
@@ -36,9 +36,10 @@ def spider(data):
                    for i in range(0, len(data), divisible_n)]
 
     # SPIDER CRAWLER
-    # process = CrawlerProcess(get_project_settings())
+    process = CrawlerProcess(get_project_settings())
     for spider in spider_data:
         # process.crawl('test_spider', spider)
+        process.crawl('article_static', spider)
         spiders.append({
             'thread_crawlers': {'crawlers': spider}#len(spider)
         })
@@ -50,7 +51,7 @@ def spider(data):
     #     print(item.process_item)
     # spider_log(spiders)
 
-    # process.start()
+    process.start()
   
     # print(article_items)
     # for item in article_items:
@@ -123,7 +124,16 @@ def save_all_logs(info_path, debug_path, error_path, json_path):
 
     return info_log, debug_log, error_log, json_log
 
+def update_all_status_processing(data):
+    if len(data) != 0:
+        log.info("Updating all %s from Processing status to Queued", len(data))
+        for obj in data:
+            
+        print("{} updated".format(len(data)))
 
+    else:
+        print("{} articles".format(len(data)))
+        log.info("No processing article(s).")
 
 if __name__ == "__main__":
 
@@ -214,12 +224,10 @@ if __name__ == "__main__":
     # while len(data) == 0:
     #     pass
     print(len(system_data))
-    for d in system_data:
-        pprint(d['data']['article_status'])
     WORKERS = os.cpu_count() - 2
     t1 = time.perf_counter()
 
-    # total_data, total_workers, spiders = main(system_links, WORKERS)
+    # total_data, total_workers, spiders = main(system_data, WORKERS)
 
     t2 = time.perf_counter()
     elapsed_seconds = round(t2-t1, 2)
@@ -241,27 +249,33 @@ if __name__ == "__main__":
 
     # SAVE LOGS IN MEMORY
     info_log, debug_log, error_log, json_log = save_all_logs(info_path, debug_path, error_path, json_path)
+
+    process_articles = get_all_processing_artilces()
+    update_all_status_processing(process_articles['data'])
+
     # pprint(info_log)
     # for article_item in json_log:
     #     print(article_item.get('download_latency'))
 
 
-    scraper = {}
-    scraper['data'] = total_data
-    scraper['workers'] = total_workers
-    scraper['spiders'] = spiders
-    scraper['info_log'] = info_log
-    scraper['debug_log'] = debug_log
-    scraper['error_log'] = error_log
-    scraper['json_log'] = json_log
-    scraper['is_finished'] = True
+    # scraper = {}
+    # scraper['data'] = total_data
+    # scraper['workers'] = total_workers
+    # scraper['spiders'] = spiders
+    # scraper['info_log'] = info_log
+    # scraper['debug_log'] = debug_log
+    # scraper['error_log'] = error_log
+    # scraper['json_log'] = json_log
+    # scraper['is_finished'] = True
 
     # pprint(scraper)
     # for spider in scraper['spiders']:
     #     print("")
     #     pprint(spider)
     #     print("")
-    time.sleep(1.5)
+
+    # time.sleep(1.5)
+
     # delete_all_logs(info_path, debug_path, error_path, json_path)
     
     

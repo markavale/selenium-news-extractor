@@ -35,29 +35,30 @@ class ScrapyCrawlerItem(scrapy.Item):
 
 class StaticArticleItem(scrapy.Item):
     # define the fields for your item here like:
-    article_title = scrapy.Field()
-    article_section = scrapy.Field()
-    article_authors = scrapy.Field()
-    article_publish_date = scrapy.Field()
-    article_images = scrapy.Field()
-    article_content = scrapy.Field()
-    article_videos = scrapy.Field()
-    article_media_type = scrapy.Field()
+    article_title           = scrapy.Field()
+    article_section         = scrapy.Field()
+    article_authors         = scrapy.Field()
+    article_publish_date    = scrapy.Field()
+    article_images          = scrapy.Field()
+    article_content         = scrapy.Field()
+    article_videos          = scrapy.Field()
+    article_media_type      = scrapy.Field()
     # website = scrapy.Field()
-    article_ad_value = scrapy.Field()
-    article_pr_value = scrapy.Field()
-    article_language = scrapy.Field()
-    article_status = scrapy.Field()
-    article_error_status = scrapy.Field()
-    article_source_from = scrapy.Field()
-    keyword = scrapy.Field()
-    article_url = scrapy.Field()
-    date_created = scrapy.Field()
-    date_updated = scrapy.Field()
-    created_by = scrapy.Field()
-    updated_by = scrapy.Field()
+    article_ad_value        = scrapy.Field()
+    article_pr_value        = scrapy.Field()
+    article_language        = scrapy.Field()
+    article_status          = scrapy.Field()
+    article_error_status    = scrapy.Field()
+    article_source_from     = scrapy.Field()
+    keyword                 = scrapy.Field()
+    article_url             = scrapy.Field()
+    date_created            = scrapy.Field()
+    date_updated            = scrapy.Field()
+    created_by              = scrapy.Field()
+    updated_by              = scrapy.Field()
 
-    download_latency = scrapy.Field()
+    article_id              = scrapy.Field()
+    download_latency        = scrapy.Field()
 
     # {
     #     "google_date": "2021-03-09T21:55:00.000Z", # article_publish_date
@@ -73,9 +74,7 @@ class StaticArticleItem(scrapy.Item):
     #     "google_image": "https://lh6.googleusercontent.com/proxy/bpMUbH6tdkpxiS7SsMpOKW_u21shFx7qECVKN-4JqPIAi3LTtbiXzKubcuBtPG3083bxwbW1vV5HYmdnZHsLC01J6AH2QSNUwsNksEWJ=-p-df-h100-w100",
     #     # article_images
     # },
-
     #     # TODO: if exists
-
     #     {
     #     "google_date": "2021-03-09T12:38:43.000Z", # publish_date
     #     "status": "Queued", # article_status
@@ -85,6 +84,25 @@ class StaticArticleItem(scrapy.Item):
     #     "original_url": "http://www.fxstreet.com/amp/cryptocurrencies/news/korean-crypto-exchange-bithumb-toughens-up-its-anti-money-laundering-measures-202103091238"
     #     }
 
+class GlobalLinkItem(scrapy.Item):
+    google_date                 = scrapy.Field()
+    status                      = scrapy.Field()
+    date_created                = scrapy.Field()
+    date_updated                = scrapy.Field()
+    created_by                  = scrapy.Field()
+    updated_by                  = scrapy.Field()
+    google_link                 = scrapy.Field()
+    google_title                = scrapy.Field()
+    google_website_name         = scrapy.Field()
+    google_image                = scrapy.Field()
+
+class GlobalLinkItemExists(scrapy.Item):
+    google_date                 = scrapy.Field()
+    status                      = scrapy.Field()
+    google_title                = scrapy.Field()
+    google_website_name         = scrapy.Field()
+    google_image                = scrapy.Field()
+    original_url                = scrapy.Field()
 
 class GoogleNewsItem(scrapy.Item):
     article_title = scrapy.Field()

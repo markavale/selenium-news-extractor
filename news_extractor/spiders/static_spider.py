@@ -28,7 +28,7 @@ class ArticleStaticSpider(scrapy.Spider):
 
     custom_settings = {
         'ITEM_PIPELINES': {'news_extractor.pipelines.StaticExtractorPipeline': 300},
-        "FEEDS": {"articles.json": {"format": "json"}},
+        # "FEEDS": {"articles.json": {"format": "json"}},
     }
 
     def __init__(self, data=None):
@@ -96,6 +96,7 @@ class ArticleStaticSpider(scrapy.Spider):
         self.article_items['created_by'] = "Python Global Scraper"
         self.article_items['updated_by'] = "Python Global Scraper"
 
+        self.article_items['article_id'] = article['_id']
         log.info(response.request.headers)
         log.debug(response.request.meta)
 
@@ -159,41 +160,41 @@ class ArticleStaticSpider(scrapy.Spider):
                                  )
 
     def errback_httpbin_final(self, failure):
-        article_id = failure.request.cb_kwargs['_id']
+        article = failure.request.cb_kwargs['article']
+        article_id = article['_id']
 
         if failure.check(HttpError):
             # these exceptions come from HttpError spider middleware
             # you can get the non-200 response
             response = failure.value.response
             log.error("HttpError2 on %s", response.url)
-            __article_error(article_id, "HTTP Error")
+            # __article_error(article_id, "HTTP Error")
             self.logger.error('HttpError on %s', response.url)
 
         elif failure.check(DNSLookupError):
             # this is the original request
             request = failure.request
             log.error("DNSLookupError2 on %s", request.url)
-            __article_error(article_id, "DNS Lookup Error")
+            # __article_error(article_id, "DNS Lookup Error")
             self.logger.error('DNSLookupError on %s', request.url)
 
         elif failure.check(TimeoutError, TCPTimedOutError):
             request = failure.request
             log.error("TimeoutError2 on %s", request.url)
-            __article_error(article_id, "Timeout Error")
+            # __article_error(article_id, "Timeout Error")
             self.logger.error('TimeoutError on %s', request.url)
 
         else:
             request = failure.request
             log.error("BaseError2 on %s", request.url)
-            __article_error(article_id, "Error")
+            # __article_error(article_id, "Error")
 
 class GoogleLinkSpider(scrapy.Spider):
     logfile("server.log", maxBytes=1e6, backupCount=3)
-    name = "article_static"
+    name = "global_static"
 
     custom_settings = {
-        'ITEM_PIPELINES': {'news_extractor.pipelines.StaticExtractorPipeline': 300},
-        "FEEDS": {"articles.json": {"format": "json"}},
+        'ITEM_PIPELINES': {'news_extractor.pipelines.GlobalExtractorPipeline': 301},
     }
 
     def __init__(self, data=None):

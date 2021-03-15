@@ -18,8 +18,7 @@ _article_url = os.getenv(
 
 }
 '''
-
-
+# MEDIA VALUES FOR PR AND AD VALUES
 def media_value(**kwargs):
     headers = {
         'Content-Type': 'application/json'
@@ -35,35 +34,57 @@ def media_value(**kwargs):
         'images': list(kwargs['article_images']),
         'text': kwargs['article_content']
     }
-    print(_query, _url)
     req = requests.request('POST', '{}article/media_values'.format(_url),
                            data=json.dumps(_query), headers=headers)
     return req
 
 # POST REQ FOR URLS
-
-
+# REQUEST FOR ARTICLES
 def endpoints():
     headers = {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer {}'.format(TOKEN)
     }
-
-    # _url = os.getenv('PRODUCTION_API') if environment else os.getenv('DEVELOPMENT_API')
     _query = {
-        # 'status': 'Queued'
         'article_status': 'Queued'
     }
     _fields = {
         'article_url': 1
     }
     req = requests.request('POST', '{}article/custom_query?fields={}&limit={}'.format(
-        _article_url, json.dumps(_fields), 5000), data=json.dumps(_query), headers=headers)
+        _article_url, json.dumps(_fields), 2220), data=json.dumps(_query), headers=headers)
     return req.json()  # json(req.json(), indent=4)
 
     # return headers, _url, _query
 
+### UPDATE ALL SKIP URLS TO QUEUED STATUS ###
+def get_all_processing_artilces():
+    headers = {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer {}'.format(TOKEN)
+    }
+    _query = {
+        'article_status': 'Processing'
+    }
+    req = requests.request('POST', '{}article/custom_query'.format(
+        _article_url), data=json.dumps(_query), headers=headers)
+    return req.json() 
 
+def update_process_to_queued(data):
+    headers = {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer {}'.format(TOKEN)
+    }
+    _query = {
+        'article_status': 'Queued',
+        'date_updated': datetime.datetime.today().isoformat()
+    }
+    req = requests.request('PUT', '{}article/{}'.format(_url,
+                                                        data['_id']), data=json.dumps(_query), headers=headers)
+    return req
+
+
+### CRUD OP ARTICLE ###
 def __article_process(article_id):
     '''
     @ Required params
@@ -90,7 +111,6 @@ def __article_error(article_id, error_status):
     article_response => Error message
     article_status => Error (Default)
     '''
-    print(article_response)
     headers = {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer {}'.format(TOKEN)
@@ -133,14 +153,13 @@ def __article_success(article):
         'updated_by': article['updated_by']
     }
     req = requests.request('PUT', '{}article/{}'.format(_url,
-                                                        article_id), data=json.dumps(_query), headers=headers)
+                                                        article['_id']), data=json.dumps(_query), headers=headers)
     return req
 
 
 '''
         GOOGLE LINKS
 '''
-
 
 def __google_link_check_fqdn(domain_name):
     _url = os.getenv('PRODUCTION_LAMBDA_API') if environment else os.getenv(
@@ -155,7 +174,6 @@ def __google_link_check_fqdn(domain_name):
     req = requests.request('POST', '{}/web/count_custiom_query'.format(_url),
                            data=json.dumps(_query), headers=headers)
 
-
 def __google_links():
     _url = os.getenv('PRODUCTION_LAMBDA_API') if environment else os.getenv(
         'DEVELOPMENT_LAMBDA_API')
@@ -167,7 +185,46 @@ def __google_links():
     }
     req = requests.request('POST', '{}/global-link/count_custiom_query'.format(
         _url), data=json.dumps(_query), headers=headers)
+    return req 
 
+def __google_links_process():
+    _url = os.getenv('PRODUCTION_LAMBDA_API') if environment else os.getenv(
+        'DEVELOPMENT_LAMBDA_API')
+    headers = {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer {}'.format(TOKEN)
+    }
+    _query = {
+    }
+    req = requests.request('POST', '{}/global-link/count_custiom_query'.format(
+        _url), data=json.dumps(_query), headers=headers)
+    return req 
+
+def __google_links_error():
+    _url = os.getenv('PRODUCTION_LAMBDA_API') if environment else os.getenv(
+        'DEVELOPMENT_LAMBDA_API')
+    headers = {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer {}'.format(TOKEN)
+    }
+    _query = {
+    }
+    req = requests.request('POST', '{}/global-link/count_custiom_query'.format(
+        _url), data=json.dumps(_query), headers=headers)
+    return req 
+
+def __google_links_success():
+    _url = os.getenv('PRODUCTION_LAMBDA_API') if environment else os.getenv(
+        'DEVELOPMENT_LAMBDA_API')
+    headers = {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer {}'.format(TOKEN)
+    }
+    _query = {
+    }
+    req = requests.request('POST', '{}/global-link/count_custiom_query'.format(
+        _url), data=json.dumps(_query), headers=headers)
+    return req 
 
 def __google_():
     _url = os.getenv('PRODUCTION_LAMBDA_API') if environment else os.getenv(

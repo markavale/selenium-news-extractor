@@ -26,10 +26,23 @@ class StaticExtractorPipeline:
         self.file.close()
 
     def process_item(self, item, spider):
-        print("Pipeline of static extractor---------------------")
-        # __article_success(id, article)
         self.exporter.export_item(item)
-        __article_success(item)
+        # __article_success(item)
+        return item
+
+class GlobalExtractorPipeline:  
+    def __init__(self):
+        self.file = open("global_article.json", 'ab')
+        self.exporter = JsonLinesItemExporter(self.file, encoding='utf-8', ensure_ascii=False)
+        self.exporter.start_exporting()
+
+    def close_spider(self, spider):
+        self.exporter.finish_exporting()
+        self.file.close()
+
+    def process_item(self, item, spider):
+        self.exporter.export_item(item)
+        # __article_success(item)
         return item
 
 class DynamicExtractorPipeline:
