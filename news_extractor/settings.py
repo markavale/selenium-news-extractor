@@ -142,7 +142,7 @@ SELENIUM_DRIVER_EXECUTABLE_PATH = which('geckodriver')
 SELENIUM_DRIVER_ARGUMENTS = ['-headless']
 
 ### AJAX CRAWLER ###
-# AJAXCRAWL_ENABLED = True
+AJAXCRAWL_ENABLED = True
 '''
     ###### END ROTATING CONF ######
 '''
@@ -159,7 +159,7 @@ EXTENSIONS = {
 ITEM_PIPELINES = {
     #    'news_extractor.pipelines.NewsExtractorPipeline': 300,
     'news_extractor.pipelines.StaticExtractorPipeline': 300,
-    'news_extractor.pipelines.DynamicExtractorPipeline': 300,
+    'news_extractor.pipelines.DynamicExtractorPipeline': 300
 }
 
 
@@ -169,10 +169,10 @@ CONCURRENT_REQUESTS_PER_DOMAIN = 100
 AUTOTHROTTLE_ENABLED = False
 DOWNLOAD_TIMEOUT = 120 # 2 Mins
 CONNECTION_TIMEOUT = 60 # 1 min
-
+RETRY_ENABLED = False
 # TELNETCONSOLE_ENABLED=False
 
-REDIRECT_ENABLED = True
+# REDIRECT_ENABLED = False
 # REDIRECT_MAX_TIMES = 4
 
 # LOG_LEVEL = 'ERROR'
@@ -204,7 +204,7 @@ AUTOTHROTTLE_DEBUG = True
 '''
 # API_KEY = os.environ.get("API_KEY")
 API_KEY = config('API_KEY')
-
-
+environment = config('PRODUCTION', default=bool)
+TOKEN = config('TOKEN')
 ### EMAIL CONFS
 # MAIL_HOST = 

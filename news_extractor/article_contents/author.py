@@ -34,6 +34,7 @@ class Author:
                 self.names = [author]
                 break
 
+
     def __iterate_tag(self, blocks):     
         """
         Iterates bs4 blocks to find probable author

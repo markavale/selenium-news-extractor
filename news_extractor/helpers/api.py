@@ -1,33 +1,15 @@
-import os, json, requests
+import os
+import json
+import requests
 from dotenv import load_dotenv
-
+from news_extractor.settings import environment, TOKEN
+import datetime
 # from pprint import pprint
 load_dotenv()
 
-environment = bool(os.getenv('PRODUCTION'))
 
-_article_url = os.getenv('PRODUCTION_API') if environment else os.getenv('DEVELOPMENT_API') 
-
-# POST REQ FOR URLS
-def endpoints():
-    headers = {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer {}'.format(os.getenv('TOKEN'))
-    }
-    
-    # _url = os.getenv('PRODUCTION_API') if environment else os.getenv('DEVELOPMENT_API') 
-    _query = {
-        #'status': 'Queued'
-        'article_status': 'Queued'
-    }
-    _fields = {
-        'article_url': 1
-    }
-    req = requests.request('POST','{}article/custom_query?fields={}&limit={}'.format(_article_url,json.dumps(_fields),5000), data=json.dumps(_query), headers=headers)
-    return req.json()#json(req.json(), indent=4)
-
-    # return headers, _url, _query 
-
+_article_url = os.getenv(
+    'PRODUCTION_API') if environment else os.getenv('DEVELOPMENT_API')
 
 # TODO: pass => article url
 '''
@@ -36,12 +18,15 @@ def endpoints():
 
 }
 '''
+
+
 def media_value(**kwargs):
     headers = {
         'Content-Type': 'application/json'
     }
-    
-    _url = os.getenv('PRODUCTION_LAMBDA_API') if environment else os.getenv('DEVELOPMENT_LAMBDA_API') 
+
+    _url = os.getenv('PRODUCTION_LAMBDA_API') if environment else os.getenv(
+        'DEVELOPMENT_LAMBDA_API')
     _query = {
         'global': kwargs['global_rank'],
         'local': kwargs['local_rank'],
@@ -51,38 +36,52 @@ def media_value(**kwargs):
         'text': kwargs['article_content']
     }
     print(_query, _url)
-    req = requests.request('POST','{}article/media_values'.format(_url), data=json.dumps(_query), headers=headers)
-    return req#json.dumps(req.json(), indent=4)-----------------------------------------------MEDIA VALUE")
+    req = requests.request('POST', '{}article/media_values'.format(_url),
+                           data=json.dumps(_query), headers=headers)
+    return req
 
-def __google_link_check_fqdn(domain_name):
-    _url = os.getenv('PRODUCTION_LAMBDA_API') if environment else os.getenv('DEVELOPMENT_LAMBDA_API')
+# POST REQ FOR URLS
+
+
+def endpoints():
     headers = {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer {}'.format(os.getenv('TOKEN'))
+        'Authorization': 'Bearer {}'.format(TOKEN)
     }
+
+    # _url = os.getenv('PRODUCTION_API') if environment else os.getenv('DEVELOPMENT_API')
     _query = {
-        'fqdn': domain_name
+        # 'status': 'Queued'
+        'article_status': 'Queued'
     }
-    req = requests.request('POST', '{}/web/count_custiom_query'.format(_url), data=json.dumps(_query), headers=headers)
+    _fields = {
+        'article_url': 1
+    }
+    req = requests.request('POST', '{}article/custom_query?fields={}&limit={}'.format(
+        _article_url, json.dumps(_fields), 5000), data=json.dumps(_query), headers=headers)
+    return req.json()  # json(req.json(), indent=4)
+
+    # return headers, _url, _query
+
 
 def __article_process(article_id):
-    print(article_id)
     '''
     @ Required params
     article id => unique
     article_status => Process (Default)
     '''
-    print(article_response)
     headers = {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer {}'.format(os.getenv('TOKEN'))
+        'Authorization': 'Bearer {}'.format(TOKEN)
     }
     _query = {
-        'article_status': 'Process'#,
-        # ''
+        'article_status': 'Processing',
+        'date_updated': datetime.datetime.today().isoformat()
     }
-    req = requests.request('PUT','{}article/{}'.format(_url, article_id), data=json.dumps(_query), headers=headers)
+    req = requests.request('PUT', '{}article/{}'.format(_url,
+                                                        article_id), data=json.dumps(_query), headers=headers)
     return req
+
 
 def __article_error(article_id, error_status):
     '''
@@ -94,25 +93,94 @@ def __article_error(article_id, error_status):
     print(article_response)
     headers = {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer {}'.format(os.getenv('TOKEN'))
+        'Authorization': 'Bearer {}'.format(TOKEN)
     }
     _query = {
         'article_status': 'Error',
-        'article_error_status': error_status
+        'article_error_status': error_status,
+        'date_updated': datetime.datetime.today().isoformat()
     }
-    req = requests.request('PUT','{}article/{}'.format(_url, article_id), data=json.dumps(_query), headers=headers)
+    req = requests.request('PUT', '{}article/{}'.format(_url,
+                                                        article_id), data=json.dumps(_query), headers=headers)
     return req
 
-def __article_success(article_id, article):
+
+def __article_success(article):
     headers = {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer {}'.format(os.getenv('TOKEN'))
+        'Authorization': 'Bearer {}'.format(TOKEN)
     }
     _query = {
-        article
+        'article_title': article['article_title'],
+        'article_section': article['article_section'],
+        'article_authors': article['article_authors'],
+        'article_publish_date': article['article_publish_date'],
+        'article_images': article['article_images'],
+        'article_content': article['article_content'],
+        'article_videos': article['article_videos'],
+        'article_media_type': article['article_media_type'],
+        'article_ad_value': article['article_ad_value'],
+        'article_pr_value': article['article_pr_value'],
+        'article_language': article['article_language'],
+        'article_status': article['article_status'],
+        'article_error_status': article['article_error_status'],
+        'article_source_from': article['article_source_from'],
+        'keyword': article['keyword'],
+        'article_url': article['article_url'],
+        'date_created': article['date_created'],
+        'date_updated': article['date_updated'],
+        'created_by': article['created_by'],
+        'updated_by': article['updated_by']
     }
-    req = requests.request('PUT','{}article/{}'.format(_url, article_id), data=json.dumps(_query), headers=headers)
+    req = requests.request('PUT', '{}article/{}'.format(_url,
+                                                        article_id), data=json.dumps(_query), headers=headers)
     return req
+
+
+'''
+        GOOGLE LINKS
+'''
+
+
+def __google_link_check_fqdn(domain_name):
+    _url = os.getenv('PRODUCTION_LAMBDA_API') if environment else os.getenv(
+        'DEVELOPMENT_LAMBDA_API')
+    headers = {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer {}'.format(TOKEN)
+    }
+    _query = {
+        'fqdn': domain_name
+    }
+    req = requests.request('POST', '{}/web/count_custiom_query'.format(_url),
+                           data=json.dumps(_query), headers=headers)
+
+
+def __google_links():
+    _url = os.getenv('PRODUCTION_LAMBDA_API') if environment else os.getenv(
+        'DEVELOPMENT_LAMBDA_API')
+    headers = {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer {}'.format(TOKEN)
+    }
+    _query = {
+    }
+    req = requests.request('POST', '{}/global-link/count_custiom_query'.format(
+        _url), data=json.dumps(_query), headers=headers)
+
+
+def __google_():
+    _url = os.getenv('PRODUCTION_LAMBDA_API') if environment else os.getenv(
+        'DEVELOPMENT_LAMBDA_API')
+    headers = {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer {}'.format(TOKEN)
+    }
+    _query = {
+    }
+    req = requests.request('POST', '{}/global-link/count_custiom_query'.format(
+        _url), data=json.dumps(_query), headers=headers)
+
 
 def api_call(article):
     pass
@@ -121,6 +189,8 @@ def api_call(article):
 def total_spider_api_call(total_links, workers):
     print("Total :: {} || {}".format(total_links, workers))
 
+
 def spider_log(spiders):
+    # print("")
     [print(spider) for spider in spiders]
     print("")

@@ -209,9 +209,9 @@ class News:
         if article:
             authors = catch('list', lambda: _author if _author
                             else article.authors if len(article.authors) != 0
-                            else [])
+                            else ['No - Author'])
         else:
-            authors = _author if _author else []
+            authors = _author if _author else ['No - Author']
 
         if not isinstance(authors, list):
             authors = [authors]
