@@ -40,11 +40,7 @@ CONCURRENT_REQUESTS = 32
 DOWNLOAD_DELAY = 3
 # The download delay setting will honor only one of:
 # CONCURRENT_REQUESTS_PER_DOMAIN = 10
-<<<<<<< HEAD
-CONCURRENT_REQUESTS_PER_IP = 30
-=======
 # CONCURRENT_REQUESTS_PER_IP = 10
->>>>>>> production
 
 # CONCURRENT_ITEMS = 200
 # RETRY_TIMES = 3
