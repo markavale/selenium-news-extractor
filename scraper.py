@@ -24,11 +24,10 @@ headers = {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer {}'.format(TOKEN)
     }
-info_path = os.path.abspath('/tmp/logs/news_extractor/app.log')
-debug_path = os.path.abspath('/tmp/logs/news_extractor/debug.log')
-error_path = os.path.abspath('/tmp/logs/news_extractor/errors.log')
-json_path = os.path.abspath('/home/markanthonyvale/dev/media_meter/news-extractor/article_spider.json')
-
+info_path = os.path.abspath('{}/logs/info.log'.format(os.getcwd()))
+debug_path = os.path.abspath('{}/logs/debug.log'.format(os.getcwd()))
+error_path = os.path.abspath('{}/logs/errors.log'.format(os.getcwd()))
+json_path = os.path.abspath('{}/article_spider.json'.format(os.getcwd()))
 
 def spider(data):
     # INITIALIZATION
