@@ -19,7 +19,7 @@ log = init_log("news_extractor")
 
 from decouple import config
 TOKEN = config("TOKEN")
-
+#
 headers = {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer {}'.format(TOKEN)

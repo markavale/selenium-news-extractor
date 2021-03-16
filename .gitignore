@@ -3,7 +3,6 @@ article_static.log
 article_dynamic.log
 article.log
 server.log
-*.txt
 *.log
 .env
 *.json
