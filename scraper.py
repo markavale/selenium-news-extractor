@@ -102,6 +102,7 @@ if __name__ == "__main__":
     delete_all_logs(info_path, debug_path, error_path, json_path)
     process_name = config("PROCESS_NAME")
     limit = config("PAGE_LIMIT", cast=int)
+    website_category = config("WEBSITE_CATEGORY")
     if process_name == "article_link":
         _query = {
         'article_status': 'Queued'
@@ -111,8 +112,8 @@ if __name__ == "__main__":
         }
         
         d = article_link_articles(headers=headers, query=_query, fields=_fields, limit=limit)
-        data = list(map(lambda x:x, d['data']))
-        # data = list(filter(lambda d:d['website']['website_category'] == "Blog", d['data']))[:1]
+        # data = list(map(lambda x:x, d['data']))
+        data = list(filter(lambda d:d['website']['website_category'] == website_category, d['data']))
     else:
         _query = {
         'original_url': {'$ne':None}
