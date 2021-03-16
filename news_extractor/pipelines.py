@@ -29,6 +29,18 @@ class StaticExtractorPipeline:
         self.file.close()
 
     def process_item(self, item, spider):
+<<<<<<< HEAD
+        print("Pipeline of static extractor---------------------")
+        # print(f"Pipeline of Static Extrator: {item['article_title']}")
+        print(item)
+        try:
+            file = open("article_static.json", "a")
+            file.write(str(item))
+        except Exception as e:
+            print(e)
+        finally:
+            file.close()
+=======
         self.exporter.export_item(item)
         article_success(item, process_name)
         self.items.append(item)
@@ -47,6 +59,7 @@ class GlobalExtractorPipeline:
     def process_item(self, item, spider):
         self.exporter.export_item(item)
         # __article_success(item)
+>>>>>>> production
         return item
 
 class DynamicExtractorPipeline:

@@ -32,7 +32,7 @@ LOG_ENABLED = False
 
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
-# CONCURRENT_REQUESTS = 32
+CONCURRENT_REQUESTS = 32
 
 # Configure a delay for requests for the same website (default: 0)
 # See https://docs.scrapy.org/en/latest/topics/settings.html#download-delay
@@ -40,7 +40,11 @@ LOG_ENABLED = False
 DOWNLOAD_DELAY = 3
 # The download delay setting will honor only one of:
 # CONCURRENT_REQUESTS_PER_DOMAIN = 10
+<<<<<<< HEAD
+CONCURRENT_REQUESTS_PER_IP = 30
+=======
 # CONCURRENT_REQUESTS_PER_IP = 10
+>>>>>>> production
 
 # CONCURRENT_ITEMS = 200
 # RETRY_TIMES = 3
