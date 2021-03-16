@@ -14,7 +14,7 @@ from decouple import config
 from logs.main_log import init_log
 log = init_log('news_extractor')
 
-use_proxy = config('USE_PROXY', bool)
+use_proxy = config('USE_PROXY', cast=bool)
 
 process_name = config('PROCESS_NAME')
 
@@ -38,7 +38,6 @@ class ArticleStaticSpider(scrapy.Spider):
     def start_requests(self):
         log.info("Spider started scraping")
         log.info("Using Proxy %s" %use_proxy)
-        print("")
         for d in self.data:
             try:
                 if process_name == "article_link":
@@ -46,6 +45,8 @@ class ArticleStaticSpider(scrapy.Spider):
                 else:
                     article_process(d['_id'], "global-link")  # update status to Process
                 if use_proxy == True:
+                    print("IM HERE -----------------------------------------------")
+                    log.info("USING PROXY")
                     meta = {}
                     headers = {}
                     try:
@@ -102,6 +103,8 @@ class ArticleStaticSpider(scrapy.Spider):
         self.article_items['created_by'] = "Python Global Scraper"
         self.article_items['updated_by'] = "Python Global Scraper"
         self.article_items['article_id'] = article['_id']
+        self.article_items['download_latency'] = response.request.headers['download_latency']
+        
         log.info(response.request.headers)
         log.debug(response.request.meta)
 

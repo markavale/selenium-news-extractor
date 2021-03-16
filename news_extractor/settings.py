@@ -28,6 +28,8 @@ USER_AGENT = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Ge
 
 # Obey robots.txt rules
 ROBOTSTXT_OBEY = False
+DEBUG = False
+
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
 # CONCURRENT_REQUESTS = 32
@@ -48,7 +50,7 @@ COOKIES_ENABLED = False
 
 ### custom conf ###
 # LOG_ENABLED = True
-# LOG_LEVEL = 'ERROR'  # to only display errors
+LOG_LEVEL = 'ERROR'  # to only display errors
 # Disable Telnet Console (enabled by default)
 #TELNETCONSOLE_ENABLED = False
 

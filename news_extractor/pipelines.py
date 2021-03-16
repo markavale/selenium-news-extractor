@@ -17,8 +17,6 @@ process_name = config("PROCESS_NAME")
 #     def process_item(self, item, spider):
 #         return item
 
-
-
 class StaticExtractorPipeline:
     def __init__(self):
         self.file = open("article_spider.json", 'ab')

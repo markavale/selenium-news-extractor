@@ -2,7 +2,7 @@ import requests, datetime, json
 from decouple import config
 
 
-environment = config("PRODUCTION", bool)
+environment = config("PRODUCTION", cast=bool)
 _root_url = config(
     'PRODUCTION_API') if environment else config('DEVELOPMENT_API')
 TOKEN = config("TOKEN")

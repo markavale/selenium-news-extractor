@@ -3,7 +3,7 @@ from decouple import config
 from .utils import get_host_name
 import json
 
-environment = config("PRODUCTION", bool)
+environment = config("PRODUCTION", cast=bool)
 _root_url = config(
     'PRODUCTION_LAMBDA_API') if environment else config('DEVELOPMENT_LAMBDA_API')
 TOKEN = config("TOKEN")

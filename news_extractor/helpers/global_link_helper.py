@@ -4,7 +4,7 @@ from .utils import get_host_name
 import json
 
 
-environment = config("PRODUCTION", bool)
+environment = config("PRODUCTION", cast=bool)
 _root_url = config(
     'PRODUCTION_API') if environment else config('DEVELOPMENT_API')
 TOKEN = config("TOKEN")
@@ -12,7 +12,7 @@ TOKEN = config("TOKEN")
 print(TOKEN)
 
 def global_link_articles(**kwargs):
-    a = api(method="POST", url="{}global-link/custom_query?limit{}".format(_root_url,kwargs['limit']),
+    a = api(method="POST", url="{}global-link/custom_query?limit={}".format(_root_url,kwargs['limit']),
             body=kwargs['query'], headers=kwargs['headers'])
     return a.json()
 

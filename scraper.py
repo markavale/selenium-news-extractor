@@ -101,7 +101,7 @@ def update_all_status_processing(data):
 if __name__ == "__main__":
     delete_all_logs(info_path, debug_path, error_path, json_path)
     process_name = config("PROCESS_NAME")
-    
+    limit = config("PAGE_LIMIT", cast=int)
     if process_name == "article_link":
         _query = {
         'article_status': 'Queued'
@@ -110,7 +110,7 @@ if __name__ == "__main__":
             'article_url': 1
         }
         
-        d = article_link_articles(headers=headers, query=_query, fields=_fields, limit=10)
+        d = article_link_articles(headers=headers, query=_query, fields=_fields, limit=limit)
         data = list(map(lambda x:x, d['data']))
         # data = list(filter(lambda d:d['website']['website_category'] == "Blog", d['data']))[:1]
     else:
@@ -121,13 +121,9 @@ if __name__ == "__main__":
             data["article_url"] = data['original_url']
             resp = google_link_check_fqdn(article_url=data['article_url'], headers=headers)
             data['website'] = resp
-            pprint(data)
             return data
-        d = global_link_articles(headers=headers, query=_query, limit=10)
+        d = global_link_articles(headers=headers, query=_query, limit=limit)
         data = list(map(append_article_url, d['data']))
-
-        
-        # print(data)
 
     system_links = [
         "http://www.nytimes.com/2021/02/25/podcasts/still-processing-best-of-the-archives-whitney-houston.html",
@@ -203,7 +199,6 @@ if __name__ == "__main__":
     try:
         while True:
             print("Getting data from system")
-            # print(data['data'])
             system_data = data
             if len(system_data) == 0:
                 log.info("{} data available. Sleeping....".format(len(system_data)))
