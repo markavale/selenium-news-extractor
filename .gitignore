@@ -2,10 +2,7 @@ __pycache__/
 article_static.log
 article_dynamic.log
 article.log
-<<<<<<< HEAD
-=======
 *.log
->>>>>>> production
 .env
 *.json
 !spec/*.json
