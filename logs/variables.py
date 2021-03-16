@@ -1,7 +1,8 @@
 logs = [
-  'NewsExtractor',
-  'StaticScraperMain',
-  'StaticScraperSub',
-  'DynamicScraperMain',
-  'DynamicScraperSub',
+  'news_extractor'
+  # 'NewsExtractor',
+  # 'StaticScraperMain',
+  # 'StaticScraperSub',
+  # 'DynamicScraperMain',
+  # 'DynamicScraperSub',
 ]

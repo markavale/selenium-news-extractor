@@ -10,7 +10,7 @@ from .content import Content
 from newspaper import Article
 from bs4 import BeautifulSoup
 from dateutil.parser import parse
-from logs import init_log
+from logs.main_log import init_log
 
 
 class News:
@@ -76,7 +76,7 @@ class News:
         self.authors = self.__get_authors(author.names, article)
         self.publish_date = self.__get_publish_date(publish_date.date, article)
         self.images = self.__get_images(article)
-        self.content = self.__get_content(content.text, article, js=js)
+        self.content = self.__get_content(content.text, article, js=js)# or self.__get_title(title.text, article)
 
 
         self.videos = catch('list', lambda: article.movies if article.movies else [])
@@ -209,9 +209,9 @@ class News:
         if article:
             authors = catch('list', lambda: _author if _author
                             else article.authors if len(article.authors) != 0
-                            else [])
+                            else ['No - Author'])
         else:
-            authors = _author if _author else []
+            authors = _author if _author else ['No - Author']
 
         if not isinstance(authors, list):
             authors = [authors]
