@@ -159,6 +159,7 @@ EXTENSIONS = {
 ITEM_PIPELINES = {
     #    'news_extractor.pipelines.NewsExtractorPipeline': 300,
     'news_extractor.pipelines.StaticExtractorPipeline': 300,
+    'news_extractor.pipelines.GlobalExtractorPipeline': 300,
     'news_extractor.pipelines.DynamicExtractorPipeline': 300
 }
 

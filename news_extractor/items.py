@@ -24,13 +24,14 @@ class TestItem(scrapy.Item):
 
 
 class ScrapyCrawlerItem(scrapy.Item):
-    data = scrapy.Field()
-    download_latency = scrapy.Field()
-    http_err = scrapy.Field()
-    timeout_err = scrapy.Field()
-    dns_err = scrapy.Field()
-    base_err = scrapy.Field()
-    skip_url = scrapy.Field()
+    url                 = scrapy.Field()
+    article_id          = scrapy.Field()
+    download_latency    = scrapy.Field()
+    http_err            = scrapy.Field()
+    timeout_err         = scrapy.Field()
+    dns_err             = scrapy.Field()
+    base_err            = scrapy.Field()
+    skip_url            = scrapy.Field()
 
 
 class StaticArticleItem(scrapy.Item):
@@ -59,7 +60,9 @@ class StaticArticleItem(scrapy.Item):
 
     article_id              = scrapy.Field()
     download_latency        = scrapy.Field()
-
+    ip                      = scrapy.Field()
+    user_agent              = scrapy.Field()
+    
     # {
     #     "google_date": "2021-03-09T21:55:00.000Z", # article_publish_date
     #     "status": "Queued", # article_status
@@ -84,6 +87,7 @@ class StaticArticleItem(scrapy.Item):
     #     "original_url": "http://www.fxstreet.com/amp/cryptocurrencies/news/korean-crypto-exchange-bithumb-toughens-up-its-anti-money-laundering-measures-202103091238"
     #     }
 
+
 class GlobalLinkItem(scrapy.Item):
     google_date                 = scrapy.Field()
     status                      = scrapy.Field()
@@ -103,6 +107,12 @@ class GlobalLinkItemExists(scrapy.Item):
     google_website_name         = scrapy.Field()
     google_image                = scrapy.Field()
     original_url                = scrapy.Field()
+
+'''
+
+IP, dl_latency, headers
+
+'''
 
 class GoogleNewsItem(scrapy.Item):
     article_title = scrapy.Field()

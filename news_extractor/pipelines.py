@@ -7,19 +7,24 @@
 # useful for handling different item types with a single interface
 from itemadapter import ItemAdapter
 import requests, os
-from news_extractor.helpers.api import __article_success
+from news_extractor.helpers.api import article_success
 from scrapy.exporters import JsonItemExporter, JsonLinesItemExporter
+from decouple import config
 
+process_name = config("PROCESS_NAME")
 
 # class NewsExtractorPipeline:
 #     def process_item(self, item, spider):
 #         return item
+
+
 
 class StaticExtractorPipeline:
     def __init__(self):
         self.file = open("article_spider.json", 'ab')
         self.exporter = JsonLinesItemExporter(self.file, encoding='utf-8', ensure_ascii=False)
         self.exporter.start_exporting()
+        self.items = []
 
     def close_spider(self, spider):
         self.exporter.finish_exporting()
@@ -27,7 +32,8 @@ class StaticExtractorPipeline:
 
     def process_item(self, item, spider):
         self.exporter.export_item(item)
-        # __article_success(item)
+        article_success(item, process_name)
+        self.items.append(item)
         return item
 
 class GlobalExtractorPipeline:  

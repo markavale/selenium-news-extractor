@@ -2,25 +2,32 @@ from scrapy.crawler import CrawlerProcess
 from scrapy.utils.project import get_project_settings
 from scrapy import signals
 import os, math, json, time
-from news_extractor.helpers.api import endpoints
+# from news_extractor.helpers.api import system_articles_data
 import concurrent.futures
 from pprint import pprint
-from news_extractor.helpers.api import total_spider_api_call, spider_log, get_all_processing_artilces
+# from news_extractor.helpers.api import total_spider_api_call, spider_log, get_all_processing_articles, update_process_to_queued, __get_google_links
 from logs.main_log import init_log
 from news_extractor.pipelines import StaticExtractorPipeline
-
+from news_extractor.helpers.utils import (convert,get_total_spider,__total_data_and_workers,__admin_scraper_post, delete_all_logs,
+                save_all_logs)
+import random
 __articles_items = StaticExtractorPipeline()
+from decouple import config
+from news_extractor.helpers import article_link_articles, global_link_articles, google_link_check_fqdn
 
 log = init_log("news_extractor")
 
+from decouple import config
+TOKEN = config("TOKEN")
 
-# def write_log_spider():
-#     with open("spider_spwn.txt", "a") as spider_file:
-#         spider_file.write("\n")
-#         spider_file.write(f'test')
-#         spider_file.write("\n")
-
-#         spider_file.write("\n")
+headers = {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer {}'.format(TOKEN)
+    }
+info_path = os.path.abspath('/tmp/logs/news_extractor/app.log')
+debug_path = os.path.abspath('/tmp/logs/news_extractor/debug.log')
+error_path = os.path.abspath('/tmp/logs/news_extractor/errors.log')
+json_path = os.path.abspath('/home/markanthonyvale/dev/media_meter/news-extractor/article_spider.json')
 
 
 def spider(data):
@@ -43,12 +50,14 @@ def spider(data):
         spiders.append({
             'thread_crawlers': {'crawlers': spider}#len(spider)
         })
-        # article_items.append(item)
     log.info("Spider links: {}".format(len(spider_data)))
 
+    # print(__articles_items.items)
 
     # for item in __articles_items:
-    #     print(item.process_item)
+    #     print(item)
+
+
     # spider_log(spiders)
 
     process.start()
@@ -57,7 +66,6 @@ def spider(data):
     # for item in article_items:
     #     print(item)
     return spiders
-
 
 
 def main(system_data, WORKERS):
@@ -75,60 +83,15 @@ def main(system_data, WORKERS):
         future = [executor.submit(spider, obj) for obj in data]
     spiders =  [obj.result() for obj in future]
 
-    # spiders = []
-    # for result in spider_result:
-    #     spiders.append(result)    
-
     total_data, total_workers = __total_data_and_workers(system_links, MAX_WORKERS)
 
     return total_data, total_workers, spiders
-
-
-    
-
-def convert(seconds):
-    seconds = seconds % (24 * 3600)
-    hour = seconds // 3600
-    seconds %= 3600
-    minutes = seconds // 60
-    seconds %= 60
-
-    return "%d:%02d:%02d" % (hour, minutes, seconds)
-
-def get_total_spider():
-    pass
-
-def __total_data_and_workers(_data, _workers):
-    return len(_data), _workers
-
-def __admin_scraper_post():
-    pass
-
-def delete_all_logs(info_path, debug_path, error_path, json_path):
-    with open(str(info_path), 'w') as info_file, open(str(debug_path), 'w') as debug_file, open(str(error_path), 'w') as erorr_file, open(str(json_path), 'w') as json_file:
-        info_file.write("")
-        debug_file.write("")
-        erorr_file.write("")
-        json_file.write("")
-
-def save_all_logs(info_path, debug_path, error_path, json_path):
-    info_log    = []
-    debug_log   = []
-    error_log   = []
-    json_log    = []
-    with open(str(info_path), 'r') as info_file, open(str(debug_path), 'r') as debug_file, open(str(error_path), 'r') as erorr_file, open(str(json_path)) as json_file:
-        [info_log.append(line) for line in info_file]
-        [debug_log.append(line) for line in debug_file]
-        [error_log.append(line) for line in erorr_file]
-        [json_log.append(json.loads(line)) for line in json_file]
-
-    return info_log, debug_log, error_log, json_log
 
 def update_all_status_processing(data):
     if len(data) != 0:
         log.info("Updating all %s from Processing status to Queued", len(data))
         for obj in data:
-            
+            update_process_to_queued(data)   
         print("{} updated".format(len(data)))
 
     else:
@@ -136,14 +99,43 @@ def update_all_status_processing(data):
         log.info("No processing article(s).")
 
 if __name__ == "__main__":
+    delete_all_logs(info_path, debug_path, error_path, json_path)
+    process_name = config("PROCESS_NAME")
+    
+    if process_name == "article_link":
+        _query = {
+        'article_status': 'Queued'
+        }
+        _fields = {
+            'article_url': 1
+        }
+        
+        d = article_link_articles(headers=headers, query=_query, fields=_fields, limit=10)
+        data = list(map(lambda x:x, d['data']))
+        # data = list(filter(lambda d:d['website']['website_category'] == "Blog", d['data']))[:1]
+    else:
+        _query = {
+        'original_url': {'$ne':None}
+        }
+        def append_article_url(data):
+            data["article_url"] = data['original_url']
+            resp = google_link_check_fqdn(article_url=data['article_url'], headers=headers)
+            data['website'] = resp
+            pprint(data)
+            return data
+        d = global_link_articles(headers=headers, query=_query, limit=10)
+        data = list(map(append_article_url, d['data']))
+
+        
+        # print(data)
 
     system_links = [
-        "http://www.nytimes.com/2021/02/25/podcasts/still-processing-best-of-the-archives-whitney-houston.html"
-        # 'https://newsinfo.inquirer.net/1407028/manila-to-place-6-barangays-under-4-day-lockdown'
-        # "http://www.nytimes.com/2021/02/25/podcasts/still-processing-best-of-the-archives-whitney-houston.html",
-        # "http://www.nytimes.com/2021/02/28/nyregion/cuomo-investigation-sex-harassment.html",
+        "http://www.nytimes.com/2021/02/25/podcasts/still-processing-best-of-the-archives-whitney-houston.html",
+        # 'https://newsinfo.inquirer.net/1407028/manila-to-place-6-barangays-under-4-day-lockdown',
+        "http://www.nytimes.com/2021/02/25/podcasts/still-processing-best-of-the-archives-whitney-houston.html",
+        "http://www.nytimes.com/2021/02/28/nyregion/cuomo-investigation-sex-harassment.html",
         # "http://www.nytimes.com/2021/02/28/business/media/pandemic-streaming-tv-shows.html",
-        # "http://www.nytimes.com/2021/02/28/us/schools-reopening-philadelphia-parents.html"
+        "http://www.nytimes.com/2021/02/28/us/schools-reopening-philadelphia-parents.html"
 
         # "http://www.nytimes.com/2021/02/25/podcasts/still-processing-best-of-the-archives-whitney-houston.html",
         # "http://www.nytimes.com/2021/02/28/nyregion/cuomo-investigation-sex-harassment.html",
@@ -209,26 +201,28 @@ if __name__ == "__main__":
         # "https://www.gmanetwork.com/news/lifestyle/familyandrelationships/779216/marjorie-barretto-says-daughter-julia-is-at-her-happiest-on-24th-birthday/story/"
     ] * 1
     try:
-        data = endpoints()
-        system_data = list(
-        filter(lambda x: x['website']['website_category'] == 'Blog', data['data']))
+        while True:
+            print("Getting data from system")
+            # print(data['data'])
+            system_data = data
+            if len(system_data) == 0:
+                log.info("{} data available. Sleeping....".format(len(system_data)))
+                time.sleep(random.randint(3,10))
+            else:
+                break        
     except ConnectionError as e:
         print(e)
+        log.error(e)
     except TimeoutError as e:
         print(e)
+        log.error(e)
     except Exception as e:
         print(e)
-        print("API BUSY")
-        time.sleep(1.5)
-        print("Trying again...")
-    # while len(data) == 0:
-    #     pass
-    print(len(system_data))
+        log.error(e)
+    # print(len(system_links))
     WORKERS = os.cpu_count() - 2
     t1 = time.perf_counter()
-
-    # total_data, total_workers, spiders = main(system_data, WORKERS)
-
+    total_data, total_workers, spiders = main(system_data, WORKERS)
     t2 = time.perf_counter()
     elapsed_seconds = round(t2-t1, 2)
     time_finish = convert(elapsed_seconds)
@@ -242,16 +236,15 @@ if __name__ == "__main__":
     # print("-------------------------------")
 
     # FILE PATH
-    info_path = os.path.abspath('/tmp/logs/news_extractor/app.log')
-    debug_path = os.path.abspath('/tmp/logs/news_extractor/debug.log')
-    error_path = os.path.abspath('/tmp/logs/news_extractor/errors.log')
-    json_path = os.path.abspath('/home/markanthonyvale/dev/media_meter/news-extractor/article_spider.json')
+    
 
     # SAVE LOGS IN MEMORY
     info_log, debug_log, error_log, json_log = save_all_logs(info_path, debug_path, error_path, json_path)
 
-    process_articles = get_all_processing_artilces()
-    update_all_status_processing(process_articles['data'])
+    # process_articles = get_all_processing_articles()
+    # if len(process_articles) > 0:
+    #     update_all_status_processing(process_articles['data'])
+        
 
     # pprint(info_log)
     # for article_item in json_log:

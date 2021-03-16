@@ -1,0 +1,174 @@
+from ..items import GlobalLinkItem
+from logzero import logfile, logger
+import requests, os, datetime, json, scrapy
+from ..article_contents.news import News
+from ..article_contents.source.static import StaticSource
+from scrapy.spidermiddlewares.httperror import HttpError
+from twisted.internet.error import DNSLookupError
+from twisted.internet.error import TimeoutError, TCPTimedOutError
+from ..helpers.media_value_helper import (media_value)#, __article_process, __article_error)
+from ..helpers.global_api import (
+    __google_link_check_fqdn, add_new_website, __get_google_links)
+from ..helpers.proxy import get_proxy
+from ..helpers.utils import get_host_name
+from logs.main_log import init_log
+log = init_log('news_extractor')
+
+
+class GoogleLinkSpider(scrapy.Spider):
+    name = "global_static"
+    custom_settings = {
+        'ITEM_PIPELINES': {'news_extractor.pipelines.GlobalExtractorPipeline': 301},
+    }
+
+    def __init__(self, data=None):
+        self.data = data
+        self.article_items = StaticArticleItem()
+
+    def start_requests(self):
+        log.info("Spider started scraping")
+        for d in self.data:
+            try:
+                # __article_process(d)  # update status to Process
+                resp_data = __google_link_check_fqdn(d['original_url'])
+                meta={}
+                headers={}
+                try:
+                    proxy = get_proxy()
+                    ip = proxy['ip']
+                    port = proxy['port']
+                    meta_proxy = f"http://{ip}:{port}"
+                    headers['User-Agent'] = proxy['randomUserAgent']
+                    meta['proxy'] = meta_proxy
+                except Exception as e:
+                    meta['proxy']='http://103.105.212.106:53281'
+                    headers['User-Agent']='Mozilla/5.0 (Windows NT 6.0 rv:21.0) Gecko/20100101 Firefox/21.0'
+                yield scrapy.Request(d['original_url'], self.parse, headers=headers, meta=meta, errback=self.errback_httpbin, cb_kwargs={'article': resp_data}, dont_filter=True)
+                # yield scrapy.Request(d['article_url'], callback=self.parse, errback=self.errback_httpbin, cb_kwargs={'article': d}, dont_filter=True)
+            except Exception as e:
+                self.skip_url += 1
+                log.error(e)
+                log.error("Skip url: %s", url)
+                self.crawler_items['skip_url']=1
+
+    def parse(self, response, article):
+        src=StaticSource(response.url)
+        text_format=src.text
+        news=News(response.url, text_format)
+        if news.content is None:
+            log.error("Content Error on %s", response.url)
+        data=news.generate_data()
+        try:
+            media=media_value(global_rank=article["website"]["alexa_rankings"]['global'], local_rank=article["website"]["alexa_rankings"]['local'],
+                                website_cost=article['website']["website_cost"], article_images=news.images, article_videos=news.videos, article_content=news.content)
+        except Exception as e:
+            log.error("Meida value %s", e)
+            log.error("Media value error %s", response.url)
+        self.article_items['article_title']=news.title
+        self.article_items['article_section']=[]
+        self.article_items['article_authors']=news.authors
+        self.article_items['article_publish_date']=news.publish_date
+        self.article_items['article_images']=news.images
+        self.article_items['article_content']=news.content
+        self.article_items['article_videos']=news.videos
+        self.article_items['article_media_type']='web'
+        self.article_items['article_ad_value']=media.json()[
+            'data']['advalue']
+        self.article_items['article_pr_value']=media.json()[
+            'data']['prvalue']
+        self.article_items['article_language']=news.language
+        self.article_items['article_status']="Done"
+        self.article_items['article_error_status']=None
+        self.article_items['article_source_from']=None
+        self.article_items['keyword']=[]
+        self.article_items['article_url']=news.url
+        self.article_items['date_created']=datetime.datetime.today(
+        ).isoformat()
+        self.article_items['date_updated']=datetime.datetime.today(
+        ).isoformat()
+        self.article_items['created_by']="Python Global Scraper"
+        self.article_items['updated_by']="Python Global Scraper"
+
+        self.article_items['website'] = article.get('_id')
+
+        # log.info(response.request.headers)
+        # log.debug(response.request.meta)
+        yield self.article_items
+
+    def errback_httpbin(self, failure):
+        article=failure.request.cb_kwargs['article']
+        # log all failures
+        self.logger.error(repr(failure))
+
+        # in case you want to do something special for some errors,
+        # you may need the failure's type:
+
+        if failure.check(HttpError):
+            # these exceptions come from HttpError spider middleware
+            # you can get the non-200 response
+            response=failure.value.response
+            log.error("HttpError1 on %s", response.url)
+            log.info("Retry to parse on %s", response.url)
+            self.logger.error('HttpError on %s', response.url)
+            yield scrapy.Request(response.url,
+                                 callback=self.parse,
+                                 errback=self.errback_httpbin_final,
+                                 dont_filter=True,
+                                 cb_kwargs={'article': article}
+                                 )
+        elif failure.check(DNSLookupError):
+            # this is the original request
+            request=failure.request
+            log.error("DNSLookupError1 on %s", request.url)
+            log.info("Retry to parse on %s", request.url)
+            self.logger.error('DNSLookupError on %s', request.url)
+            yield scrapy.Request(request.url,
+                                 callback=self.parse,
+                                 errback=self.errback_httpbin_final,
+                                 dont_filter=True,
+                                 cb_kwargs={'article': article}
+                                 )
+        elif failure.check(TimeoutError, TCPTimedOutError):
+            request=failure.request
+            log.error("TimeoutError1 on %s", request.url)
+            log.info("Retry to parse on %s", request.url)
+            self.logger.error('TimeoutError on %s', request.url)
+            yield scrapy.Request(request.url,
+                                 callback=self.parse,
+                                 errback=self.errback_httpbin_final,
+                                 dont_filter=True,
+                                 cb_kwargs={'article': article}
+                                 )
+        else:
+            request=failure.request
+            log.error("Base Error1 on %s", request.url)
+            log.info("Retry to parse on %s", request.url)
+            yield scrapy.Request(request.url,
+                                 callback=self.parse,
+                                 errback=self.errback_httpbin_final,
+                                 dont_filter=True,
+                                 cb_kwargs={'article': article}
+                                 )
+
+    def errback_httpbin_final(self, failure):
+        if failure.check(HttpError):
+            # these exceptions come from HttpError spider middleware
+            # you can get the non-200 response
+            response=failure.value.response
+            log.error("HttpError2 on %s", response.url)
+            self.logger.error('HttpError on %s', response.url)
+
+        elif failure.check(DNSLookupError):
+            # this is the original request
+            request=failure.request
+            log.error("DNSLookupError2 on %s", request.url)
+            self.logger.error('DNSLookupError on %s', request.url)
+
+        elif failure.check(TimeoutError, TCPTimedOutError):
+            request=failure.request
+            log.error("TimeoutError2 on %s", request.url)
+            self.logger.error('TimeoutError on %s', request.url)
+
+        else:
+            request=failure.request
+            log.error("BaseError2 on %s", request.url)
