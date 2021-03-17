@@ -22,18 +22,24 @@ headers = {
         'Authorization': 'Bearer {}'.format(TOKEN)
     }
 
-# info_path = os.path.abspath('/tmp//logs/news_extractor/app.log')
-# debug_path = os.path.abspath('/tmp//logs/news_extractor/debug.log')
-# error_path = os.path.abspath('/tmp//logs/news_extractor/errors.log')
+info_path = os.path.abspath('/tmp//logs/news_extractor/app.log')
+debug_path = os.path.abspath('/tmp//logs/news_extractor/debug.log')
+error_path = os.path.abspath('/tmp//logs/news_extractor/errors.log')
 
-info_path = os.path.abspath('{}/logs/info.log'.format(os.getcwd()))
-debug_path = os.path.abspath('{}/logs/debug.log'.format(os.getcwd()))
-error_path = os.path.abspath('{}/logs/error.log'.format(os.getcwd()))
-json_path = os.path.abspath('{}/article_spider.json'.format(os.getcwd()))
+# info_path = os.path.abspath('{}/logs/info.log'.format(os.getcwd()))
+# debug_path = os.path.abspath('{}/logs/debug.log'.format(os.getcwd()))
+# error_path = os.path.abspath('{}/logs/error.log'.format(os.getcwd()))
+if not TESTING:
+    json_path = os.path.abspath('{}/article_spider.json'.format(os.getcwd()))
+else:
+    json_path = os.path.abspath('{}/test_article.json'.format(os.getcwd()))
+
+
 # json_path = os.path.abspath('/home/markanthonyvale/dev/media_meter/news-extractor/article_spider.json')
 
 # print(info_path)
 # print(os.getcwd())
+# print(json_path)
 
 # exit(0)
 
@@ -53,8 +59,8 @@ def spider(data):
     # SPIDER CRAWLER
     process = CrawlerProcess(get_project_settings())
     for spider in spider_data:
-        # item = process.crawl('test_spider', spider)
-        process.crawl('article_static', spider)
+        item = process.crawl('test_spider', spider)
+        # process.crawl('article_static', spider)
         spiders.append({
             'thread_crawlers': {'crawlers': spider}#len(spider)
         })

@@ -62,7 +62,7 @@ class ArticleStaticSpider(scrapy.Spider):
                 else:
                     yield scrapy.Request(d['article_url'], callback=self.parse, errback=self.errback_httpbin, cb_kwargs={'article': d}, dont_filter=True)
             except Exception as e:
-                log.error(e)
+                log.exception(e)
                 log.error("Skip url: %s", url)
                 self.crawler_items['skip_url'] = 1
                 
