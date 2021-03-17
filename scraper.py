@@ -32,8 +32,8 @@ error_path = os.path.abspath('{}/logs/error.log'.format(os.getcwd()))
 json_path = os.path.abspath('{}/article_spider.json'.format(os.getcwd()))
 # json_path = os.path.abspath('/home/markanthonyvale/dev/media_meter/news-extractor/article_spider.json')
 
-print(info_path)
-print(os.getcwd())
+# print(info_path)
+# print(os.getcwd())
 
 # exit(0)
 

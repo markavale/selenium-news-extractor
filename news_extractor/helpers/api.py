@@ -99,4 +99,6 @@ def article_success(article, process_name):
     else:
         req = api(method='POST', url='{}article'.format(_root_url),
                   body=_query, headers=headers)
+        req_update = api(method='PUT', url='{}google-link/{}'.format(_root_url,
+                                               article['_id']), body=_query, headers=headers)
     return req.json()
