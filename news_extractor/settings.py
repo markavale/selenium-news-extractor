@@ -201,7 +201,7 @@ TOKEN = config('TOKEN')
 ### EMAIL CONFS
 # MAIL_HOST = 
 
-
+process_name = config("PROCESS_NAME")
 ### PROXY ###
 PROXY = config("USE_PROXY", cast=bool)
 

@@ -10,7 +10,7 @@ from ..helpers.api import  article_process, article_error
 from ..helpers.media_value_helper import media_value
 from ..helpers.proxy import get_proxy
 from decouple import config
-
+from pprint import pprint
 from logs.main_log import init_log
 log = init_log('static_spider')
 
@@ -45,7 +45,6 @@ class ArticleStaticSpider(scrapy.Spider):
                 else:
                     article_process(d['_id'], "global-link")  # update status to Process
                 if use_proxy == True:
-                    # print("IM HERE -----------------------------------------------")
                     log.info("USING PROXY")
                     meta = {}
                     headers = {}
@@ -57,15 +56,20 @@ class ArticleStaticSpider(scrapy.Spider):
                         headers['User-Agent'] = proxy['randomUserAgent']
                         meta['proxy'] = meta_proxy
                     except Exception as e:
+                        
                         meta['proxy'] = 'http://103.105.212.106:53281'
                         headers['User-Agent'] = 'Mozilla/5.0 (Windows NT 6.0 rv:21.0) Gecko/20100101 Firefox/21.0'
                     yield scrapy.Request(d['article_url'], self.parse, headers=headers, meta=meta, errback=self.errback_httpbin, cb_kwargs={'article': d}, dont_filter=True)
                 else:
+                    # pprint(d)
+                    # print(d['website']['fqdn'])
                     yield scrapy.Request(d['article_url'], callback=self.parse, errback=self.errback_httpbin, cb_kwargs={'article': d}, dont_filter=True)
             except Exception as e:
                 log.error(e)
                 log.error("Skip url: %s", url)
                 self.crawler_items['skip_url'] = 1
+
+                yield self.crawler_items
                 
     def parse(self, response, article):
         src = StaticSource(response.url)
@@ -74,14 +78,17 @@ class ArticleStaticSpider(scrapy.Spider):
         if news.content is None:
             log.error("Content Error on %s", response.url)
         data = news.generate_data()
+        
         try:
             media = media_value(global_rank=article["website"]["alexa_rankings"]['global'], local_rank=article["website"]["alexa_rankings"]['local'],
                                 website_cost=article['website']["website_cost"], article_images=news.images, article_videos=news.videos, article_content=news.content)
+            pprint(media)
         except Exception as e:
             log.error("Meida value %s", e)
             log.error("Media value error %s", response.url)
+        self.article_items['article_source_url'] = article['website']['fqdn']
         self.article_items['article_title'] = news.title
-        self.article_items['article_section'] = []
+        self.article_items['article_section'] = [article['website']['website_category']]
         self.article_items['article_authors'] = news.authors
         self.article_items['article_publish_date'] = news.publish_date
         self.article_items['article_images'] = news.images
@@ -102,9 +109,9 @@ class ArticleStaticSpider(scrapy.Spider):
         self.article_items['date_updated'] = datetime.datetime.today().isoformat()
         self.article_items['created_by'] = "Python Global Scraper"
         self.article_items['updated_by'] = "Python Global Scraper"
-        self.article_items['article_id'] = article['_id']
-        self.article_items['artice_source_url'] = article['fqdn']
+        self.article_items['google_link_id'] = article['_id']
         
+        # print(article['website']['fqdn'])
         # self.article_items['download_latency'] = response.request.headers['download_latency']
         
         log.info(response.request.headers)

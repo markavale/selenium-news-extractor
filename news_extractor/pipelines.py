@@ -1,19 +1,21 @@
 from itemadapter import ItemAdapter
-import requests, os
-from news_extractor.helpers.api import article_success
+import requests
+import os
+from news_extractor.helpers.api import api
 from scrapy.exporters import JsonItemExporter, JsonLinesItemExporter
 from decouple import config
-
+from news_extractor.settings import TOKEN, environment
 process_name = config("PROCESS_NAME")
 
-# class NewsExtractorPipeline:
-#     def process_item(self, item, spider):
-#         return item
+_root_url = config(
+    'PRODUCTION_API') if environment else config('DEVELOPMENT_API')
+
 
 class StaticExtractorPipeline:
     def __init__(self):
         self.file = open("article_spider.json", 'ab')
-        self.exporter = JsonLinesItemExporter(self.file, encoding='utf-8', ensure_ascii=False)
+        self.exporter = JsonLinesItemExporter(
+            self.file, encoding='utf-8', ensure_ascii=False)
         self.exporter.start_exporting()
         self.items = []
 
@@ -23,14 +25,31 @@ class StaticExtractorPipeline:
 
     def process_item(self, item, spider):
         self.exporter.export_item(item)
-        article_success(item, process_name)
-        self.items.append(item)
+        headers = {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer {}'.format(TOKEN)
+        }
+        if process_name == "article_link":
+            req = api(method='PUT', url='{}article/{}'.format(_root_url,
+                                                              dict(item)['_id']), body=dict(item), headers=headers)
+        else:
+            req = api(method='POST', url='{}article'.format(_root_url),
+                      body=dict(item), headers=headers)
+            update_query = {
+                "status": "Done",
+                'date_updated': item['date_updated'],
+                'updated_by': "Python Global Scraper"
+            }
+            req_update = api(method='PUT', url='{}global-link/{}'.format(_root_url,
+                                                                         dict(item)['google_link_id']), body=update_query, headers=headers)
         return item
+
 
 class TestStaticPipeline:
     def __init__(self):
         self.file = open("test_article.json", 'ab')
-        self.exporter = JsonLinesItemExporter(self.file, encoding='utf-8', ensure_ascii=False)
+        self.exporter = JsonLinesItemExporter(
+            self.file, encoding='utf-8', ensure_ascii=False)
         self.exporter.start_exporting()
         self.items = []
 
@@ -45,10 +64,12 @@ class TestStaticPipeline:
         pprint(item)
         return item
 
-class GlobalExtractorPipeline:  
+
+class GlobalExtractorPipeline:
     def __init__(self):
         self.file = open("global_article.json", 'ab')
-        self.exporter = JsonLinesItemExporter(self.file, encoding='utf-8', ensure_ascii=False)
+        self.exporter = JsonLinesItemExporter(
+            self.file, encoding='utf-8', ensure_ascii=False)
         self.exporter.start_exporting()
 
     def close_spider(self, spider):
@@ -57,8 +78,8 @@ class GlobalExtractorPipeline:
 
     def process_item(self, item, spider):
         self.exporter.export_item(item)
-        # __article_success(item)
         return item
+
 
 class DynamicExtractorPipeline:
     def __init__(self):

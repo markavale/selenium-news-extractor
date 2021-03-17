@@ -53,7 +53,8 @@ def google_link_check_fqdn(**kwargs):
     fields = {
         "alexa_rankings": 1,
         "website_cost": 1,
-        "fqdn": 1
+        "fqdn": 1,
+        "website_category": 1
     }
     req = api(method='POST',
               url='{}/web/custom_query?fields={}'.format(

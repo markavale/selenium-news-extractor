@@ -31,9 +31,11 @@ error_path = os.path.abspath('/tmp//logs/news_extractor/errors.log')
 # error_path = os.path.abspath('{}/logs/error.log'.format(os.getcwd()))
 # json_path = os.path.abspath('{}/article_spider.json'.format(os.getcwd()))
 if TESTING:
-    json_path = os.path.abspath('/home/markanthonyvale/dev/media_meter/news-extractor/test_article.json')
+    # json_path = os.path.abspath('/home/markanthonyvale/dev/media_meter/news-extractor/test_article.json')
+    json_path = os.path.abspath('{}/test_article.json'.format(os.getcwd()))
 else:
-    json_path = os.path.abspath('/home/markanthonyvale/dev/media_meter/news-extractor/article_spider.json')
+    # json_path = os.path.abspath('/home/markanthonyvale/dev/media_meter/news-extractor/article_spider.json')
+    json_path = os.path.abspath('{}/article_spider.json'.format(os.getcwd()))
 
 # print(info_path)
 # print(os.getcwd())
@@ -56,11 +58,14 @@ def spider(data):
     # SPIDER CRAWLER
     process = CrawlerProcess(get_project_settings())
     for spider in spider_data:
-        item = process.crawl('test_spider', spider)
-        # process.crawl('article_static', spider)
+        if TESTING:
+            item = process.crawl('test_spider', spider)
+        else:
+            item = process.crawl('article_static', spider)
         spiders.append({
             'thread_crawlers': {'crawlers': spider}#len(spider)
         })
+        
         print('----------------------------- twisted ---------------------------------------')
         # print(type(item))
         # # pprint(item.__class__.__dict__.__init__.dir)

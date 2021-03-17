@@ -1,6 +1,7 @@
 import requests, datetime, json
 from decouple import config
-
+from logs.main_log import init_log
+log = init_log("api")
 
 environment = config("PRODUCTION", cast=bool)
 _root_url = config(
@@ -69,26 +70,7 @@ def article_success(article, process_name):
         'Authorization': 'Bearer {}'.format(TOKEN)
     }
     _query = {
-        'article_title': article['article_title'],
-        'article_section': article['article_section'],
-        'article_authors': article['article_authors'],
-        'article_publish_date': article['article_publish_date'],
-        'article_images': article['article_images'],
-        'article_content': article['article_content'],
-        'article_videos': article['article_videos'],
-        'article_media_type': article['article_media_type'],
-        'article_ad_value': article['article_ad_value'],
-        'article_pr_value': article['article_pr_value'],
-        'article_language': article['article_language'],
-        'article_status': article['article_status'],
-        'article_error_status': article['article_error_status'],
-        'article_source_from': article['article_source_from'],
-        'keyword': article['keyword'],
-        'article_url': article['article_url'],
-        'date_created': article['date_created'],
-        'date_updated': article['date_updated'],
-        'created_by': article['created_by'],
-        'updated_by': article['updated_by']
+        article
     }
 
     if process_name == "article_link":
@@ -97,6 +79,20 @@ def article_success(article, process_name):
     else:
         req = api(method='POST', url='{}article'.format(_root_url),
                   body=_query, headers=headers)
+        print(req.json())
+        update_query = {
+            "status": "Done",
+            'date_updated': article['date_updated'],
+            'updated_by': "Python Global Scraper"
+        }
+        print(article)
+        log.debug(article)
+        print(update_query)
+        print(article['_id'])
+        log.debug(article['_id'])
+        log.debug(update_query)
+        # try:
         req_update = api(method='PUT', url='{}global-link/{}'.format(_root_url,
-                                               article['_id']), body=_query, headers=headers)
+                                            article['_id']), body=update_query, headers=headers)
+        # ex
     return req.json()
