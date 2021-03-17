@@ -102,6 +102,7 @@ class ArticleStaticSpider(scrapy.Spider):
         self.article_items['created_by'] = "Python Global Scraper"
         self.article_items['updated_by'] = "Python Global Scraper"
         self.article_items['article_id'] = article['_id']
+        elf.article_items['artice_source_url'] = article['fqdn']
         # self.article_items['download_latency'] = response.request.headers['download_latency']
         
         log.info(response.request.headers)
