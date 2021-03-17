@@ -16,8 +16,6 @@ def api(**kwargs):
     )
     return r
 
-
-
 def article_process(article_id, collection_name):
     '''
     @ Required params
