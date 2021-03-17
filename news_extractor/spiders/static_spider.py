@@ -45,7 +45,6 @@ class ArticleStaticSpider(scrapy.Spider):
                 else:
                     article_process(d['_id'], "global-link")  # update status to Process
                 if use_proxy == True:
-                    # print("IM HERE -----------------------------------------------")
                     log.info("USING PROXY")
                     meta = {}
                     headers = {}
@@ -157,7 +156,7 @@ class ArticleStaticSpider(scrapy.Spider):
 
     def errback_httpbin_final(self, failure):
         article = failure.request.cb_kwargs['article']
-        # article_id = article['_id']
+        article_id = article['_id']
 
 
         if failure.check(HttpError):
