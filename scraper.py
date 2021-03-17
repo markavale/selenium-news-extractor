@@ -298,7 +298,7 @@ if __name__ == "__main__":
     scraper['json_log'] = json_log
     scraper['is_finished'] = True
 
-    pprint(scraper)
+    # pprint(scraper)
     # for spider in scraper['spiders']:
     #     print("")
     #     pprint(spider)
