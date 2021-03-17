@@ -37,14 +37,8 @@ def convert(seconds):
 
     return "%d:%02d:%02d" % (hour, minutes, seconds)
 
-def get_total_spider():
-    pass
-
 def __total_data_and_workers(_data, _workers):
     return len(_data), _workers
-
-def __admin_scraper_post():
-    pass
 
 def delete_all_logs(info_path, debug_path, error_path, json_path):
     with open(str(info_path), 'w') as info_file, open(str(debug_path), 'w') as debug_file, open(str(error_path), 'w') as erorr_file, open(str(json_path), 'w') as json_file:

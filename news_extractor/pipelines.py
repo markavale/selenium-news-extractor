@@ -34,6 +34,23 @@ class StaticExtractorPipeline:
         self.items.append(item)
         return item
 
+class TestStaticPipeline:
+    def __init__(self):
+        self.file = open("test_article.json", 'ab')
+        self.exporter = JsonLinesItemExporter(self.file, encoding='utf-8', ensure_ascii=False)
+        self.exporter.start_exporting()
+        self.items = []
+
+    def close_spider(self, spider):
+        self.exporter.finish_exporting()
+        self.file.close()
+
+    def process_item(self, item, spider):
+        self.exporter.export_item(item)
+        self.items.append(item)
+        print(item)
+        return item
+
 class GlobalExtractorPipeline:  
     def __init__(self):
         self.file = open("global_article.json", 'ab')

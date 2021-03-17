@@ -1,24 +1,22 @@
 from ..items import StaticArticleItem
 from logzero import logfile, logger
-import requests,os, datetime, json, scrapy
+import requests, os, datetime, json, scrapy
 from scrapy import signals
 from ..article_contents.news import News
 from ..article_contents.source.static import StaticSource
-
 from scrapy.spidermiddlewares.httperror import HttpError
 from twisted.internet.error import DNSLookupError
 from twisted.internet.error import TimeoutError, TCPTimedOutError
 from ..helpers.proxy import get_proxy
-
+from news_extractor.settings import PROXY
 from logs.main_log import init_log
 log = init_log('news_extractor')
 
+
 class TestSpider(scrapy.Spider):
     name = "test_spider"
-    logfile("server.log", maxBytes=1e6, backupCount=3)
     custom_settings = {
-        'ITEM_PIPELINES': {'news_extractor.pipelines.StaticExtractorPipeline': 300},
-        "FEEDS": {"test_articles.json": {"format": "json"}},
+        'ITEM_PIPELINES': {'news_extractor.pipelines.TestStaticPipeline': 300},
     }
 
     def __init__(self, urls=None):
@@ -30,11 +28,13 @@ class TestSpider(scrapy.Spider):
         self.base_error = 0
         self.skip_url = 0
         self.download_latency = 0
+        self.crawler_items = []
 
     @classmethod
     def from_crawler(cls, crawler, *args, **kwargs):
         spider = super(TestSpider, cls).from_crawler(crawler, *args, **kwargs)
-        crawler.signals.connect(spider.item_scraped, signal=signals.item_scraped)
+        crawler.signals.connect(spider.item_scraped,
+                                signal=signals.item_scraped)
         return spider
 
     def item_scraped(self, item):
@@ -50,39 +50,37 @@ class TestSpider(scrapy.Spider):
         return item
 
     def start_requests(self):
+        print("went here")
         log.debug(f"Spider started scraping || Total data: {len(self.urls)}")
-        for url in self.urls:
+        for d in self.urls:
             try:
-                # proxy = get_proxy()
-                # ip = proxy['ip']
-                # port = proxy['port']
-                # meta_proxy = f"http://{ip}:{port}"
-                # # headers['User-Agent'] = proxy['randomUserAgent']
-                # headers = {
-                #     "User-Agent": proxy['randomUserAgent']
-                # }
-                # # meta['proxy'] = meta_proxy
-                # meta = {
-                #     "proxy": meta_proxy
-                # }
                 article = {
                     "test": "hello world"
                 }
-                print(
-                    f"------------------------------------ start request  -------------------------------")
-                # yield scrapy.Request(url, callback=self.parse, meta=meta, headers=headers, errback=self.errback_httpbin, dont_filter=True)
-                # yield scrapy.Request(url, callback=self.parse, meta=meta, headers=headers, errback=self.errback_httpbin, dont_filter=True, cb_kwargs={'article': article})
-                yield scrapy.Request(url, callback=self.parse, errback=self.errback_httpbin, dont_filter=True, cb_kwargs={'article': article})
-
-                print(
-                    f"------------------------------------ end start request  -------------------------------")
-            except Exception as e:
-                self.skip_url += 1
+                if PROXY:
+                    log.info("USING PROXY")
+                    meta = {}
+                    headers = {}
+                    try:
+                        proxy = get_proxy()
+                        ip = proxy['ip']
+                        port = proxy['port']
+                        meta_proxy = f"http://{ip}:{port}"
+                        headers['User-Agent'] = proxy['randomUserAgent']
+                        meta['proxy'] = meta_proxy
+                    except Exception as e:
+                        meta['proxy'] = 'http://103.105.212.106:53281'
+                        headers['User-Agent'] = 'Mozilla/5.0 (Windows NT 6.0 rv:21.0) Gecko/20100101 Firefox/21.0'
+                    yield scrapy.Request(d, self.parse, headers=headers, meta=meta, errback=self.errback_httpbin, cb_kwargs={'article': article}, dont_filter=True)
+                else:
+                    yield scrapy.Request(d, callback=self.parse, errback=self.errback_httpbin, cb_kwargs={'article': article}, dont_filter=True)
+            except Exception as e: 
                 log.error(e)
-                log.exception(e)
-                log.error("SKip url: %s", url)
+                log.error("Skip url: %s", url)
+                self.crawler_items['skip_url'] = 1
 
     def parse(self, response, article):
+        # print("went here")
         src = StaticSource(response.url)
         text_format = src.text
         news = News(response.url, text_format)
@@ -117,8 +115,13 @@ class TestSpider(scrapy.Spider):
         log.info(response.request.headers)
         log.debug(response.request.meta)
         self.article_items['download_latency'] = response.request.meta['download_latency']
+        self.article_items['user_agent'] = response.request.headers['User-Agent']
+        self.article_items['ip'] = response.requeset.meta['proxy']
 
         yield self.article_items
+
+        self.crawler_items.append(self.article_items)
+
         print(
             f"------------------------------------ end parsing ---------------------------")
 
@@ -203,3 +206,6 @@ class TestSpider(scrapy.Spider):
             self.base_error += 1
             request = failure.request
             log.error("BaseError2 on %s", request.url)
+
+    def get_crawler_items():
+        return self.crawler_items
