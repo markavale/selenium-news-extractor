@@ -53,6 +53,7 @@ class TestSpider(scrapy.Spider):
         # The next item will be scraped only after
         # deferred (d) is fired
         return item
+    
 
     def start_requests(self):
         print("went here")
@@ -134,7 +135,7 @@ class TestSpider(scrapy.Spider):
 
         yield self.article_items
         # log.debug(self.article_items)
-        self.crawler_items.append(self.article_items)
+        yield self.crawler_items.append(self.article_items)
 
         print(
             f"------------------------------------ end parsing ---------------------------")

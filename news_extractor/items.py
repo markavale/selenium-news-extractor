@@ -58,8 +58,18 @@ class StaticArticleItem(scrapy.Item):
     created_by              = scrapy.Field()
     updated_by              = scrapy.Field()
 
-    article_id              = scrapy.Field()
-    download_latency        = scrapy.Field()
+    # article_id              = scrapy.Field()
+    # download_latency        = scrapy.Field()
+
+    url                 = scrapy.Field()
+    article_id          = scrapy.Field()
+    download_latency    = scrapy.Field()
+    http_err            = scrapy.Field()
+    timeout_err         = scrapy.Field()
+    dns_err             = scrapy.Field()
+    base_err            = scrapy.Field()
+    skip_url            = scrapy.Field()
+
     # ip                      = scrapy.Field()
     # user_agent              = scrapy.Field()
     

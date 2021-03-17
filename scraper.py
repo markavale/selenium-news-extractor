@@ -5,7 +5,7 @@ import os, math, json, time, random
 import concurrent.futures
 from pprint import pprint
 # from news_extractor.helpers.api import total_spider_api_call, spider_log, get_all_processing_articles, update_process_to_queued, __get_google_links
-from news_extractor.pipelines import StaticExtractorPipeline
+from news_extractor.pipelines import StaticExtractorPipeline, TestStaticPipeline
 from news_extractor.helpers.utils import (convert,__total_data_and_workers, delete_all_logs,
                 save_all_logs)
 from decouple import config
@@ -65,11 +65,14 @@ def spider(data):
             'thread_crawlers': {'crawlers': spider}#len(spider)
         })
         print('----------------------------- twisted ---------------------------------------')
-        print(item.__class__)
-        print(item.__dict__)
-        print(item.callback)
-        print(item._debugInfo)
-
+        # print(type(item))
+        # # pprint(item.__class__.__dict__.__init__.dir)
+        # print(item.callback)
+        # print("Dict: ",item.__dict__)
+        # print(item.callback)
+        # print(item._debugInfo)
+        print(item)
+        # print(TestStaticPipeline())
         print('----------------------------- twisted ---------------------------------------')
         # crawler_items.append(item.get_crawler_items())
     log.info("Spider links: {}".format(len(spider_data)))
@@ -150,12 +153,12 @@ def get_system_data(**kwargs):
 if __name__ == "__main__":
     delete_all_logs(info_path, debug_path, error_path, json_path)
     system_links = [
-        # "http://www.nytimes.com/2021/02/25/podcasts/still-processing-best-of-the-archives-whitney-houston.html",
-        'https://newsinfo.inquirer.net/1407028/manila-to-place-6-barangays-under-4-day-lockdown',
+        "http://www.nytimes.com/2021/02/25/podcasts/still-processing-best-of-the-archives-whitney-houston.html",
+        # 'https://newsinfo.inquirer.net/1407028/manila-to-place-6-barangays-under-4-day-lockdown',
         # "http://www.nytimes.com/2021/02/25/podcasts/still-processing-best-of-the-archives-whitney-housawefawefton.htmlfawefawefawefaw",
-        "http://www.nytimes.com/2021/02/28/nyregion/cuomo-investigation-sex-harassment.html"
+        # "http://www.nytimes.com/2021/02/28/nyregion/cuomo-investigation-sex-harassment.html",
         # "http://www.nytimes.com/2021/02/28/business/media/pandemic-streaming-tv-shows.html",
-        # "http://www.nytimes.com/2021/02/28/us/schools-reopening-philadelphia-parents.html"
+        "http://www.nytimes.com/2021/02/28/us/schools-reopening-philadelphia-parents.html"
 
         # "http://www.nytimes.com/2021/02/25/podcasts/still-processing-best-of-the-archives-whitney-houston.html",
         # "http://www.nytimes.com/2021/02/28/nyregion/cuomo-investigation-sex-harassment.html",
@@ -287,7 +290,7 @@ if __name__ == "__main__":
     scraper['json_log'] = json_log
     scraper['is_finished'] = True
 
-    # pprint(scraper)
+    pprint(scraper)
     # for spider in scraper['spiders']:
     #     print("")
     #     pprint(spider)
