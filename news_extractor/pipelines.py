@@ -5,6 +5,7 @@ from news_extractor.helpers.api import api
 from scrapy.exporters import JsonItemExporter, JsonLinesItemExporter
 from decouple import config
 from news_extractor.settings import TOKEN, environment
+from pprint import pprint
 process_name = config("PROCESS_NAME")
 
 _root_url = config(
@@ -29,19 +30,29 @@ class StaticExtractorPipeline:
             'Content-Type': 'application/json',
             'Authorization': 'Bearer {}'.format(TOKEN)
         }
-        if process_name == "article_link":
-            req = api(method='PUT', url='{}article/{}'.format(_root_url,
-                                                              dict(item)['_id']), body=dict(item), headers=headers)
+        # print(dict(item))
+        if dict(item)['article_status'] == "Error":
+            if dict(item)['collection_name'] == "article_link":
+                req = api(method='PUT', url='{}article/{}'.format(_root_url,
+                                                                    dict(item)['article_id']), body=dict(item), headers=headers)
+            else:
+                req = api(method='POST', url='{}article'.format(
+                    _root_url), body=dict(item), headers=headers)
         else:
-            req = api(method='POST', url='{}article'.format(_root_url),
-                      body=dict(item), headers=headers)
-            update_query = {
-                "status": "Done",
-                'date_updated': item['date_updated'],
-                'updated_by': "Python Global Scraper"
-            }
-            req_update = api(method='PUT', url='{}global-link/{}'.format(_root_url,
-                                                                         dict(item)['google_link_id']), body=update_query, headers=headers)
+
+            if dict(item)['collection_name'] == "article_link":
+                req = api(method='PUT', url='{}article/{}'.format(_root_url,
+                                                                  dict(item)['article_id']), body=dict(item), headers=headers)
+            else:
+                req = api(method='POST', url='{}article'.format(_root_url),
+                          body=dict(item), headers=headers)
+                update_query = {
+                    "status": "Done",
+                    'date_updated': item['date_updated'],
+                    'updated_by': "Python Global Scraper"
+                }
+                req_update = api(method='PUT', url='{}global-link/{}'.format(_root_url,
+                                                                             dict(item)['google_link_id']), body=update_query, headers=headers)
         return item
 
 

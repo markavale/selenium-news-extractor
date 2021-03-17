@@ -1,6 +1,6 @@
 from scrapy.crawler import CrawlerProcess
 from scrapy.utils.project import get_project_settings
-import os, math, json, time, random
+import os, math, json, time, random, scrapy
 # from news_extractor.helpers.api import system_articles_data
 import concurrent.futures
 from pprint import pprint
@@ -65,7 +65,13 @@ def spider(data):
         spiders.append({
             'thread_crawlers': {'crawlers': spider}#len(spider)
         })
-        
+        # print(spider)
+        # item_data = __articles_items.process_item(list(spider),scrapy.Spider)
+        # print(item_data)
+        # print(dict(item))
+        # item_meta = __articles_items.process_item(item, scrapy.Spider)
+        # print(item_meta)
+        # log.info(__articles_items)
         print('----------------------------- twisted ---------------------------------------')
         # print(type(item))
         # # pprint(item.__class__.__dict__.__init__.dir)
@@ -73,7 +79,7 @@ def spider(data):
         # print("Dict: ",item.__dict__)
         # print(item.callback)
         # print(item._debugInfo)
-        print(item)
+        # print(item)
         # print(TestStaticPipeline())
         print('----------------------------- twisted ---------------------------------------')
         # crawler_items.append(item.get_crawler_items())
@@ -292,7 +298,7 @@ if __name__ == "__main__":
     scraper['json_log'] = json_log
     scraper['is_finished'] = True
 
-    # pprint(scraper)
+    pprint(scraper)
     # for spider in scraper['spiders']:
     #     print("")
     #     pprint(spider)

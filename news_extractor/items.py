@@ -59,9 +59,10 @@ class StaticArticleItem(scrapy.Item):
     created_by              = scrapy.Field()
     updated_by              = scrapy.Field()
     google_link_id          = scrapy.Field()
+    collection_name         = scrapy.Field()
 
-    # article_id              = scrapy.Field()
-    # download_latency        = scrapy.Field()
+    article_id              = scrapy.Field()
+    download_latency        = scrapy.Field()
 
     # url                 = scrapy.Field()
     # article_id          = scrapy.Field()
