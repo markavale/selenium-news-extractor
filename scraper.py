@@ -217,7 +217,7 @@ if __name__ == "__main__":
     process_name = config("PROCESS_NAME")
     limit = config("PAGE_LIMIT", cast=int)
     if not TESTING:
-        data = get_system_data(process_name=process_name, limit=linit)
+        data = get_system_data(process_name=process_name, limit=limit)
         try:
             while True:
                 print("Getting data from system")
