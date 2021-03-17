@@ -167,10 +167,6 @@ class ArticleStaticSpider(scrapy.Spider):
     def errback_httpbin_final(self, failure):
         article = failure.request.cb_kwargs['article']
         article_id = article['_id']
-<<<<<<< HEAD
-
-=======
->>>>>>> backup_master
 
         if failure.check(HttpError):
             response = failure.value.response
