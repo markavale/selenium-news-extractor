@@ -53,6 +53,7 @@ class TestSpider(scrapy.Spider):
         # The next item will be scraped only after
         # deferred (d) is fired
         return item
+    
 
     def start_requests(self):
         print("went here")
@@ -80,7 +81,7 @@ class TestSpider(scrapy.Spider):
                 else:
                     yield scrapy.Request(d, callback=self.parse, errback=self.errback_httpbin, cb_kwargs={'article': article}, dont_filter=True)
             except Exception as e:
-                log.error(e)
+                log.exception(e)
                 log.error("Skip url: %s", url)
                 self.crawler_items['skip_url'] = 1
 
@@ -127,14 +128,14 @@ class TestSpider(scrapy.Spider):
         #     log.exception(e)
         # log.debug(response.request.meta['User-Agent'])
         # log.debug(response.request.meta['proxy'])
-        self.article_items['user_agent'] = response.request.headers['User-Agent']
-        self.article_items['ip'] = response.meta.get('proxy')
+        # self.article_items['user_agent'] = response.request.headers['User-Agent']
+        # self.article_items['ip'] = response.meta.get('proxy')
 
         
 
         yield self.article_items
         # log.debug(self.article_items)
-        self.crawler_items.append(self.article_items)
+        yield self.crawler_items.append(self.article_items)
 
         print(
             f"------------------------------------ end parsing ---------------------------")
@@ -193,30 +194,26 @@ class TestSpider(scrapy.Spider):
     def errback_httpbin_final(self, failure):
         log.error("errback_httpbin_final triggered")
         if failure.check(HttpError):
-            self.http_error += 1
-            # these exceptions come from HttpError spider middleware
-            # you can get the non-200 response
             response = failure.value.response
             log.error("HttpError2 on %s", response.url)
             self.logger.error('HttpError2 on %s', response.url)
+            self.http_error = 1
 
         elif failure.check(DNSLookupError):
-            self.dns_error += 1
-            # this is the original request
             request = failure.request
             log.error("DNSLookupError2 on %s", request.url)
             self.logger.error('DNSLookupError2 on %s', request.url)
+            self.dns_error = 1
 
         elif failure.check(TimeoutError, TCPTimedOutError):
-            self.timeout_error += 1
             request = failure.request
             log.error("TimeoutError2 on %s", request.url)
             self.logger.error('TimeoutError2 on %s', request.url)
-
+            self.timeout_error = 1
         else:
-            self.base_error += 1
             request = failure.request
             log.error("BaseError2 on %s", request.url)
+            self.base_error = 1
 
     def get_crawler_items():
         return self.crawler_items

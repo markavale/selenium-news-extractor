@@ -44,6 +44,7 @@ class StaticArticleItem(scrapy.Item):
     article_content         = scrapy.Field()
     article_videos          = scrapy.Field()
     article_media_type      = scrapy.Field()
+    article_source_url      = scrapy.Field()
     # website = scrapy.Field()
     article_ad_value        = scrapy.Field()
     article_pr_value        = scrapy.Field()
@@ -57,11 +58,22 @@ class StaticArticleItem(scrapy.Item):
     date_updated            = scrapy.Field()
     created_by              = scrapy.Field()
     updated_by              = scrapy.Field()
+    google_link_id          = scrapy.Field()
 
-    article_id              = scrapy.Field()
-    download_latency        = scrapy.Field()
-    ip                      = scrapy.Field()
-    user_agent              = scrapy.Field()
+    # article_id              = scrapy.Field()
+    # download_latency        = scrapy.Field()
+
+    # url                 = scrapy.Field()
+    # article_id          = scrapy.Field()
+    # download_latency    = scrapy.Field()
+    # http_err            = scrapy.Field()
+    # timeout_err         = scrapy.Field()
+    # dns_err             = scrapy.Field()
+    # base_err            = scrapy.Field()
+    # skip_url            = scrapy.Field()
+
+    # ip                      = scrapy.Field()
+    # user_agent              = scrapy.Field()
     
     # {
     #     "google_date": "2021-03-09T21:55:00.000Z", # article_publish_date
