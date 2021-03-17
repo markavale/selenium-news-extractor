@@ -52,7 +52,8 @@ def google_link_check_fqdn(**kwargs):
     }
     fields = {
         "alexa_rankings": 1,
-        "website_cost": 1
+        "website_cost": 1,
+        "fqdn": 1
     }
     req = api(method='POST',
               url='{}/web/custom_query?fields={}'.format(
@@ -62,5 +63,6 @@ def google_link_check_fqdn(**kwargs):
     if len(domain['data']) != 0:
         clean_data = domain['data'].pop()
         clean_data["article_url"] = kwargs['article_url']
+        # clean_data['article_source_url'] = kwargs['article_url']
         return clean_data
     return add_new_website(fqdn=_clean_url)

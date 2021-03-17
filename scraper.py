@@ -226,7 +226,7 @@ if __name__ == "__main__":
     process_name = config("PROCESS_NAME")
     limit = config("PAGE_LIMIT", cast=int)
     if not TESTING:
-        data = get_system_data(process_name=process_name, limit=linit)
+        data = get_system_data(process_name=process_name, limit=limit)
         try:
             while True:
                 print("Getting data from system")
@@ -290,7 +290,7 @@ if __name__ == "__main__":
     scraper['json_log'] = json_log
     scraper['is_finished'] = True
 
-    pprint(scraper)
+    # pprint(scraper)
     # for spider in scraper['spiders']:
     #     print("")
     #     pprint(spider)
