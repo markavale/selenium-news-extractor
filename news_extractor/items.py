@@ -60,8 +60,8 @@ class StaticArticleItem(scrapy.Item):
 
     article_id              = scrapy.Field()
     download_latency        = scrapy.Field()
-    ip                      = scrapy.Field()
-    user_agent              = scrapy.Field()
+    # ip                      = scrapy.Field()
+    # user_agent              = scrapy.Field()
     
     # {
     #     "google_date": "2021-03-09T21:55:00.000Z", # article_publish_date

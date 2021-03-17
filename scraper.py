@@ -30,7 +30,13 @@ error_path = os.path.abspath('/tmp//logs/news_extractor/errors.log')
 # debug_path = os.path.abspath('{}/logs/debug.log'.format(os.getcwd()))
 # error_path = os.path.abspath('{}/logs/error.log'.format(os.getcwd()))
 # json_path = os.path.abspath('{}/article_spider.json'.format(os.getcwd()))
-json_path = os.path.abspath('/home/markanthonyvale/dev/media_meter/news-extractor/article_spider.json')
+if TESTING:
+    json_path = os.path.abspath('/home/markanthonyvale/dev/media_meter/news-extractor/test_article.json')
+else:
+    json_path = os.path.abspath('/home/markanthonyvale/dev/media_meter/news-extractor/article_spider.json')
+
+
+
 
 print(info_path)
 print(os.getcwd())
@@ -145,8 +151,8 @@ if __name__ == "__main__":
     delete_all_logs(info_path, debug_path, error_path, json_path)
     system_links = [
         # "http://www.nytimes.com/2021/02/25/podcasts/still-processing-best-of-the-archives-whitney-houston.html",
-        # 'https://newsinfo.inquirer.net/1407028/manila-to-place-6-barangays-under-4-day-lockdown',
-        "http://www.nytimes.com/2021/02/25/podcasts/still-processing-best-of-the-archives-whitney-houston.html",
+        'https://newsinfo.inquirer.net/1407028/manila-to-place-6-barangays-under-4-day-lockdown',
+        # "http://www.nytimes.com/2021/02/25/podcasts/still-processing-best-of-the-archives-whitney-housawefawefton.htmlfawefawefawefaw",
         "http://www.nytimes.com/2021/02/28/nyregion/cuomo-investigation-sex-harassment.html"
         # "http://www.nytimes.com/2021/02/28/business/media/pandemic-streaming-tv-shows.html",
         # "http://www.nytimes.com/2021/02/28/us/schools-reopening-philadelphia-parents.html"

@@ -157,8 +157,7 @@ class ArticleStaticSpider(scrapy.Spider):
 
     def errback_httpbin_final(self, failure):
         article = failure.request.cb_kwargs['article']
-        # article_id = article['_id']
-
+        article_id = article['_id']
 
         if failure.check(HttpError):
             response = failure.value.response
@@ -187,3 +186,4 @@ class ArticleStaticSpider(scrapy.Spider):
             log.error("BaseError on %s", request.url)
             article_error(article_id, "Error", process_name)
             self.crawler_items['base_err'] = 1
+
