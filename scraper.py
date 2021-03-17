@@ -53,18 +53,18 @@ def spider(data):
     # SPIDER CRAWLER
     process = CrawlerProcess(get_project_settings())
     for spider in spider_data:
-        item = process.crawl('test_spider', spider)
-        # process.crawl('article_static', spider)
+        # item = process.crawl('test_spider', spider)
+        process.crawl('article_static', spider)
         spiders.append({
             'thread_crawlers': {'crawlers': spider}#len(spider)
         })
-        print('----------------------------- twisted ---------------------------------------')
-        print(item.__class__)
-        print(item.__dict__)
-        print(item.callback)
-        print(item._debugInfo)
+        # print('----------------------------- twisted ---------------------------------------')
+        # print(item.__class__)
+        # print(item.__dict__)
+        # print(item.callback)
+        # print(item._debugInfo)
 
-        print('----------------------------- twisted ---------------------------------------')
+        # print('----------------------------- twisted ---------------------------------------')
         # crawler_items.append(item.get_crawler_items())
     log.info("Spider links: {}".format(len(spider_data)))
 
