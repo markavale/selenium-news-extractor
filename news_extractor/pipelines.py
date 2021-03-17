@@ -46,9 +46,10 @@ class TestStaticPipeline:
         self.file.close()
 
     def process_item(self, item, spider):
+        print("Pipeline Extracotr ------------------------------------------------------------------------------------------")
         self.exporter.export_item(item)
         self.items.append(item)
-        print(item)
+        pprint(item)
         return item
 
 class GlobalExtractorPipeline:  

@@ -12,7 +12,7 @@ from ..helpers.proxy import get_proxy
 from decouple import config
 
 from logs.main_log import init_log
-log = init_log('news_extractor')
+log = init_log('static_spider')
 
 use_proxy = config('USE_PROXY', cast=bool)
 
@@ -45,7 +45,7 @@ class ArticleStaticSpider(scrapy.Spider):
                 else:
                     article_process(d['_id'], "global-link")  # update status to Process
                 if use_proxy == True:
-                    print("IM HERE -----------------------------------------------")
+                    # print("IM HERE -----------------------------------------------")
                     log.info("USING PROXY")
                     meta = {}
                     headers = {}

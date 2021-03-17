@@ -1,6 +1,10 @@
 from ..items import StaticArticleItem
 from logzero import logfile, logger
-import requests, os, datetime, json, scrapy
+import requests
+import os
+import datetime
+import json
+import scrapy
 from scrapy import signals
 from ..article_contents.news import News
 from ..article_contents.source.static import StaticSource
@@ -10,13 +14,14 @@ from twisted.internet.error import TimeoutError, TCPTimedOutError
 from ..helpers.proxy import get_proxy
 from news_extractor.settings import PROXY
 from logs.main_log import init_log
-log = init_log('news_extractor')
+log = init_log('test_static_spider')
 
 
 class TestSpider(scrapy.Spider):
     name = "test_spider"
     custom_settings = {
         'ITEM_PIPELINES': {'news_extractor.pipelines.TestStaticPipeline': 300},
+        # "FEEDS": {"test_articles.json": {"format": "json"}},
     }
 
     def __init__(self, urls=None):
@@ -74,7 +79,7 @@ class TestSpider(scrapy.Spider):
                     yield scrapy.Request(d, self.parse, headers=headers, meta=meta, errback=self.errback_httpbin, cb_kwargs={'article': article}, dont_filter=True)
                 else:
                     yield scrapy.Request(d, callback=self.parse, errback=self.errback_httpbin, cb_kwargs={'article': article}, dont_filter=True)
-            except Exception as e: 
+            except Exception as e:
                 log.error(e)
                 log.error("Skip url: %s", url)
                 self.crawler_items['skip_url'] = 1
@@ -115,11 +120,20 @@ class TestSpider(scrapy.Spider):
         log.info(response.request.headers)
         log.debug(response.request.meta)
         self.article_items['download_latency'] = response.request.meta['download_latency']
+        # try:
+        #     log.debug(response.request.headers['User-Agent'])
+        #     log.debug(response.meta.get("proxy"))
+        # except Exception as e:
+        #     log.exception(e)
+        # log.debug(response.request.meta['User-Agent'])
+        # log.debug(response.request.meta['proxy'])
         self.article_items['user_agent'] = response.request.headers['User-Agent']
-        self.article_items['ip'] = response.requeset.meta['proxy']
+        self.article_items['ip'] = response.meta.get('proxy')
+
+        
 
         yield self.article_items
-
+        # log.debug(self.article_items)
         self.crawler_items.append(self.article_items)
 
         print(
@@ -127,11 +141,7 @@ class TestSpider(scrapy.Spider):
 
     def errback_httpbin(self, failure):
         article = failure.request.cb_kwargs['article']
-        # log all failures
         self.logger.error(repr(failure))
-
-        # in case you want to do something special for some errors,
-        # you may need the failure's type:
 
         if failure.check(HttpError):
             # these exceptions come from HttpError spider middleware
@@ -181,6 +191,7 @@ class TestSpider(scrapy.Spider):
                                  )
 
     def errback_httpbin_final(self, failure):
+        log.error("errback_httpbin_final triggered")
         if failure.check(HttpError):
             self.http_error += 1
             # these exceptions come from HttpError spider middleware

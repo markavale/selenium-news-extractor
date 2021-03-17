@@ -30,7 +30,7 @@ error_path = os.path.abspath('/tmp//logs/news_extractor/errors.log')
 # debug_path = os.path.abspath('{}/logs/debug.log'.format(os.getcwd()))
 # error_path = os.path.abspath('{}/logs/error.log'.format(os.getcwd()))
 # json_path = os.path.abspath('{}/article_spider.json'.format(os.getcwd()))
-json_path = os.path.abspath('/home/markanthonyvale/dev/media_meter/news-extractor/article_spider.json'.format(os.getcwd()))
+json_path = os.path.abspath('/home/markanthonyvale/dev/media_meter/news-extractor/article_spider.json')
 
 print(info_path)
 print(os.getcwd())
@@ -58,7 +58,13 @@ def spider(data):
         spiders.append({
             'thread_crawlers': {'crawlers': spider}#len(spider)
         })
-        print(item)
+        print('----------------------------- twisted ---------------------------------------')
+        print(item.__class__)
+        print(item.__dict__)
+        print(item.callback)
+        print(item._debugInfo)
+
+        print('----------------------------- twisted ---------------------------------------')
         # crawler_items.append(item.get_crawler_items())
     log.info("Spider links: {}".format(len(spider_data)))
 
@@ -140,10 +146,10 @@ if __name__ == "__main__":
     system_links = [
         # "http://www.nytimes.com/2021/02/25/podcasts/still-processing-best-of-the-archives-whitney-houston.html",
         # 'https://newsinfo.inquirer.net/1407028/manila-to-place-6-barangays-under-4-day-lockdown',
-        # "http://www.nytimes.com/2021/02/25/podcasts/still-processing-best-of-the-archives-whitney-houston.html",
-        "http://www.nytimes.com/2021/02/28/nyregion/cuomo-investigation-sex-harassment.html",
+        "http://www.nytimes.com/2021/02/25/podcasts/still-processing-best-of-the-archives-whitney-houston.html",
+        "http://www.nytimes.com/2021/02/28/nyregion/cuomo-investigation-sex-harassment.html"
         # "http://www.nytimes.com/2021/02/28/business/media/pandemic-streaming-tv-shows.html",
-        "http://www.nytimes.com/2021/02/28/us/schools-reopening-philadelphia-parents.html"
+        # "http://www.nytimes.com/2021/02/28/us/schools-reopening-philadelphia-parents.html"
 
         # "http://www.nytimes.com/2021/02/25/podcasts/still-processing-best-of-the-archives-whitney-houston.html",
         # "http://www.nytimes.com/2021/02/28/nyregion/cuomo-investigation-sex-harassment.html",
