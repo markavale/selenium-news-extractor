@@ -34,7 +34,6 @@ if TESTING:
 else:
     # json_path = os.path.abspath('/home/markanthonyvale/dev/media_meter/news-extractor/article_spider.json')
     json_path = os.path.abspath('{}/article_spider.json'.format(os.getcwd()))
-    
 def spider(data):
     # INITIALIZATION
     spiders = []
