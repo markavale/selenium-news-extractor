@@ -101,15 +101,12 @@ class ArticleStaticSpider(scrapy.Spider):
         self.article_items['date_updated'] = datetime.datetime.today().isoformat()
         self.article_items['created_by'] = "Python Global Scraper"
         self.article_items['updated_by'] = "Python Global Scraper"
-        
+        self.article_items['website'] = article['website']['_id']
         self.article_items['collection_name'] = process_name
         if process_name == "article_link":
             self.article_items['article_id'] = article['_id']
-            
         else:
             self.article_items['google_link_id'] = article['_id']
-            self.article_items['website'] = article['website']['_id']
-
         # self.article_items['download_latency'] = response.request.headers['download_latency']
         
         log.info(response.request.headers)
