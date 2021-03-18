@@ -56,7 +56,6 @@ class TestSpider(scrapy.Spider):
     
 
     def start_requests(self):
-        print("went here")
         log.debug(f"Spider started scraping || Total data: {len(self.urls)}")
         for d in self.urls:
             try:
@@ -86,7 +85,6 @@ class TestSpider(scrapy.Spider):
                 self.crawler_items['skip_url'] = 1
 
     def parse(self, response, article):
-        # print("went here")
         src = StaticSource(response.url)
         text_format = src.text
         news = News(response.url, text_format)

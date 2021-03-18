@@ -88,6 +88,7 @@ def get_system_data(**kwargs):
         }
         
         d = article_link_articles(headers=headers, query=_query, fields=_fields, limit=kwargs['limit'])
+        # print(data)
         data = list(filter(lambda d:d['website']['website_category'] == website_category, d['data']))
         return data
     else:
