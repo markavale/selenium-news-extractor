@@ -1,12 +1,11 @@
 import requests, datetime, json
 from decouple import config
 from logs.main_log import init_log
+from news_extractor.settings import environment, TOKEN
 log = init_log("api")
 
-environment = config("PRODUCTION", cast=bool)
 _root_url = config(
     'PRODUCTION_API') if environment else config('DEVELOPMENT_API')
-TOKEN = config("TOKEN")
 
 def api(**kwargs):
     r = requests.request(

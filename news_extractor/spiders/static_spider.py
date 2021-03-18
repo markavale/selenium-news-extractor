@@ -12,13 +12,9 @@ from ..helpers.proxy import get_proxy
 from decouple import config
 from pprint import pprint
 from logs.main_log import init_log
+from news_extractor.settings import TOKEN, process_name, PROXY
 log = init_log('static_spider')
-
-use_proxy = config('USE_PROXY', cast=bool)
-
-process_name = config('PROCESS_NAME')
-
-TOKEN = config("TOKEN")
+use_proxy = PROXY
 
 class ArticleStaticSpider(scrapy.Spider):
     name = "article_static"
@@ -56,13 +52,10 @@ class ArticleStaticSpider(scrapy.Spider):
                         headers['User-Agent'] = proxy['randomUserAgent']
                         meta['proxy'] = meta_proxy
                     except Exception as e:
-                        
                         meta['proxy'] = 'http://103.105.212.106:53281'
                         headers['User-Agent'] = 'Mozilla/5.0 (Windows NT 6.0 rv:21.0) Gecko/20100101 Firefox/21.0'
                     yield scrapy.Request(d['article_url'], self.parse, headers=headers, meta=meta, errback=self.errback_httpbin, cb_kwargs={'article': d}, dont_filter=True)
                 else:
-                    # pprint(d)
-                    # print(d['website']['fqdn'])
                     yield scrapy.Request(d['article_url'], callback=self.parse, errback=self.errback_httpbin, cb_kwargs={'article': d}, dont_filter=True)
             except Exception as e:
                 log.exception(e)
@@ -112,9 +105,11 @@ class ArticleStaticSpider(scrapy.Spider):
         self.article_items['collection_name'] = process_name
         if process_name == "article_link":
             self.article_items['article_id'] = article['_id']
+            
         else:
             self.article_items['google_link_id'] = article['_id']
-        # print(article['website']['fqdn'])
+            self.article_items['website'] = article['website']['_id']
+
         # self.article_items['download_latency'] = response.request.headers['download_latency']
         
         log.info(response.request.headers)

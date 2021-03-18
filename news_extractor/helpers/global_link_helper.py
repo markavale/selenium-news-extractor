@@ -2,14 +2,9 @@ from .api import api
 from decouple import config
 from .utils import get_host_name
 import json
-
-
-environment = config("PRODUCTION", cast=bool)
+from news_extractor.settings import environment, TOKEN
 _root_url = config(
     'PRODUCTION_API') if environment else config('DEVELOPMENT_API')
-TOKEN = config("TOKEN")
-
-print(TOKEN)
 
 def global_link_articles(**kwargs):
     a = api(method="POST", url="{}global-link/custom_query?limit={}".format(_root_url,kwargs['limit']),

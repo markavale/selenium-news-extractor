@@ -2,17 +2,14 @@ from .api import api
 from decouple import config
 from .utils import get_host_name
 import json
-
-environment = config("PRODUCTION", cast=bool)
+from news_extractor.settings import TOKEN, environment
 _root_url = config(
     'PRODUCTION_LAMBDA_API') if environment else config('DEVELOPMENT_LAMBDA_API')
-TOKEN = config("TOKEN")
 
 def media_value(**kwargs):
     headers = {
         'Content-Type': 'application/json'
     }
-
     _query = {
         'global': kwargs['global_rank'],
         'local': kwargs['local_rank'],

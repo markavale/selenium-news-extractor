@@ -45,7 +45,7 @@ class StaticArticleItem(scrapy.Item):
     article_videos          = scrapy.Field()
     article_media_type      = scrapy.Field()
     article_source_url      = scrapy.Field()
-    # website = scrapy.Field()
+    website                 = scrapy.Field()
     article_ad_value        = scrapy.Field()
     article_pr_value        = scrapy.Field()
     article_language        = scrapy.Field()
