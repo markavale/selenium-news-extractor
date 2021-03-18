@@ -19,10 +19,10 @@ def article_link_articles(**kwargs):
         "match": {"website_category": website_category}
     }
     print(website_query)
-    req = api(method='POST', url='{}article/custom_query?fields={}&limit={}'.format(
-        _root_url, json.dumps(kwargs['fields']), kwargs['limit']), body=kwargs['query'], headers=kwargs['headers'])
-    # req = api(method='POST', url='{}article/custom_query?website_query={}&fields={}&limit={}'.format(
-    #     _root_url, json.dumps(website_query), json.dumps(kwargs['fields']), kwargs['limit']), body=kwargs['query'], headers=kwargs['headers'])
+    # req = api(method='POST', url='{}article/custom_query?fields={}&limit={}'.format(
+    #     _root_url, json.dumps(kwargs['fields']), kwargs['limit']), body=kwargs['query'], headers=kwargs['headers'])
+    req = api(method='POST', url='{}article/custom_query?website_query={}&fields={}&limit={}'.format(
+        _root_url, json.dumps(website_query), json.dumps(kwargs['fields']), kwargs['limit']), body=kwargs['query'], headers=kwargs['headers'])
     return req.json()
 
 
