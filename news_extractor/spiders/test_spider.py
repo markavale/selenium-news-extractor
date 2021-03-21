@@ -12,9 +12,14 @@ from scrapy.spidermiddlewares.httperror import HttpError
 from twisted.internet.error import DNSLookupError
 from twisted.internet.error import TimeoutError, TCPTimedOutError
 from ..helpers.proxy import get_proxy
-from news_extractor.settings import PROXY
+from news_extractor.settings import PROXY, process_name
 from logs.main_log import init_log
 log = init_log('test_static_spider')
+
+if process_name == "article_link":
+    collection_name = process_name
+else:
+    collection_name = "global_link"
 
 
 class TestSpider(scrapy.Spider):
@@ -53,14 +58,14 @@ class TestSpider(scrapy.Spider):
         # The next item will be scraped only after
         # deferred (d) is fired
         return item
-    
 
     def start_requests(self):
         log.debug(f"Spider started scraping || Total data: {len(self.urls)}")
         for d in self.urls:
             try:
                 article = {
-                    "test": "hello world"
+                    "test": "hello world",
+                    "_id": "123123123123"
                 }
                 if PROXY:
                     log.info("USING PROXY")
@@ -93,32 +98,40 @@ class TestSpider(scrapy.Spider):
             log.error(news.content)
         # data = news.generate_data()
         print("--------------------------------------------------------------------------------")
-        self.article_items['article_title'] = news.title
-        self.article_items['article_section'] = []
-        self.article_items['article_authors'] = news.authors
-        self.article_items['article_publish_date'] = news.publish_date
-        self.article_items['article_images'] = news.images
-        self.article_items['article_content'] = news.content
-        self.article_items['article_videos'] = news.videos
-        self.article_items['article_media_type'] = 'web'
-        self.article_items['article_ad_value'] = ""
-        self.article_items['article_pr_value'] = ""
-        self.article_items['article_language'] = news.language
-        self.article_items['article_status'] = "Done"
-        self.article_items['article_error_status'] = None
-        self.article_items['article_source_from'] = None
-        self.article_items['keyword'] = []
-        self.article_items['article_url'] = news.url
-        self.article_items['date_created'] = datetime.datetime.today(
-        ).isoformat()
-        self.article_items['date_updated'] = datetime.datetime.today(
-        ).isoformat()
-        self.article_items['created_by'] = "Python Global Scraper"
-        self.article_items['updated_by'] = "Python Global Scraper"
-
         log.info(response.request.headers)
         log.debug(response.request.meta)
-        self.article_items['download_latency'] = response.request.meta['download_latency']
+        articles = self.yeild_article_items(
+            article_title=news.title,
+            article_section=[],
+            article_authors=news.authors,
+            article_publish_date=news.publish_date,
+            article_images=news.images,
+            article_content=news.content,
+            article_videos=news.videos,
+            article_media_type='web',
+            article_ad_value="",
+            article_pr_value="",
+            article_language=news.language,
+            article_status="Done",
+            article_error_status=None,
+            article_source_from=None,
+            keyword=[],
+            article_url=news.url,
+            date_created=datetime.datetime.today().isoformat(),
+            date_updated=datetime.datetime.today().isoformat(),
+            created_by="Python Global Scraper",
+            updated_by="Python Global Scraper",
+            article_id=article['_id'],
+            collection_name=collection_name,
+            download_latency=response.request.meta['download_latency'],
+            http_err=0,
+            dns_err=0,
+            timeout_err=0,
+            base_err=0,
+            skip_url=0
+        )
+
+        yield articles
         # try:
         #     log.debug(response.request.headers['User-Agent'])
         #     log.debug(response.meta.get("proxy"))
@@ -128,8 +141,6 @@ class TestSpider(scrapy.Spider):
         # log.debug(response.request.meta['proxy'])
         # self.article_items['user_agent'] = response.request.headers['User-Agent']
         # self.article_items['ip'] = response.meta.get('proxy')
-
-        
 
         yield self.article_items
         # log.debug(self.article_items)
@@ -146,9 +157,8 @@ class TestSpider(scrapy.Spider):
             # these exceptions come from HttpError spider middleware
             # you can get the non-200 response
             response = failure.value.response
-            log.error("HttpError1 on %s", response.url)
-            log.info("Retry to parse on %s", response.url)
-            self.logger.error('HttpError1 on %s', response.url)
+            log.info("HTTP Error Retry to parsing on %s", response.url)
+            self.logger.error('HTTP Error Retry parsing on %s', response.url)
             yield scrapy.Request(response.url,
                                  callback=self.parse,
                                  errback=self.errback_httpbin_final,
@@ -158,9 +168,9 @@ class TestSpider(scrapy.Spider):
         elif failure.check(DNSLookupError):
             # this is the original request
             request = failure.request
-            log.error("DNSLookupError1 on %s", request.url)
-            log.info("Retry to parse on %s", request.url)
-            self.logger.error('DNSLookupError1 on %s', request.url)
+            log.info("DNSLookup Error Retry to parsing on %s", request.url)
+            self.logger.error(
+                'DNS Lookup Error Retry parsing on %s', request.url)
             yield scrapy.Request(request.url,
                                  callback=self.parse,
                                  errback=self.errback_httpbin_final,
@@ -169,9 +179,9 @@ class TestSpider(scrapy.Spider):
                                  )
         elif failure.check(TimeoutError, TCPTimedOutError):
             request = failure.request
-            log.error("TimeoutError1 on %s", request.url)
-            log.info("Retry to parse on %s", request.url)
-            self.logger.error('TimeoutError1 on %s', request.url)
+            log.info("Timeout Error Retry parsing on %s", request.url)
+            self.logger.error(
+                'Timeout Error Retry parsing on on %s', request.url)
             yield scrapy.Request(request.url,
                                  callback=self.parse,
                                  errback=self.errback_httpbin_final,
@@ -180,8 +190,7 @@ class TestSpider(scrapy.Spider):
                                  )
         else:
             request = failure.request
-            log.error("Base Error1 on %s", request.url)
-            log.info("Retry to parse on %s", request.url)
+            log.info("Base Error Retry parsing on %s", request.url)
             yield scrapy.Request(request.url,
                                  callback=self.parse,
                                  errback=self.errback_httpbin_final,
@@ -190,28 +199,183 @@ class TestSpider(scrapy.Spider):
                                  )
 
     def errback_httpbin_final(self, failure):
-        log.error("errback_httpbin_final triggered")
+        article = failure.request.cb_kwargs['article']
+        log.exception("errback_httpbin_final triggered")
+        print("errror")
         if failure.check(HttpError):
             response = failure.value.response
-            log.error("HttpError2 on %s", response.url)
-            self.logger.error('HttpError2 on %s', response.url)
-            self.http_error = 1
+            log.error("HTTP Error on %s", response.url)
+            self.logger.error('HTTP Error on %s', response.url)
+            articles = self.yeild_article_items(
+                article_title=None,
+                article_section=[],
+                article_authors=None,
+                article_publish_date=None,
+                article_images=None,
+                article_content=None,
+                article_videos=None,
+                article_media_type='web',
+                article_ad_value=None,
+                article_pr_value=None,
+                article_language=None,
+                article_status="Error",
+                article_error_status="HTTP Error",
+                article_source_from=None,
+                keyword=[],
+                article_url=response.url,
+                date_created=None,
+                date_updated=datetime.datetime.today().isoformat(),
+                created_by="Python Global Scraper",
+                updated_by="Python Global Scraper",
+                article_id=article['_id'],
+                collection_name=collection_name,
+                download_latency=None,
+                http_err=1,
+                dns_err=0,
+                timeout_err=0,
+                base_err=0,
+                skip_url=0,
+            )
+            yield articles
 
         elif failure.check(DNSLookupError):
             request = failure.request
             log.error("DNSLookupError2 on %s", request.url)
             self.logger.error('DNSLookupError2 on %s', request.url)
-            self.dns_error = 1
+            articles = self.yeild_article_items(
+                article_title=None,
+                article_section=[],
+                article_authors=None,
+                article_publish_date=None,
+                article_images=None,
+                article_content=None,
+                article_videos=None,
+                article_media_type='web',
+                article_ad_value=None,
+                article_pr_value=None,
+                article_language=None,
+                article_status="Error",
+                article_error_status="DNS Error",
+                article_source_from=None,
+                keyword=[],
+                article_url=request.url,
+                date_created=None,
+                date_updated=datetime.datetime.today().isoformat(),
+                created_by="Python Global Scraper",
+                updated_by="Python Global Scraper",
+                article_id=article['_id'],
+                collection_name=collection_name,
+                download_latency=None,
+                http_err=0,
+                dns_err=1,
+                timeout_err=0,
+                base_err=0,
+                skip_url=0,
+            )
+            yield articles
 
         elif failure.check(TimeoutError, TCPTimedOutError):
             request = failure.request
             log.error("TimeoutError2 on %s", request.url)
             self.logger.error('TimeoutError2 on %s', request.url)
-            self.timeout_error = 1
+            articles = self.yeild_article_items(
+                article_title=None,
+                article_section=[],
+                article_authors=None,
+                article_publish_date=None,
+                article_images=None,
+                article_content=None,
+                article_videos=None,
+                article_media_type='web',
+                article_ad_value=None,
+                article_pr_value=None,
+                article_language=None,
+                article_status="Error",
+                article_error_status="Timeout Error",
+                article_source_from=None,
+                keyword=[],
+                article_url=request.url,
+                date_created=None,
+                date_updated=datetime.datetime.today().isoformat(),
+                created_by="Python Global Scraper",
+                updated_by="Python Global Scraper",
+                article_id=article['_id'],
+                collection_name=collection_name,
+                download_latency=None,
+                http_err=0,
+                dns_err=0,
+                timeout_err=1,
+                base_err=0,
+                skip_url=0,
+            )
+            yield articles
         else:
             request = failure.request
             log.error("BaseError2 on %s", request.url)
-            self.base_error = 1
+            articles = self.yeild_article_items(
+                article_title=None,
+                article_section=[],
+                article_authors=None,
+                article_publish_date=None,
+                article_images=None,
+                article_content=None,
+                article_videos=None,
+                article_media_type='web',
+                article_ad_value=None,
+                article_pr_value=None,
+                article_language=None,
+                article_status="Error",
+                article_error_status="Base Error",
+                article_source_from=None,
+                keyword=[],
+                article_url=request.url,
+                date_created=None,
+                date_updated=datetime.datetime.today().isoformat(),
+                created_by="Python Global Scraper",
+                updated_by="Python Global Scraper",
+                article_id=article['_id'],
+                collection_name=collection_name,
+                download_latency=None,
+                http_err=0,
+                dns_err=0,
+                timeout_err=0,
+                base_err=1,
+                skip_url=0,
+            )
+            yield articles
 
-    def get_crawler_items():
-        return self.crawler_items
+
+    def yeild_article_items(self, **kwargs):
+        # try:
+        self.article_items['article_title'] = kwargs['article_title']
+        self.article_items['article_section'] = kwargs['article_section']
+        self.article_items['article_authors'] = kwargs['article_authors']
+        self.article_items['article_publish_date'] = kwargs['article_publish_date']
+        self.article_items['article_images'] = kwargs['article_images']
+        self.article_items['article_content'] = kwargs['article_content']
+        self.article_items['article_videos'] = kwargs['article_videos']
+        self.article_items['article_media_type'] = kwargs['article_media_type']
+        self.article_items['article_ad_value'] = kwargs['article_ad_value']
+        self.article_items['article_pr_value'] = kwargs['article_pr_value']
+        self.article_items['article_language'] = kwargs['article_language']
+        self.article_items['article_status'] = kwargs['article_status']
+        self.article_items['article_error_status'] = kwargs['article_error_status']
+        self.article_items['article_source_from'] = kwargs['article_source_from']
+        self.article_items['keyword'] = kwargs['keyword']
+        self.article_items['article_url'] = kwargs['article_url']
+        self.article_items['date_created'] = kwargs['date_created']
+        self.article_items['date_updated'] = kwargs['date_updated']
+        self.article_items['created_by'] = kwargs['created_by']
+        self.article_items['updated_by'] = kwargs['updated_by']
+        self.article_items['article_id'] = kwargs['article_id']
+        self.article_items['collection_name'] = kwargs['collection_name']
+        self.article_items['download_latency'] = kwargs['download_latency']
+        self.article_items['http_err'] = kwargs['http_err']
+        self.article_items['dns_err'] = kwargs['dns_err']
+        self.article_items['timeout_err'] = kwargs['timeout_err']
+        self.article_items['base_err'] = kwargs['base_err']
+        self.article_items['skip_url'] = kwargs['skip_url']
+        # except Exception as e:
+        #     print(e)
+
+        return self.article_items
