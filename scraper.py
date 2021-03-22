@@ -79,7 +79,7 @@ def main(system_data, WORKERS):
     with concurrent.futures.ProcessPoolExecutor(max_workers=MAX_WORKERS) as executor:
         future = [executor.submit(spider, obj) for obj in data]
     spiders = [obj.result() for obj in future]
-    total_data, total_workers = __total_data_and_workers(data, MAX_WORKERS)
+    total_data, total_workers = __total_data_and_workers(system_data, MAX_WORKERS)
     return total_data, total_workers, spiders
 
 
@@ -117,7 +117,7 @@ def get_system_data(**kwargs):
 
 if __name__ == "__main__":
     system_links = list(map(lambda x: x.strip(), open(
-        'test-articles.txt').read().split('\n'))) * 25
+        'test-articles.txt').read().split('\n'))) * 250
     process_name = config("PROCESS_NAME")
     limit = config("PAGE_LIMIT", cast=int)
     if not TESTING:
@@ -178,10 +178,11 @@ if __name__ == "__main__":
     scraper['data'] = total_data
     scraper['workers'] = total_workers
     scraper['spiders'] = spiders
-    scraper['info_log'] = ""#info_log
-    scraper['error_log'] = ""#error_log
+    scraper['info_log'] = info_log
+    scraper['error_log'] = error_log
     scraper['json_log'] = ""#json_log
     scraper['crawler_items'] = ""#""crawler_items # FIX 
+    scraper["time_finished"] = time_finish
     scraper['is_finished'] = True
 
     _url = PRODUCTION_ADMIN_API if environment else DEVELOPMENT_ADMIN_API
@@ -189,6 +190,8 @@ if __name__ == "__main__":
     # resp = admin_api(method="POST", url="{}add-crawler-items/".format(_url), body=scraper["crawler_items"])
     # print(resp)
     pprint(scraper)
+    with open("test_data.json", 'w') as f:
+        f.write(str(scraper))
 
     # for json in json_log:
     #     print(json['article_title'])
