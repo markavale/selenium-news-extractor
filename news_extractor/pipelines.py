@@ -31,27 +31,11 @@ class StaticExtractorPipeline:
         }
         # print(dict(item))
         if dict(item)['article_status'] == "Error":
-            if dict(item)['collection_name'] == "article_link":
-                req = api(method='PUT', url='{}article/{}'.format(_root_url,
+            req = api(method='PUT', url='{}article/{}'.format(_root_url,
                                                                     dict(item)['article_id']), body=dict(item), headers=headers)
-            else:
-                req = api(method='POST', url='{}article'.format(
-                    _root_url), body=dict(item), headers=headers)
         else:
-
-            if dict(item)['collection_name'] == "article_link":
-                req = api(method='PUT', url='{}article/{}'.format(_root_url,
+            req = api(method='PUT', url='{}article/{}'.format(_root_url,
                                                                   dict(item)['article_id']), body=dict(item), headers=headers)
-            else:
-                req = api(method='POST', url='{}article'.format(_root_url),
-                          body=dict(item), headers=headers)
-                update_query = {
-                    "status": "Done",
-                    'date_updated': item['date_updated'],
-                    'updated_by': "Python Global Scraper"
-                }
-                req_update = api(method='PUT', url='{}global-link/{}'.format(_root_url,
-                                                                             dict(item)['google_link_id']), body=update_query, headers=headers)
         return item
 
 
