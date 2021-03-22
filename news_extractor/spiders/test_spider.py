@@ -12,9 +12,11 @@ from scrapy.spidermiddlewares.httperror import HttpError
 from twisted.internet.error import DNSLookupError
 from twisted.internet.error import TimeoutError, TCPTimedOutError
 from ..helpers.proxy import get_proxy
-from news_extractor.settings import PROXY, process_name
+from news_extractor.settings import PROXY
 from logs.main_log import init_log
 log = init_log('test_static_spider')
+
+process_name = "article_link"
 
 if process_name == "article_link":
     collection_name = process_name
@@ -346,36 +348,33 @@ class TestSpider(scrapy.Spider):
 
 
     def yeild_article_items(self, **kwargs):
-        # try:
-        self.article_items['article_title'] = kwargs['article_title']
-        self.article_items['article_section'] = kwargs['article_section']
-        self.article_items['article_authors'] = kwargs['article_authors']
-        self.article_items['article_publish_date'] = kwargs['article_publish_date']
-        self.article_items['article_images'] = kwargs['article_images']
-        self.article_items['article_content'] = kwargs['article_content']
-        self.article_items['article_videos'] = kwargs['article_videos']
-        self.article_items['article_media_type'] = kwargs['article_media_type']
-        self.article_items['article_ad_value'] = kwargs['article_ad_value']
-        self.article_items['article_pr_value'] = kwargs['article_pr_value']
-        self.article_items['article_language'] = kwargs['article_language']
-        self.article_items['article_status'] = kwargs['article_status']
-        self.article_items['article_error_status'] = kwargs['article_error_status']
-        self.article_items['article_source_from'] = kwargs['article_source_from']
-        self.article_items['keyword'] = kwargs['keyword']
-        self.article_items['article_url'] = kwargs['article_url']
-        self.article_items['date_created'] = kwargs['date_created']
-        self.article_items['date_updated'] = kwargs['date_updated']
-        self.article_items['created_by'] = kwargs['created_by']
-        self.article_items['updated_by'] = kwargs['updated_by']
-        self.article_items['article_id'] = kwargs['article_id']
-        self.article_items['collection_name'] = kwargs['collection_name']
-        self.article_items['download_latency'] = kwargs['download_latency']
-        self.article_items['http_err'] = kwargs['http_err']
-        self.article_items['dns_err'] = kwargs['dns_err']
-        self.article_items['timeout_err'] = kwargs['timeout_err']
-        self.article_items['base_err'] = kwargs['base_err']
-        self.article_items['skip_url'] = kwargs['skip_url']
-        # except Exception as e:
-        #     print(e)
+        self.article_items['article_title'] = kwargs['article_title'] or None
+        self.article_items['article_section'] = kwargs['article_section'] or None
+        self.article_items['article_authors'] = kwargs['article_authors'] or None
+        self.article_items['article_publish_date'] = kwargs['article_publish_date'] or None
+        self.article_items['article_images'] = kwargs['article_images'] or None
+        self.article_items['article_content'] = kwargs['article_content'] or None
+        self.article_items['article_videos'] = kwargs['article_videos'] or None
+        self.article_items['article_media_type'] = kwargs['article_media_type'] or None
+        self.article_items['article_ad_value'] = kwargs['article_ad_value'] or None
+        self.article_items['article_pr_value'] = kwargs['article_pr_value'] or None
+        self.article_items['article_language'] = kwargs['article_language'] or None
+        self.article_items['article_status'] = kwargs['article_status'] or None
+        self.article_items['article_error_status'] = kwargs['article_error_status'] or None
+        self.article_items['article_source_from'] = kwargs['article_source_from'] or None
+        self.article_items['keyword'] = kwargs['keyword'] or None
+        self.article_items['article_url'] = kwargs['article_url'] or None
+        self.article_items['date_created'] = kwargs['date_created'] or None
+        self.article_items['date_updated'] = kwargs['date_updated'] or None
+        self.article_items['created_by'] = kwargs['created_by'] or None
+        self.article_items['updated_by'] = kwargs['updated_by'] or None
+        self.article_items['article_id'] = kwargs['article_id'] or None
+        self.article_items['collection_name'] = kwargs['collection_name'] or None
+        self.article_items['download_latency'] = kwargs['download_latency'] or None
+        self.article_items['http_err'] = kwargs['http_err'] or None
+        self.article_items['dns_err'] = kwargs['dns_err'] or None
+        self.article_items['timeout_err'] = kwargs['timeout_err'] or None
+        self.article_items['base_err'] = kwargs['base_err'] or None
+        self.article_items['skip_url'] = kwargs['skip_url'] or None
 
         return self.article_items

@@ -12,7 +12,7 @@ from ..helpers.proxy import get_proxy
 from decouple import config
 from pprint import pprint
 from logs.main_log import init_log
-from news_extractor.settings import TOKEN, process_name, PROXY
+from news_extractor.settings import TOKEN, PROXY
 log = init_log('static_spider')
 use_proxy = PROXY
 
@@ -36,10 +36,7 @@ class ArticleStaticSpider(scrapy.Spider):
         log.info("Using Proxy %s" %use_proxy)
         for d in self.data:
             try:
-                if process_name == "article_link":
-                    article_process(d['_id'], "article")  # update status to Process
-                else:
-                    article_process(d['_id'], "global-link")  # update status to Process
+                article_process(d['_id'], "article")  # update status to Process
                 if use_proxy == True:
                     log.info("USING PROXY")
                     meta = {}
@@ -102,11 +99,8 @@ class ArticleStaticSpider(scrapy.Spider):
         self.article_items['created_by'] = "Python Global Scraper"
         self.article_items['updated_by'] = "Python Global Scraper"
         self.article_items['website'] = article['website']['_id']
-        self.article_items['collection_name'] = process_name
-        if process_name == "article_link":
-            self.article_items['article_id'] = article['_id']
-        else:
-            self.article_items['google_link_id'] = article['_id']
+        self.article_items['article_id'] = article['_id']
+
         # self.article_items['download_latency'] = response.request.headers['download_latency']
         
         log.info(response.request.headers)
@@ -166,17 +160,13 @@ class ArticleStaticSpider(scrapy.Spider):
         if failure.check(HttpError):
             response = failure.value.response
             log.error("HttpError on %s", response.url)
-            if process_name == "article_link":
-                self.article_items['article_id'] = article['_id']
-            else:
-                self.article_items['google_link_id'] = article['_id']
+            self.article_items['article_id'] = article['_id']
             self.logger.error('HttpError on %s', response.url)
             self.crawler_items['http_err'] = 1
             self.article_items['article_status'] = "Error"
             self.article_items['article_error_status'] = "HTTP Error"
             self.article_items['date_updated'] = datetime.datetime.today().isoformat()
             self.article_items['article_url'] = response.url
-            self.article_items['collection_name'] = process_name
             yield self.article_items
 
         elif failure.check(DNSLookupError):
@@ -184,15 +174,11 @@ class ArticleStaticSpider(scrapy.Spider):
             log.error("DNSLookupError on %s", request.url)
             self.logger.error('DNSLookupError on %s', request.url)
             self.crawler_items['dns_err'] = 1
-            if process_name == "article_link":
-                self.article_items['article_id'] = article['_id']
-            else:
-                self.article_items['google_link_id'] = article['_id']
+            self.article_items['article_id'] = article['_id']
             self.article_items['article_status'] = "Error"
             self.article_items['article_error_status'] = "DNS Lookup Error"
             self.article_items['date_updated'] = datetime.datetime.today().isoformat()
             self.article_items['article_url'] = request.url
-            self.article_items['collection_name'] = process_name
             yield self.article_items
 
         elif failure.check(TimeoutError, TCPTimedOutError):
@@ -200,28 +186,20 @@ class ArticleStaticSpider(scrapy.Spider):
             log.error("TimeoutError2 on %s", request.url)
             self.logger.error('TimeoutError on %s', request.url)
             # self.crawler_items['timeout_err'] = 1
-            if process_name == "article_link":
-                self.article_items['article_id'] = article['_id']
-            else:
-                self.article_items['google_link_id'] = article['_id']
+            self.article_items['article_id'] = article['_id']
             self.article_items['article_status'] = "Error"
             self.article_items['article_error_status'] = "Timeout Error"
             self.article_items['date_updated'] = datetime.datetime.today().isoformat()
             self.article_items['article_url'] = request.url
-            self.article_items['collection_name'] = process_name
             yield self.article_items
         else:
             request = failure.request
             log.error("BaseError on %s", request.url)
             # self.crawler_items['base_err'] = 1
-            if process_name == "article_link":
-                self.article_items['article_id'] = article['_id']
-            else:
-                self.article_items['google_link_id'] = article['_id']
+            self.article_items['article_id'] = article['_id']
             self.article_items['article_status'] = "Error"
             self.article_items['article_error_status'] = "Error"
             self.article_items['date_updated'] = datetime.datetime.today().isoformat()
             self.article_items['article_url'] = request.url
-            self.article_items['collection_name'] = process_name
             yield self.article_items
 

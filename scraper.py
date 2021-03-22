@@ -1,6 +1,11 @@
 from scrapy.crawler import CrawlerProcess
 from scrapy.utils.project import get_project_settings
-import os, math, json, time, random, scrapy
+import os
+import math
+import json
+import time
+import random
+import scrapy
 # from news_extractor.helpers.api import system_articles_data
 import concurrent.futures
 from pprint import pprint
@@ -9,12 +14,11 @@ from news_extractor.helpers.utils import (convert, __total_data_and_workers, del
                                           save_all_logs)
 from decouple import config
 from news_extractor.helpers import article_link_articles, global_link_articles, google_link_check_fqdn, admin_api
-from news_extractor.settings import TESTING, TOKEN, PRODUCTION_ADMIN_API, DEVELOPMENT_ADMIN_API, environment
+from news_extractor.settings import TESTING, TOKEN, PRODUCTION_ADMIN_API, DEVELOPMENT_ADMIN_API, environment, CREATED_BY
 from logs.main_log import init_log
 log = init_log("news_extractor")
 
-
-###
+# HEADERS
 headers = {
     'Content-Type': 'application/json',
     'Authorization': 'Bearer {}'.format(TOKEN)
@@ -48,9 +52,9 @@ def spider(data):
     process = CrawlerProcess(get_project_settings())
     if TESTING:
         for spider in spider_data:
-            #item = process.crawl('test_spider', spider)
+            item = process.crawl('test_spider', spider)
             spiders.append({
-                'thread_crawlers':[{"url": data, "article_id": "1231231"} for data in spider] # FIX
+                'thread_crawlers': [{"url": data, "article_id": "1231231"} for data in spider]
             })
     else:
         print("Total thread spider(s): {}".format(len(spider_data)))
@@ -58,7 +62,7 @@ def spider(data):
         for spider in spider_data:
             item = process.crawl('article_static', spider)
             spiders.append({
-                'thread_crawlers': {'crawlers': spider}
+                'thread_crawlers': {'url': spider}
             })
     log.info("Spider links: {}".format(len(spider_data)))
     process.start()
@@ -79,52 +83,39 @@ def main(system_data, WORKERS):
     with concurrent.futures.ProcessPoolExecutor(max_workers=MAX_WORKERS) as executor:
         future = [executor.submit(spider, obj) for obj in data]
     spiders = [obj.result() for obj in future]
-    total_data, total_workers = __total_data_and_workers(system_data, MAX_WORKERS)
+    total_data, total_workers = __total_data_and_workers(
+        system_data, MAX_WORKERS)
     return total_data, total_workers, spiders
 
 
 def get_system_data(**kwargs):
-    if kwargs['process_name'] == "article_link":
-        website_category = config("WEBSITE_CATEGORY")
-        _query = {
-            'article_status': 'Queued'
-        }
-        _fields = {
-            'article_url': 1
-        }
-
-        data = article_link_articles(
-            headers=headers, query=_query, fields=_fields, limit=kwargs['limit'])
-        print(data)
-        # data = list(filter(lambda d:d['website']['website_category'] == website_category, d['data']))
-        return data
-    else:
-        _query = {
-            'original_url': {'$ne': None}
-        }
-
-        def append_article_url(data):
-            data["article_url"] = data['original_url']
-            resp = google_link_check_fqdn(
-                article_url=data['article_url'], headers=headers)
-            data['website'] = resp
-            return data
-        d = global_link_articles(
-            headers=headers, query=_query, limit=kwargs['limit'])
-        data = list(map(append_article_url, d['data']))
-        return data
-
+    website_category = config("WEBSITE_CATEGORY")
+    article_website_query = {
+        "path": "website",
+        "match": {"website_category": website_category},
+        "select": "-main_sections -section_filter -article_filter -selectors -sub_sections -embedded_sections -code_snippet"
+    }
+    body_query = {
+        'article_status': 'Queued',
+        'created_by': CREATED_BY
+    }
+    _fields = {
+        'article_url': 1
+    }
+    data = article_link_articles(
+        headers=headers, body=body_query, fields=_fields, limit=kwargs['limit'], website_query=article_website_query)
+    return data
 
 if __name__ == "__main__":
     system_links = list(map(lambda x: x.strip(), open(
-        'test-articles.txt').read().split('\n'))) * 250
-    process_name = config("PROCESS_NAME")
+        'test-articles.txt').read().split('\n')))
     limit = config("PAGE_LIMIT", cast=int)
     if not TESTING:
-        data = get_system_data(process_name=process_name, limit=limit)
+        data = get_system_data(limit=limit)
         try:
             print("Getting data from system")
-            system_data = data
+            system_data = data['data']
+            print(len(system_data))
             if len(system_data) == 0:
                 print("No Data")
                 log.info('No data')
@@ -160,17 +151,17 @@ if __name__ == "__main__":
     for item in json_log:
         crawler_items.append(
             {
-                "article_id": item['article_id'],
-                "article_url": item['article_url'],
-                "download_latency": item['download_latency'],
-                "collection_name": item['collection_name'],
-                "article_status": item['article_status'],
-                "article_error_status": item['article_error_status'],
-                "http_error": item['http_err'],
-                "dns_error": item['dns_err'],
-                "timeout_error": item['timeout_err'],
-                "base_error": item['base_err'],
-                "skip_url": item['skip_url'],
+                # "article_id": item['article_id'],
+                # "article_url": item['article_url'],
+                # "download_latency": item['download_latency'],
+                # "collection_name": item['collection_name'],
+                # "article_status": item['article_status'],
+                # "article_error_status": item['article_error_status'],
+                # "http_error": item['http_err'],
+                # "dns_error": item['dns_err'],
+                # "timeout_error": item['timeout_err'],
+                # "base_error": item['base_err'],
+                # "skip_url": item['skip_url'],
             }
         )
 
@@ -180,8 +171,7 @@ if __name__ == "__main__":
     scraper['spiders'] = spiders
     scraper['info_log'] = info_log
     scraper['error_log'] = error_log
-    scraper['json_log'] = ""#json_log
-    scraper['crawler_items'] = ""#""crawler_items # FIX 
+    scraper['crawler_items'] = ""  # ""crawler_items # FIX
     scraper["time_finished"] = time_finish
     scraper['is_finished'] = True
 

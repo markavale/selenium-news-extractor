@@ -1,4 +1,6 @@
-import requests, datetime, json
+import requests
+import datetime
+import json
 from decouple import config
 from logs.main_log import init_log
 from news_extractor.settings import environment, TOKEN
@@ -6,6 +8,7 @@ log = init_log("api")
 
 _root_url = config(
     'PRODUCTION_API') if environment else config('DEVELOPMENT_API')
+
 
 def api(**kwargs):
     r = requests.request(
@@ -15,6 +18,7 @@ def api(**kwargs):
         data=json.dumps(kwargs['body'])
     )
     return r
+
 
 def article_process(article_id, collection_name):
     '''
@@ -31,12 +35,12 @@ def article_process(article_id, collection_name):
         'date_updated': datetime.datetime.today().isoformat()
     }
 
-    req = api(method='PUT', url='{}{}/{}'.format(_root_url,collection_name,
-                                           article_id), body=_query, headers=headers)
+    req = api(method='PUT', url='{}{}/{}'.format(_root_url, collection_name,
+                                                 article_id), body=_query, headers=headers)
     return req.json()
 
 
-def article_error(article_id, error_status, process_name):
+def article_error(article_id, error_status):
     '''
     @ Required params
     article id => unique
@@ -52,17 +56,12 @@ def article_error(article_id, error_status, process_name):
         'article_error_status': error_status,
         'date_updated': datetime.datetime.today().isoformat()
     }
-
-    if process_name == "article_link":
-        req = api(method='PUT', url='{}article/{}'.format(_root_url,
-                                               article_id), body=_query, headers=headers)
-    else:
-        req = api(method='POST', url='{}article'.format(_root_url),
-                  body=_query, headers=headers)
+    req = api(method='PUT', url='{}article/{}'.format(_root_url,
+                                                      article_id), body=_query, headers=headers)
     return req.json()
 
 
-def article_success(article, process_name):
+def article_success(article):
 
     headers = {
         'Content-Type': 'application/json',
@@ -72,26 +71,6 @@ def article_success(article, process_name):
         article
     }
 
-    if process_name == "article_link":
-        req = api(method='PUT', url='{}article/{}'.format(_root_url,
-                                               article['article_id']), body=_query, headers=headers)
-    else:
-        req = api(method='POST', url='{}article'.format(_root_url),
-                  body=_query, headers=headers)
-        print(req.json())
-        update_query = {
-            "status": "Done",
-            'date_updated': article['date_updated'],
-            'updated_by': "Python Global Scraper"
-        }
-        print(article)
-        log.debug(article)
-        print(update_query)
-        print(article['_id'])
-        log.debug(article['_id'])
-        log.debug(update_query)
-        # try:
-        req_update = api(method='PUT', url='{}global-link/{}'.format(_root_url,
-                                            article['_id']), body=update_query, headers=headers)
-        # ex
+    req = api(method='PUT', url='{}article/{}'.format(_root_url,
+                                                      article['article_id']), body=_query, headers=headers)
     return req.json()

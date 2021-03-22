@@ -6,7 +6,6 @@ from scrapy.exporters import JsonItemExporter, JsonLinesItemExporter
 from decouple import config
 from news_extractor.settings import TOKEN, environment
 from pprint import pprint
-process_name = config("PROCESS_NAME")
 
 _root_url = config(
     'PRODUCTION_API') if environment else config('DEVELOPMENT_API')
