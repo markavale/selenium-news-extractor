@@ -203,6 +203,7 @@ TOKEN = config('TOKEN')
 
 # ARTICLES
 CREATED_BY = config("CREATED_BY")
+PAGE_OFFSET = config("PAGE_OFFSET")
 
 ### PROXY ###
 PROXY = config("USE_PROXY", cast=bool)

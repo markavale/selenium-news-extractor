@@ -9,7 +9,7 @@ from news_extractor.helpers.utils import (convert, __total_data_and_workers, del
                                           save_all_logs)
 from decouple import config
 from news_extractor.helpers import article_link_articles, global_link_articles, google_link_check_fqdn, admin_api
-from news_extractor.settings import TESTING, TOKEN, PRODUCTION_ADMIN_API, DEVELOPMENT_ADMIN_API, environment, CREATED_BY
+from news_extractor.settings import TESTING, TOKEN, PRODUCTION_ADMIN_API, DEVELOPMENT_ADMIN_API, environment, CREATED_BY, PAGE_OFFSET
 from logs.main_log import init_log
 log = init_log("news_extractor")
 
@@ -84,10 +84,10 @@ def main(system_data, WORKERS):
 
 
 def get_system_data(**kwargs):
-    website_category = config("WEBSITE_CATEGORY")
+    # website_category = config("WEBSITE_CATEGORY")
     article_website_query = {
         "path": "website",
-        "match": {"website_category": website_category},
+        # "match": {"website_category": website_category},
         "select": "-main_sections -section_filter -article_filter -selectors -sub_sections -embedded_sections -code_snippet"
     }
     body_query = {
@@ -98,7 +98,7 @@ def get_system_data(**kwargs):
         'article_url': 1,
     }
     data = article_link_articles(
-        headers=headers, body=body_query, fields=_fields, limit=kwargs['limit'], website_query=article_website_query)
+        headers=headers, body=body_query, fields=_fields, limit=kwargs['limit'], website_query=article_website_query, page_offset=PAGE_OFFSET)
     return data
 
 if __name__ == "__main__":

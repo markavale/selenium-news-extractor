@@ -5,7 +5,6 @@ import json
 from news_extractor.settings import environment, TOKEN
 _root_url = config(
     'PRODUCTION_API') if environment else config('DEVELOPMENT_API')
-website_category = config("WEBSITE_CATEGORY")
 
 def article_link_articles(**kwargs):
     # _query = {
@@ -14,8 +13,8 @@ def article_link_articles(**kwargs):
     # _fields = {
     #     'article_url': 1
     # }
-    req = api(method='POST', url='{}article/custom_query?website_query={}&fields={}&limit={}'.format(
-        _root_url, json.dumps(kwargs['website_query']), json.dumps(kwargs['fields']), kwargs['limit']), body=kwargs['body'], headers=kwargs['headers'])
+    req = api(method='POST', url='{}article/custom_query?website_query={}&fields={}&limit={}&offset={}'.format(
+        _root_url, json.dumps(kwargs['website_query']), json.dumps(kwargs['fields']), kwargs['limit'], kwargs['page_offset']), body=kwargs['body'], headers=kwargs['headers'])
     return req.json()
 
 
