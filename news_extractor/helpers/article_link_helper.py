@@ -16,8 +16,6 @@ def article_link_articles(**kwargs):
     # }
     req = api(method='POST', url='{}article/custom_query?website_query={}&fields={}&limit={}'.format(
         _root_url, json.dumps(kwargs['website_query']), json.dumps(kwargs['fields']), kwargs['limit']), body=kwargs['body'], headers=kwargs['headers'])
-    print(req.json())
-    print("------------------------------")
     return req.json()
 
 

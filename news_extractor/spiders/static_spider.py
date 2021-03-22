@@ -73,6 +73,7 @@ class ArticleStaticSpider(scrapy.Spider):
             media = media_value(global_rank=article["website"]["alexa_rankings"]['global'], local_rank=article["website"]["alexa_rankings"]['local'],
                                 website_cost=article['website']["website_cost"], article_images=news.images, article_videos=news.videos, article_content=news.content)
         except Exception as e:
+            print(e)
             log.error("Meida value %s", e)
             log.error("Media value error %s", response.url)
         self.article_items['article_source_url'] = article['website']['fqdn']

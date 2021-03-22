@@ -9,7 +9,6 @@ log = init_log("api")
 _root_url = config(
     'PRODUCTION_API') if environment else config('DEVELOPMENT_API')
 
-
 def api(**kwargs):
     r = requests.request(
         method=kwargs['method'],
@@ -18,7 +17,6 @@ def api(**kwargs):
         data=json.dumps(kwargs['body'])
     )
     return r
-
 
 def article_process(article_id, collection_name):
     '''

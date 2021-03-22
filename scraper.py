@@ -1,11 +1,6 @@
 from scrapy.crawler import CrawlerProcess
 from scrapy.utils.project import get_project_settings
-import os
-import math
-import json
-import time
-import random
-import scrapy
+import os, math, json, time, random, scrapy
 # from news_extractor.helpers.api import system_articles_data
 import concurrent.futures
 from pprint import pprint
@@ -100,7 +95,7 @@ def get_system_data(**kwargs):
         'created_by': CREATED_BY
     }
     _fields = {
-        'article_url': 1
+        'article_url': 1,
     }
     data = article_link_articles(
         headers=headers, body=body_query, fields=_fields, limit=kwargs['limit'], website_query=article_website_query)
@@ -115,7 +110,6 @@ if __name__ == "__main__":
         try:
             print("Getting data from system")
             system_data = data['data']
-            print(len(system_data))
             if len(system_data) == 0:
                 print("No Data")
                 log.info('No data')
@@ -179,7 +173,7 @@ if __name__ == "__main__":
 
     # resp = admin_api(method="POST", url="{}add-crawler-items/".format(_url), body=scraper["crawler_items"])
     # print(resp)
-    pprint(scraper)
+    # pprint(scraper)
     with open("test_data.json", 'w') as f:
         f.write(str(scraper))
 
