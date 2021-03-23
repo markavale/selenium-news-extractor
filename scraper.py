@@ -179,8 +179,8 @@ if __name__ == "__main__":
     resp2 = admin_api(method="POST", url="{}process-scraper/".format(_url), body=scraper)
     print(resp2)
     # pprint(scraper)
-    with open("test_data.json", 'w') as f:
-        f.write(str(scraper))
+    # with open("test_data.json", 'w') as f:
+    #     f.write(str(scraper))
 
     # for json in json_log:
     #     print(json['article_title'])

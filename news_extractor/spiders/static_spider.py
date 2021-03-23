@@ -92,7 +92,6 @@ class ArticleStaticSpider(scrapy.Spider):
         self.article_items['article_language'] = news.language
         self.article_items['article_status'] = "Done"
         self.article_items['article_error_status'] = None
-        self.article_items['article_source_from'] = None
         self.article_items['keyword'] = []
         self.article_items['article_url'] = news.url
         self.article_items['date_created'] = datetime.datetime.today().isoformat()

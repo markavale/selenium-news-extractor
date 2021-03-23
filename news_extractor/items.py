@@ -51,7 +51,6 @@ class StaticArticleItem(scrapy.Item):
     article_language        = scrapy.Field()
     article_status          = scrapy.Field()
     article_error_status    = scrapy.Field()
-    article_source_from     = scrapy.Field()
     keyword                 = scrapy.Field()
     article_url             = scrapy.Field()
     date_created            = scrapy.Field()
