@@ -156,7 +156,7 @@ ITEM_PIPELINES = {
 
 
 CONCURRENT_ITEMS = 100 # => Maximum number of concurrent items (per response) to process in parallel in item pipelines.
-CONCURRENT_REQUESTS = 100
+CONCURRENT_REQUESTS = 200
 CONCURRENT_REQUESTS_PER_DOMAIN = 100
 AUTOTHROTTLE_ENABLED = False
 DOWNLOAD_TIMEOUT = 120 # 2 Mins

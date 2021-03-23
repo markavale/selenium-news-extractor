@@ -15,7 +15,6 @@ from ..article_contents.news import News
 
 class ArticleDyamicSpider(scrapy.Spider):
     # Initializing log file
-    logfile("server.log", maxBytes=1e6, backupCount=3)
     name = "article_dynamic"
     # allowed_domains = ["toscrape.com"]
     custom_settings = {

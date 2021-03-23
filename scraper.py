@@ -1,4 +1,4 @@
-from scrapy.crawler import CrawlerProcess
+from scrapy.crawler import CrawlerProcess, CrawlerRunner
 from scrapy.utils.project import get_project_settings
 import os, math, json, time, random, scrapy
 # from news_extractor.helpers.api import system_articles_data
@@ -11,7 +11,14 @@ from decouple import config
 from news_extractor.helpers import article_link_articles, global_link_articles, google_link_check_fqdn, admin_api
 from news_extractor.settings import TESTING, TOKEN, PRODUCTION_ADMIN_API, DEVELOPMENT_ADMIN_API, environment, CREATED_BY, PAGE_OFFSET
 from logs.main_log import init_log
+# from apscheduler.schedulers.twisted import TwistedScheduler
+# from apscheduler.schedulers.Scheduler import Scheduler
+# from apscheduler.schedulers import Scheduler
 log = init_log("news_extractor")
+
+# scheduler = TwistedScheduler()
+
+# scheduler = TwistedScheduler()
 
 # HEADERS
 headers = {
@@ -47,20 +54,33 @@ def spider(data):
     process = CrawlerProcess(get_project_settings())
     if TESTING:
         for spider in spider_data:
-            item = process.crawl('test_spider', spider)
+            # scheduler.add_job(
+            #     process.crawl,
+            #     "cron",
+            #     args=[spider],
+            #     minute=1
+            # )
+            scheduler.add_job(process.crawl, 'interval', args=['test_spider' ,spider], seconds=10)
+            # process.crawl('test_spider', spider)
             spiders.append({
                 'thread_crawlers': [{"url": data, "article_id": "1231231"} for data in spider]
             })
+            # scheduler.start()
     else:
         print("Total thread spider(s): {}".format(len(spider_data)))
         log.info("Total thread spider(s) {}".format(len(spider_data)))
         for spider in spider_data:
+            # scheduler.add_job(process.crawl, 'interval', args=['article_static' ,spider], seconds=10)
             item = process.crawl('article_static', spider)
             spiders.append({
                 'thread_crawlers': [{'url': data['article_url'], "article_id": data['_id']} for data in spider]
             })
+            # scheduler.start()
     log.info("Spider links: {}".format(len(spider_data)))
-    process.start()
+    process.start(False) # Do not stop reactor after spider closes
+
+    # scheduler start
+    # scheduler.start()
     return spiders
 
 
@@ -99,7 +119,7 @@ def get_system_data(**kwargs):
         headers=headers, body=body_query, fields=_fields, limit=kwargs['limit'], website_query=article_website_query, page_offset=PAGE_OFFSET)
     return data
 
-if __name__ == "__main__":
+def run():
     system_links = list(map(lambda x: x.strip(), open(
         'test-articles.txt').read().split('\n')))
     limit = config("PAGE_LIMIT", cast=int)
@@ -186,3 +206,17 @@ if __name__ == "__main__":
     #     print(json['article_title'])
 
     # delete_all_logs(info_path, debug_path, error_path, json_path)
+
+if __name__ == "__main__":
+    run()
+    # add_s = scheduler.add_job(run, 'interval', seconds=2)
+    # scheduler.start()
+    # print(add_s)
+    # run()
+    # scheduler = Scheduler()
+    # print("Started scheduling")
+    # scheduler.start()
+    # print("Added new job")
+    # job = scheduler.add_interval_job(run, seconds=15)
+    # print(job)
+    
