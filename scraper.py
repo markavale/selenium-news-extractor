@@ -57,7 +57,7 @@ def spider(data):
         for spider in spider_data:
             item = process.crawl('article_static', spider)
             spiders.append({
-                'thread_crawlers': {'url': spider}
+                'thread_crawlers': [{'url': data['article_url'], "article_id": data['_id']} for data in spider]
             })
     log.info("Spider links: {}".format(len(spider_data)))
     process.start()
@@ -84,10 +84,8 @@ def main(system_data, WORKERS):
 
 
 def get_system_data(**kwargs):
-    # website_category = config("WEBSITE_CATEGORY")
     article_website_query = {
         "path": "website",
-        # "match": {"website_category": website_category},
         "select": "-main_sections -section_filter -article_filter -selectors -sub_sections -embedded_sections -code_snippet"
     }
     body_query = {
@@ -143,19 +141,19 @@ if __name__ == "__main__":
     crawler_items = []
 
     for item in json_log:
+        print(item)
         crawler_items.append(
             {
-                # "article_id": item['article_id'],
-                # "article_url": item['article_url'],
-                # "download_latency": item['download_latency'],
-                # "collection_name": item['collection_name'],
-                # "article_status": item['article_status'],
-                # "article_error_status": item['article_error_status'],
-                # "http_error": item['http_err'],
-                # "dns_error": item['dns_err'],
-                # "timeout_error": item['timeout_err'],
-                # "base_error": item['base_err'],
-                # "skip_url": item['skip_url'],
+                "article_id": item['article_id'],
+                "article_url": item['article_url'],
+                "download_latency": item['download_latency'],
+                "article_status": item['article_status'],
+                "article_error_status": item['article_error_status'],
+                "http_error": item['http_error'],
+                "dns_error": item['dns_error'],
+                "timeout_error": item['timeout_error'],
+                "base_error": item['base_error'],
+                "skip_url": item['skip_url'],
             }
         )
 
@@ -165,14 +163,19 @@ if __name__ == "__main__":
     scraper['spiders'] = spiders
     scraper['info_log'] = info_log
     scraper['error_log'] = error_log
-    scraper['crawler_items'] = ""  # ""crawler_items # FIX
+    # scraper['crawler_items'] = crawler_items
     scraper["time_finished"] = time_finish
     scraper['is_finished'] = True
 
+    crl_items = {}
+    crl_items['crawler_items'] = crawler_items
+
     _url = PRODUCTION_ADMIN_API if environment else DEVELOPMENT_ADMIN_API
 
-    # resp = admin_api(method="POST", url="{}add-crawler-items/".format(_url), body=scraper["crawler_items"])
-    # print(resp)
+    resp = admin_api(method="POST", url="{}crawler-items/".format(_url), body=crl_items["crawler_items"])
+    print(resp)
+    resp2 = admin_api(method="POST", url="{}process-scraper/".format(_url), body=scraper)
+    print(resp2)
     # pprint(scraper)
     with open("test_data.json", 'w') as f:
         f.write(str(scraper))
