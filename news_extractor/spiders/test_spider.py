@@ -16,19 +16,11 @@ from news_extractor.settings import PROXY
 from logs.main_log import init_log
 log = init_log('test_static_spider')
 
-process_name = "article_link"
-
-if process_name == "article_link":
-    collection_name = process_name
-else:
-    collection_name = "global_link"
-
 
 class TestSpider(scrapy.Spider):
     name = "test_spider"
     custom_settings = {
         'ITEM_PIPELINES': {'news_extractor.pipelines.TestStaticPipeline': 300},
-        # "FEEDS": {"test_articles.json": {"format": "json"}},
     }
 
     def __init__(self, urls=None):
@@ -124,7 +116,6 @@ class TestSpider(scrapy.Spider):
             created_by="Python Global Scraper",
             updated_by="Python Global Scraper",
             article_id=article['_id'],
-            collection_name=collection_name,
             download_latency=response.request.meta['download_latency'],
             http_err=0,
             dns_err=0,
@@ -230,7 +221,6 @@ class TestSpider(scrapy.Spider):
                 created_by="Python Global Scraper",
                 updated_by="Python Global Scraper",
                 article_id=article['_id'],
-                collection_name=collection_name,
                 download_latency=None,
                 http_err=1,
                 dns_err=0,
@@ -266,7 +256,6 @@ class TestSpider(scrapy.Spider):
                 created_by="Python Global Scraper",
                 updated_by="Python Global Scraper",
                 article_id=article['_id'],
-                collection_name=collection_name,
                 download_latency=None,
                 http_err=0,
                 dns_err=1,
@@ -302,7 +291,6 @@ class TestSpider(scrapy.Spider):
                 created_by="Python Global Scraper",
                 updated_by="Python Global Scraper",
                 article_id=article['_id'],
-                collection_name=collection_name,
                 download_latency=None,
                 http_err=0,
                 dns_err=0,
@@ -336,7 +324,6 @@ class TestSpider(scrapy.Spider):
                 created_by="Python Global Scraper",
                 updated_by="Python Global Scraper",
                 article_id=article['_id'],
-                collection_name=collection_name,
                 download_latency=None,
                 http_err=0,
                 dns_err=0,
@@ -369,7 +356,6 @@ class TestSpider(scrapy.Spider):
         self.article_items['created_by'] = kwargs['created_by'] 
         self.article_items['updated_by'] = kwargs['updated_by'] 
         self.article_items['article_id'] = kwargs['article_id'] 
-        self.article_items['collection_name'] = kwargs['collection_name'] 
         self.article_items['download_latency'] = kwargs['download_latency'] 
         self.article_items['http_err'] = kwargs['http_err'] 
         self.article_items['dns_err'] = kwargs['dns_err'] 

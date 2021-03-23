@@ -149,10 +149,10 @@ if __name__ == "__main__":
                 "download_latency": item['download_latency'],
                 "article_status": item['article_status'],
                 "article_error_status": item['article_error_status'],
-                "http_error": item['http_error'],
-                "dns_error": item['dns_error'],
-                "timeout_error": item['timeout_error'],
-                "base_error": item['base_error'],
+                "http_error": item['http_err'],
+                "dns_error": item['dns_err'],
+                "timeout_error": item['timeout_err'],
+                "base_error": item['base_err'],
                 "skip_url": item['skip_url'],
             }
         )
@@ -172,8 +172,10 @@ if __name__ == "__main__":
 
     _url = PRODUCTION_ADMIN_API if environment else DEVELOPMENT_ADMIN_API
 
+    print("SENDING JSON LOG DATA SET TO ADMIN SCRAPER API")
     resp = admin_api(method="POST", url="{}crawler-items/".format(_url), body=crl_items["crawler_items"])
     print(resp)
+    print("SENDING SCRAPER OBJECT TO ADMIN SCRAPER API")
     resp2 = admin_api(method="POST", url="{}process-scraper/".format(_url), body=scraper)
     print(resp2)
     # pprint(scraper)
