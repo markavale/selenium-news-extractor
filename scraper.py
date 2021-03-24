@@ -133,19 +133,23 @@ def run():
     crawler_items = []
 
     for item in json_log:
-        crawler_items.append(
-            {
-                "article_id": item['article_id'],
-                "article_url": item['article_url'],
-                "download_latency": item['download_latency'],
-                "article_status": item['article_status'],
-                "article_error_status": item['article_error_status'],
-                "http_error": item['http_err'],
-                "dns_error": item['dns_err'],
-                "timeout_error": item['timeout_err'],
-                "base_error": item['base_err'],
-                "skip_url": item['skip_url']
-            }
+        try:
+            crawler_items.append(
+                {
+                    "article_id": item['article_id'],
+                    "article_url": item['article_url'],
+
+                    "download_latency": item['download_latency'],
+                    "article_status": item['article_status'],
+                    "article_error_status": item['article_error_status'],
+                    "http_error": item['http_err'],
+                    "dns_error": item['dns_err'],
+                    "timeout_error": item['timeout_err'],
+                    "base_error": item['base_err'],
+                    "skip_url": item['skip_url']
+                }
+            except Exception as e:
+                print(e)
         )
 
     scraper = {}
