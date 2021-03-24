@@ -8,15 +8,7 @@ from news_extractor.helpers import global_link_articles, google_link_check_fqdn,
 from news_extractor.settings import (TESTING, TOKEN, PRODUCTION_ADMIN_API, DEVELOPMENT_ADMIN_API, environment, CREATED_BY, PAGE_OFFSET,
                             LIMIT)
 from logs.main_log import init_log
-# from apscheduler.schedulers.twisted import TwistedScheduler
-# from apscheduler.schedulers.Scheduler import Scheduler
-# from apscheduler.schedulers import Scheduler
 log = init_log("news_extractor")
-
-# scheduler = TwistedScheduler()
-
-# scheduler = TwistedScheduler()
-
 # HEADERS
 headers = {
     'Content-Type': 'application/json',
@@ -61,7 +53,7 @@ def spider(data):
             # scheduler.add_job(process.crawl, 'interval', args=['test_spider' ,spider], seconds=10)
             process.crawl('test_spider', spider)
             spiders.append({
-                'thread_crawlers': [{"url": data, "article_id": "1231231"} for data in spider]
+                'thread_crawlers': [{"url": data, "article_id": "605abf51d7ca3f780d2163f4"} for data in spider]
             })
             # scheduler.start()
     else:
@@ -126,10 +118,7 @@ def run():
 
     WORKERS = os.cpu_count() - 2
     t1 = time.perf_counter()
-    try:
-        total_data, total_workers, spiders = main(system_data, WORKERS)
-    except Exception as e:
-        print(e)
+    total_data, total_workers, spiders = main(system_data, WORKERS)
     t2 = time.perf_counter()
     elapsed_seconds = round(t2-t1, 2)
     time_finish = convert(elapsed_seconds)
@@ -144,7 +133,6 @@ def run():
     crawler_items = []
 
     for item in json_log:
-        print(item)
         crawler_items.append(
             {
                 "article_id": item['article_id'],
@@ -166,7 +154,6 @@ def run():
     scraper['spiders'] = spiders
     scraper['info_log'] = info_log
     scraper['error_log'] = error_log
-    # scraper['crawler_items'] = crawler_items
     scraper["time_finished"] = time_finish
     scraper['is_finished'] = True
 
@@ -186,18 +173,7 @@ def run():
     # for json in json_log:
     #     print(json['article_title'])
 
-    # delete_all_logs(info_path, debug_path, error_path, json_path)
+    delete_all_logs(info_path, debug_path, error_path, json_path)
 
 if __name__ == "__main__":
     run()
-    # add_s = scheduler.add_job(run, 'interval', seconds=2)
-    # scheduler.start()
-    # print(add_s)
-    # run()
-    # scheduler = Scheduler()
-    # print("Started scheduling")
-    # scheduler.start()
-    # print("Added new job")
-    # job = scheduler.add_interval_job(run, seconds=15)
-    # print(job)
-    
