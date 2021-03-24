@@ -15,20 +15,13 @@ headers = {
     'Authorization': 'Bearer {}'.format(TOKEN)
 }
 
-info_path = os.path.abspath('/tmp//logs/news_extractor/app.log')
-debug_path = os.path.abspath('/tmp//logs/news_extractor/debug.log')
-error_path = os.path.abspath('/tmp//logs/news_extractor/errors.log')
-
-# info_path = os.path.abspath('{}/logs/info.log'.format(os.getcwd()))
-# debug_path = os.path.abspath('{}/logs/debug.log'.format(os.getcwd()))
-# error_path = os.path.abspath('{}/logs/error.log'.format(os.getcwd()))
-# json_path = os.path.abspath('{}/article_spider.json'.format(os.getcwd()))
+info_path = os.path.abspath('/tmp/logs/news_extractor/app.log')
+debug_path = os.path.abspath('/tmp/logs/news_extractor/debug.log')
+error_path = os.path.abspath('/tmp/logs/news_extractor/errors.log')
 
 if TESTING:
-    # json_path = os.path.abspath('/home/markanthonyvale/dev/media_meter/news-extractor/test_article.json')
     json_path = os.path.abspath('{}/test_article.json'.format(os.getcwd()))
 else:
-    # json_path = os.path.abspath('/home/markanthonyvale/dev/media_meter/news-extractor/article_spider.json')
     json_path = os.path.abspath('{}/article_spider.json'.format(os.getcwd()))
 
 
@@ -44,28 +37,18 @@ def spider(data):
     process = CrawlerProcess(get_project_settings())
     if TESTING:
         for spider in spider_data:
-            # scheduler.add_job(
-            #     process.crawl,
-            #     "cron",
-            #     args=[spider],
-            #     minute=1
-            # )
-            # scheduler.add_job(process.crawl, 'interval', args=['test_spider' ,spider], seconds=10)
             process.crawl('test_spider', spider)
             spiders.append({
                 'thread_crawlers': [{"url": data, "article_id": "605abf51d7ca3f780d2163f4"} for data in spider]
             })
-            # scheduler.start()
     else:
         print("Total thread spider(s): {}".format(len(spider_data)))
         log.info("Total thread spider(s) {}".format(len(spider_data)))
         for spider in spider_data:
-            # scheduler.add_job(process.crawl, 'interval', args=['article_static' ,spider], seconds=15)
             item = process.crawl('article_static', spider)
             spiders.append({
                 'thread_crawlers': [{'url': data['article_url'], "article_id": data['_id']} for data in spider]
             })
-            # scheduler.start()
     log.info("Spider links: {}".format(len(spider_data)))
     process.start() # Do not stop reactor after spider closes
 
@@ -138,7 +121,6 @@ def run():
                 {
                     "article_id": item['article_id'],
                     "article_url": item['article_url'],
-
                     "download_latency": item['download_latency'],
                     "article_status": item['article_status'],
                     "article_error_status": item['article_error_status'],
