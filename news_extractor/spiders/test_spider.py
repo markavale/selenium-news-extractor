@@ -32,7 +32,7 @@ class TestSpider(scrapy.Spider):
         self.base_error = 0
         self.skip_url = 0
         self.download_latency = 0
-        self.crawler_items = []
+        self.crawler_items = [] 
 
     @classmethod
     def from_crawler(cls, crawler, *args, **kwargs):

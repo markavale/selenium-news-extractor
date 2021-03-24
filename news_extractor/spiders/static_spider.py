@@ -1,4 +1,4 @@
-from ..items import StaticArticleItem, ScrapyCrawlerItem
+from ..items import StaticArticleItem
 from logzero import logfile, logger
 import requests,os, datetime, json, scrapy
 from ..article_contents.news import News
@@ -24,12 +24,6 @@ class ArticleStaticSpider(scrapy.Spider):
     def __init__(self, data=None):
         self.data = data
         self.article_items = StaticArticleItem()
-        self.crawler_items = ScrapyCrawlerItem()
-        self.crawler_items['http_err'] = 0
-        self.crawler_items['timeout_err'] = 0
-        self.crawler_items['dns_err'] = 0
-        self.crawler_items['base_err'] = 0
-        self.crawler_items['skip_url'] = 0
 
     def start_requests(self):
         log.info("Spider started scraping")
@@ -56,10 +50,20 @@ class ArticleStaticSpider(scrapy.Spider):
                     yield scrapy.Request(d['article_url'], callback=self.parse, errback=self.errback_httpbin, cb_kwargs={'article': d}, dont_filter=True)
             except Exception as e:
                 log.exception(e)
-                log.error("Skip url: %s", url)
-                self.crawler_items['skip_url'] = 1
+                log.error("Skip url: %s", d['article_url'])
+                self.article_items['article_id'] = article['_id']
+                self.article_items['article_status'] = "Error"
+                self.article_items['download_latency'] = None
+                self.article_items['article_error_status'] = "Skip URL"
+                self.article_items['date_updated'] = datetime.datetime.today().isoformat()
+                self.article_items['article_url'] = d['article_url']
+                self.article_items['http_err'] = 1
+                self.article_items['dns_err'] = 0
+                self.article_items['timeout_err'] = 0
+                self.article_items['base_err'] = 0
+                self.article_items['skip_url'] = 0
 
-                yield self.crawler_items
+                yield self.article_items
                 
     def parse(self, response, article):
         src = StaticSource(response.url)
@@ -100,11 +104,12 @@ class ArticleStaticSpider(scrapy.Spider):
         self.article_items['updated_by'] = "Python Global Scraper"
         self.article_items['website'] = article['website']['_id']
         self.article_items['article_id'] = article['_id']
-
-        self.article_items['download_latency'] = response.request.meta['download_latency']
-        
-        log.info(response.request.headers)
-        log.debug(response.request.meta)
+        self.article_items['download_latency'] = response.request.meta['download_latency']        
+        self.article_items['http_err'] = 0
+        self.article_items['timeout_err'] = 0
+        self.article_items['dns_err'] = 0
+        self.article_items['base_err'] = 0
+        self.article_items['skip_url'] = 0
 
         yield self.article_items
 
@@ -162,7 +167,12 @@ class ArticleStaticSpider(scrapy.Spider):
             log.error("HttpError on %s", response.url)
             self.article_items['article_id'] = article['_id']
             self.logger.error('HttpError on %s', response.url)
-            self.crawler_items['http_err'] = 1
+            self.article_items['http_err'] = 1
+            self.article_items['dns_err'] = 0
+            self.article_items['timeout_err'] = 0
+            self.article_items['base_err'] = 0
+            self.article_items['skip_url'] = 0
+            self.article_items['download_latency'] = None
             self.article_items['article_status'] = "Error"
             self.article_items['article_error_status'] = "HTTP Error"
             self.article_items['date_updated'] = datetime.datetime.today().isoformat()
@@ -173,8 +183,13 @@ class ArticleStaticSpider(scrapy.Spider):
             request = failure.request
             log.error("DNSLookupError on %s", request.url)
             self.logger.error('DNSLookupError on %s', request.url)
-            self.crawler_items['dns_err'] = 1
+            self.article_items['http_err'] = 0
+            self.article_items['dns_err'] = 1
+            self.article_items['timeout_err'] = 0
+            self.article_items['base_err'] = 0
+            self.article_items['skip_url'] = 0
             self.article_items['article_id'] = article['_id']
+            self.article_items['download_latency'] = None
             self.article_items['article_status'] = "Error"
             self.article_items['article_error_status'] = "DNS Lookup Error"
             self.article_items['date_updated'] = datetime.datetime.today().isoformat()
@@ -185,8 +200,13 @@ class ArticleStaticSpider(scrapy.Spider):
             request = failure.request
             log.error("TimeoutError2 on %s", request.url)
             self.logger.error('TimeoutError on %s', request.url)
-            # self.crawler_items['timeout_err'] = 1
+            self.article_items['http_err'] = 0
+            self.article_items['dns_err'] = 0
+            self.article_items['timeout_err'] = 1
+            self.article_items['base_err'] = 0
+            self.article_items['skip_url'] = 0
             self.article_items['article_id'] = article['_id']
+            self.article_items['download_latency'] = None
             self.article_items['article_status'] = "Error"
             self.article_items['article_error_status'] = "Timeout Error"
             self.article_items['date_updated'] = datetime.datetime.today().isoformat()
@@ -195,11 +215,15 @@ class ArticleStaticSpider(scrapy.Spider):
         else:
             request = failure.request
             log.error("BaseError on %s", request.url)
-            # self.crawler_items['base_err'] = 1
+            self.article_items['http_err'] = 0
+            self.article_items['dns_err'] = 0
+            self.article_items['timeout_err'] = 0
+            self.article_items['base_err'] = 1
+            self.article_items['skip_url'] = 0
             self.article_items['article_id'] = article['_id']
             self.article_items['article_status'] = "Error"
+            self.article_items['download_latency'] = None
             self.article_items['article_error_status'] = "Error"
             self.article_items['date_updated'] = datetime.datetime.today().isoformat()
             self.article_items['article_url'] = request.url
             yield self.article_items
-
