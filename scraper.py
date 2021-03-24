@@ -150,7 +150,7 @@ def run():
                 }
             )
         except Exception as e:
-                print(e)
+            print(e)
 
     scraper = {}
     scraper['data'] = total_data
