@@ -60,8 +60,8 @@ def spider(data):
             #     args=[spider],
             #     minute=1
             # )
-            scheduler.add_job(process.crawl, 'interval', args=['test_spider' ,spider], seconds=10)
-            # process.crawl('test_spider', spider)
+            # scheduler.add_job(process.crawl, 'interval', args=['test_spider' ,spider], seconds=10)
+            process.crawl('test_spider', spider)
             spiders.append({
                 'thread_crawlers': [{"url": data, "article_id": "1231231"} for data in spider]
             })
@@ -70,17 +70,15 @@ def spider(data):
         print("Total thread spider(s): {}".format(len(spider_data)))
         log.info("Total thread spider(s) {}".format(len(spider_data)))
         for spider in spider_data:
-            # scheduler.add_job(process.crawl, 'interval', args=['article_static' ,spider], seconds=10)
+            # scheduler.add_job(process.crawl, 'interval', args=['article_static' ,spider], seconds=15)
             item = process.crawl('article_static', spider)
             spiders.append({
                 'thread_crawlers': [{'url': data['article_url'], "article_id": data['_id']} for data in spider]
             })
             # scheduler.start()
     log.info("Spider links: {}".format(len(spider_data)))
-    process.start(False) # Do not stop reactor after spider closes
+    process.start() # Do not stop reactor after spider closes
 
-    # scheduler start
-    # scheduler.start()
     return spiders
 
 
@@ -199,8 +197,8 @@ def run():
     resp2 = admin_api(method="POST", url="{}process-scraper/".format(_url), body=scraper)
     print(resp2)
     # pprint(scraper)
-    with open("test_data.json", 'w') as f:
-        f.write(str(scraper))
+    # with open("test_data.json", 'w') as f:
+    #     f.write(str(scraper))
 
     # for json in json_log:
     #     print(json['article_title'])

@@ -100,8 +100,12 @@ class ArticleStaticSpider(scrapy.Spider):
         self.article_items['updated_by'] = "Python Global Scraper"
         self.article_items['website'] = article['website']['_id']
         self.article_items['article_id'] = article['_id']
-
-        self.article_items['download_latency'] = response.request.meta['download_latency']
+        self.article_items['download_latency'] = response.request.meta['download_latency']        
+        self.article_items['http_err'] = 0
+        self.article_items['timeout_err'] = 0
+        self.article_items['dns_err'] = 0
+        self.article_items['base_err'] = 0
+        self.article_items['skip_url'] = 0
         
         log.info(response.request.headers)
         log.debug(response.request.meta)

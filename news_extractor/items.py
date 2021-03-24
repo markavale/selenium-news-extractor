@@ -66,8 +66,6 @@ class StaticArticleItem(scrapy.Item):
     base_err                = scrapy.Field()
     skip_url                = scrapy.Field()
 
-    # ip                      = scrapy.Field()
-    # user_agent              = scrapy.Field()
 
 class GlobalLinkItem(scrapy.Item):
     google_date                 = scrapy.Field()
