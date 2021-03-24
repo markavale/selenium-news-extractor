@@ -116,11 +116,13 @@ def run():
     crawler_items = []
 
     for item in json_log:
+        print(item['article_source_url'])
         try:
             crawler_items.append(
                 {
                     "article_id": item['article_id'],
                     "article_url": item['article_url'],
+                    "fqdn": item['article_source_url'],
                     "download_latency": item['download_latency'],
                     "article_status": item['article_status'],
                     "article_error_status": item['article_error_status'],

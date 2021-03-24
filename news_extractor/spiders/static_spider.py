@@ -166,6 +166,7 @@ class ArticleStaticSpider(scrapy.Spider):
             response = failure.value.response
             log.error("HttpError on %s", response.url)
             self.article_items['article_id'] = article['_id']
+            self.article_items['article_source_url'] = article['website']['fqdn']
             self.logger.error('HttpError on %s', response.url)
             self.article_items['http_err'] = 1
             self.article_items['dns_err'] = 0
@@ -183,6 +184,7 @@ class ArticleStaticSpider(scrapy.Spider):
             request = failure.request
             log.error("DNSLookupError on %s", request.url)
             self.logger.error('DNSLookupError on %s', request.url)
+            self.article_items['article_source_url'] = article['website']['fqdn']
             self.article_items['http_err'] = 0
             self.article_items['dns_err'] = 1
             self.article_items['timeout_err'] = 0
@@ -200,6 +202,7 @@ class ArticleStaticSpider(scrapy.Spider):
             request = failure.request
             log.error("TimeoutError2 on %s", request.url)
             self.logger.error('TimeoutError on %s', request.url)
+            self.article_items['article_source_url'] = article['website']['fqdn']
             self.article_items['http_err'] = 0
             self.article_items['dns_err'] = 0
             self.article_items['timeout_err'] = 1
@@ -215,6 +218,7 @@ class ArticleStaticSpider(scrapy.Spider):
         else:
             request = failure.request
             log.error("BaseError on %s", request.url)
+            self.article_items['article_source_url'] = article['website']['fqdn']
             self.article_items['http_err'] = 0
             self.article_items['dns_err'] = 0
             self.article_items['timeout_err'] = 0
