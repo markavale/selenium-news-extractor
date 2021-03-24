@@ -108,7 +108,6 @@ class TestSpider(scrapy.Spider):
             article_language=news.language,
             article_status="Done",
             article_error_status=None,
-            article_source_from=None,
             keyword=[],
             article_url=news.url,
             date_created=datetime.datetime.today().isoformat(),
@@ -213,7 +212,6 @@ class TestSpider(scrapy.Spider):
                 article_language=None,
                 article_status="Error",
                 article_error_status="HTTP Error",
-                article_source_from=None,
                 keyword=[],
                 article_url=response.url,
                 date_created=None,
@@ -248,7 +246,6 @@ class TestSpider(scrapy.Spider):
                 article_language=None,
                 article_status="Error",
                 article_error_status="DNS Error",
-                article_source_from=None,
                 keyword=[],
                 article_url=request.url,
                 date_created=None,
@@ -283,7 +280,6 @@ class TestSpider(scrapy.Spider):
                 article_language=None,
                 article_status="Error",
                 article_error_status="Timeout Error",
-                article_source_from=None,
                 keyword=[],
                 article_url=request.url,
                 date_created=None,
@@ -316,7 +312,6 @@ class TestSpider(scrapy.Spider):
                 article_language=None,
                 article_status="Error",
                 article_error_status="Base Error",
-                article_source_from=None,
                 keyword=[],
                 article_url=request.url,
                 date_created=None,
@@ -348,7 +343,6 @@ class TestSpider(scrapy.Spider):
         self.article_items['article_language'] = kwargs['article_language'] 
         self.article_items['article_status'] = kwargs['article_status'] 
         self.article_items['article_error_status'] = kwargs['article_error_status'] 
-        self.article_items['article_source_from'] = kwargs['article_source_from'] 
         self.article_items['keyword'] = kwargs['keyword'] 
         self.article_items['article_url'] = kwargs['article_url'] 
         self.article_items['date_created'] = kwargs['date_created'] 

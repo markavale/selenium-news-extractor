@@ -1,12 +1,7 @@
-'''
-    IMPORTS
-'''
 from shutil import which
 from decouple import config
 import os
-'''
-    END IMPORTS
-'''
+
 BOT_NAME = 'news_extractor'
 
 SPIDER_MODULES = ['news_extractor.spiders']
@@ -84,46 +79,9 @@ DOWNLOADER_MIDDLEWARES = {
     # 'scrapy.contrib.downloadermiddleware.httpproxy.HttpProxyMiddleware': 400,
     # 'scrapy.resolver.CachingThreadedResolver',
 
-    #     # rotating IP proxy
-    #    'rotating_proxies.middlewares.RotatingProxyMiddleware': 800,
-    #    'rotating_proxies.middlewares.BanDetectionMiddleware': 800,
-
-    # scrapy rotating fake user agents
-    #    'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': None,
-    #    'scrapy_user_agents.middlewares.RandomUserAgentMiddleware': 400,
-
-    # 'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': None,
-    # 'scrapy.downloadermiddlewares.retry.RetryMiddleware': None,
-    # 'scrapy_fake_useragent.middleware.RandomUserAgentMiddleware': 400,
-    # 'scrapy_fake_useragent.middleware.RetryUserAgentMiddleware': 401,
-
     # SELENIUM
     # 'scrapy_selenium.SeleniumMiddleware': 800,
 }
-'''
-    ##### ROTATING FAKE USER AGENT ######
-'''
-# FAKEUSERAGENT_PROVIDERS = [
-#     'scrapy_fake_useragent.providers.FakeUserAgentProvider',  # this is the first provider we'll try
-#     'scrapy_fake_useragent.providers.FakerProvider',  # if FakeUserAgentProvider fails, we'll use faker to generate a user-agent string for us
-#     'scrapy_fake_useragent.providers.FixedUserAgentProvider',  # fall back to USER_AGENT value
-#     #'new_extractor.providers.CustomProvider'
-# ]
-# FAKEUSERAGENT_FALLBACK  = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.106 Safari/537.36"
-
-
-'''
-    ###### ROTATING PROXY CONF ######
-'''
-# ROTATING_PROXY_LIST = [
-#     'proxy1.com:8000',
-#     'proxy2.com:8031',
-#     # etc....
-# ]
-# ROTATING_PROXY_BAN_POLICY = 'tutorial.policy.MyBanPolicy'
-# ROTATING_PROXY_LIST_PATH = 'proxy-list.txt'
-# Command
-# COMMANDS_MODULE = 'tutorial.bash'
 
 ### SELENIUM ###
 
@@ -134,9 +92,6 @@ SELENIUM_DRIVER_ARGUMENTS = ['-headless']
 
 ### AJAX CRAWLER ###
 AJAXCRAWL_ENABLED = True
-'''
-    ###### END ROTATING CONF ######
-'''
 
 
 # Enable or disable extensions
@@ -154,12 +109,11 @@ ITEM_PIPELINES = {
     'news_extractor.pipelines.DynamicExtractorPipeline': 300
 }
 
-
-CONCURRENT_ITEMS = 100 # => Maximum number of concurrent items (per response) to process in parallel in item pipelines.
+CONCURRENT_ITEMS = 200 # 100 # => Maximum number of concurrent items (per response) to process in parallel in item pipelines.
 CONCURRENT_REQUESTS = 200
-CONCURRENT_REQUESTS_PER_DOMAIN = 100
+CONCURRENT_REQUESTS_PER_DOMAIN = 200 #100
 AUTOTHROTTLE_ENABLED = False
-DOWNLOAD_TIMEOUT = 120 # 2 Mins
+DOWNLOAD_TIMEOUT = 60 #120 # 2 Mins
 CONNECTION_TIMEOUT = 60 # 1 min
 RETRY_ENABLED = False
 # TELNETCONSOLE_ENABLED=False
@@ -194,24 +148,31 @@ AUTOTHROTTLE_DEBUG = True
 '''
         ENV VARIABLES
 '''
-# API_KEY = os.environ.get("API_KEY")
+
 API_KEY = config('API_KEY')
 environment = config('PRODUCTION', default=bool)
 TOKEN = config('TOKEN')
-### EMAIL CONFS
-# MAIL_HOST = 
 
-# ARTICLES
+# EMAIL CONFS
+
+# [ ARTICLES - REQUEST VARIABLES ]
 CREATED_BY = config("CREATED_BY")
 PAGE_OFFSET = config("PAGE_OFFSET")
+LIMIT = config("PAGE_LIMIT", cast=int)
 
-### PROXY ###
+# [ HEADERS ]
+HEADERS = {
+    'Content-Type': 'application/json',
+    'Authorization': 'Bearer {}'.format(config("TOKEN"))
+}
+
+# [ PROXY ]
 PROXY = config("USE_PROXY", cast=bool)
 
-### TESTING ###
+# [ TESTING ]
 TESTING = config("TESTING", cast=bool)
 
-### ADMIN TOKEN
+# [ ADMIN TOKEN ]
 ADMIN_TOKEN = config("ADMIN_TOKEN")
 PRODUCTION_ADMIN_API = config("PRODUCTION_ADMIN_API")
 DEVELOPMENT_ADMIN_API = config("DEVELOPMENT_ADMIN_API")

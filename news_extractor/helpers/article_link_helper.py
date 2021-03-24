@@ -1,8 +1,11 @@
 from .api import api
 from decouple import config
-from .utils import get_host_name
+# from news_extractor.helpers.utils import get_host_name
+# from . utils import get_host_name
+# from news_extractor.helpers.utils import get_host_name
 import json
 from news_extractor.settings import environment, TOKEN
+
 _root_url = config(
     'PRODUCTION_API') if environment else config('DEVELOPMENT_API')
 
@@ -13,7 +16,7 @@ def article_link_articles(**kwargs):
     # _fields = {
     #     'article_url': 1
     # }
-    req = api(method='POST', url='{}article/custom_query?website_query={}&fields={}&limit={}&offset={}'.format(
+    req = api(method='POST', url='{}article/custom_query?website_query={}&fields={}&limit={}&offset={}&sort=date_created&sortBy=1'.format(
         _root_url, json.dumps(kwargs['website_query']), json.dumps(kwargs['fields']), kwargs['limit'], kwargs['page_offset']), body=kwargs['body'], headers=kwargs['headers'])
     return req.json()
 

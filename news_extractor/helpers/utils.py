@@ -1,4 +1,9 @@
 import time, os, datetime, json
+from news_extractor.settings import HEADERS, CREATED_BY, PAGE_OFFSET
+# from news_extractor.helpers import article_link_articles
+# from news_extractor.helpers import article_link_articles
+# from . import article_link_articles
+from news_extractor.helpers.article_link_helper import article_link_articles
 from urllib.parse import urlparse
 
 def time_in_range(start, end, x):
@@ -26,9 +31,6 @@ def convert(seconds):
 
     return "%d:%02d:%02d" % (hour, minutes, seconds)
 
-def __total_data_and_workers(_data, _workers):
-    return len(_data), _workers
-
 def delete_all_logs(info_path, debug_path, error_path, json_path):
     with open(str(info_path), 'w') as info_file, open(str(debug_path), 'w') as debug_file, open(str(error_path), 'w') as erorr_file, open(str(json_path), 'w') as json_file:
         info_file.write("")
@@ -54,3 +56,23 @@ def save_all_logs(info_path, debug_path, error_path, json_path):
     #         [error_log.append(line) for line in erorr_file]
     #         [json_log.append(json.loads(line)) for line in json_file]
     return info_log, debug_log, error_log, json_log
+
+
+'''
+    HELPER FUNCTIONS FOR scraper.py
+'''
+def get_system_data(**kwargs):
+    article_website_query = {
+        "path": "website",
+        "select": "-main_sections -section_filter -article_filter -selectors -sub_sections -embedded_sections -code_snippet"
+    }
+    body_query = {
+        'article_status': 'Queued',
+        'created_by': CREATED_BY
+    }
+    _fields = {
+        'article_url': 1
+    }
+    data = article_link_articles(
+        headers=HEADERS, body=body_query, fields=_fields, limit=kwargs['limit'], website_query=article_website_query, page_offset=PAGE_OFFSET)
+    return data
