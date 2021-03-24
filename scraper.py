@@ -148,9 +148,9 @@ def run():
                     "base_error": item['base_err'],
                     "skip_url": item['skip_url']
                 }
-            except Exception as e:
+            )
+        except Exception as e:
                 print(e)
-        )
 
     scraper = {}
     scraper['data'] = total_data
