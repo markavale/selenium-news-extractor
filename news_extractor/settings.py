@@ -12,7 +12,7 @@ USER_AGENT = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Ge
 
 # Obey robots.txt rules
 ROBOTSTXT_OBEY = False
-LOG_ENABLED = True
+LOG_ENABLED = False
 # LOG_LEVEL = 'ERROR' 
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
@@ -67,7 +67,7 @@ DOWNLOADER_MIDDLEWARES = {
     # 'scrapy.downloadermiddlewares.robotstxt.RobotsTxtMiddleware': None,
 
     # Bandwidth tracker
-    'news_extractor.middlewares.InOutBandwithStats': 990,
+    # 'news_extractor.middlewares.InOutBandwithStats': 990,
 
     # Retry middleware
     'scrapy.downloadermiddlewares.retry.RetryMiddleware': 120,
@@ -112,7 +112,7 @@ ITEM_PIPELINES = {
 CONCURRENT_ITEMS = 200 # 100 # => Maximum number of concurrent items (per response) to process in parallel in item pipelines.
 CONCURRENT_REQUESTS = 100
 CONCURRENT_REQUESTS_PER_DOMAIN = 200 #100
-AUTOTHROTTLE_ENABLED = False # it should be false to scrape
+AUTOTHROTTLE_ENABLED = True # it should be false to scrape
 DOWNLOAD_TIMEOUT = 60 #120 # 2 Mins
 CONNECTION_TIMEOUT = 60 # 1 min
 RETRY_ENABLED = False
@@ -126,7 +126,7 @@ RETRY_ENABLED = False
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See https://docs.scrapy.org/en/latest/topics/autothrottle.html
 # AUTOTHROTTLE_TARGET_CONCURRENCY = 50
-
+    
 #AUTOTHROTTLE_START_DELAY = 5
 # The maximum download delay to be set in case of high latencies
 #AUTOTHROTTLE_MAX_DELAY = 60

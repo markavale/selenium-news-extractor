@@ -79,6 +79,7 @@ class ArticleStaticSpider(scrapy.Spider):
             print(e)
             log.error("Meida value %s", e)
             log.error("Media value error %s", response.url)
+            exit(0)
         self.article_items['article_source_url'] = article['website']['fqdn']
         self.article_items['article_title'] = news.title
         self.article_items['article_section'] = [article['website']['website_category']]

@@ -46,7 +46,6 @@ def spider(data):
         print("Total thread spider(s): {}".format(len(spider_data)))
         log.info("Total thread spider(s) {}".format(len(spider_data)))
         for spider in spider_data:
-            print(spider)
             item = process.crawl('article_static', spider)
             spiders.append({
                 'thread_crawlers': [{'url': data['article_url'], "article_id": data['_id']} for data in spider]
@@ -79,14 +78,13 @@ def main(system_data, WORKERS):
     spiders = [obj.result() for obj in future]
     return len(system_data), MAX_WORKERS, spiders
 
-
 def run():
     system_links = list(map(lambda x: x.strip(), open(
             'test-articles.txt').read().split('\n')))
     # Cheking first if for testing or production
     if not TESTING:
-        data = get_system_data(limit=LIMIT)
         try:
+            data = get_system_data(limit=LIMIT)
             print("Getting data from system")
             system_data = data['data']
             if len(system_data) == 0:
@@ -96,12 +94,15 @@ def run():
         except ConnectionError as e:
             print(e)
             log.error(e)
+            exit(0)
         except TimeoutError as e:
             print(e)
             log.error(e)
+            exit(0)
         except Exception as e:
             print(e)
             log.error(e)
+            exit(0)
     else:
         print("Testing MODE")
         system_data = system_links
@@ -116,7 +117,7 @@ def run():
     print(f'Finish in {time_finish}')
 
     # FILE PATH
-    # SAVE LOGS IN MEMORY
+    # LOGS: send all logs to ADMIN SCRAPER API
     info_log, debug_log, error_log, json_log = save_all_logs(
         info_path, debug_path, error_path, json_path)
 
@@ -168,7 +169,8 @@ def run():
             method="POST", url="{}process-scraper/".format(_url), body=scraper)
         print(resp2)
     # pprint(scraper)
-    # delete_all_logs(info_path, debug_path, error_path, json_path)
+        # DELETE: delete logs after it successfully send it to ADMIN SCRAPER API
+        delete_all_logs(info_path, debug_path, error_path, json_path)
 
 
 if __name__ == "__main__":
