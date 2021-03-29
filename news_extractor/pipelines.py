@@ -17,7 +17,6 @@ class StaticExtractorPipeline:
         self.exporter = JsonLinesItemExporter(
             self.file, encoding='utf-8', ensure_ascii=False)
         self.exporter.start_exporting()
-        self.items = []
 
     def close_spider(self, spider):
         self.exporter.finish_exporting()
@@ -53,11 +52,13 @@ class TestStaticPipeline:
         self.file.close()
 
     def process_item(self, item, spider):
-        print("Pipeline Extractor ------------------------------------------------------------------------------------------")
-        self.exporter.export_item(item)
-        self.items.append(item)
-        pprint(item)
-        return item
+        try:
+            print("Pipeline Extractor ------------------------------------------------------------------------------------------")
+            self.exporter.export_item(item)
+            pprint(item)
+            return item
+        except:
+            print("error on pipeline")
 
 
 class GlobalExtractorPipeline:

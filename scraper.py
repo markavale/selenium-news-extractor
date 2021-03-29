@@ -46,6 +46,7 @@ def spider(data):
         print("Total thread spider(s): {}".format(len(spider_data)))
         log.info("Total thread spider(s) {}".format(len(spider_data)))
         for spider in spider_data:
+            print(spider)
             item = process.crawl('article_static', spider)
             spiders.append({
                 'thread_crawlers': [{'url': data['article_url'], "article_id": data['_id']} for data in spider]
@@ -102,8 +103,6 @@ def run():
             print(e)
             log.error(e)
     else:
-        
-
         print("Testing MODE")
         system_data = system_links
 

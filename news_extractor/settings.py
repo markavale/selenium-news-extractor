@@ -12,8 +12,8 @@ USER_AGENT = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Ge
 
 # Obey robots.txt rules
 ROBOTSTXT_OBEY = False
-LOG_ENABLED = False
-LOG_LEVEL = 'ERROR' 
+LOG_ENABLED = True
+# LOG_LEVEL = 'ERROR' 
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
 # CONCURRENT_REQUESTS = 32
@@ -27,7 +27,7 @@ DOWNLOAD_DELAY = 3
 # CONCURRENT_REQUESTS_PER_IP = 10
 
 # CONCURRENT_ITEMS = 200
-# RETRY_TIMES = 3
+# RETRY_TIMES = 2
 
 # Disable cookies (enabled by default)
 COOKIES_ENABLED = False
@@ -67,7 +67,7 @@ DOWNLOADER_MIDDLEWARES = {
     # 'scrapy.downloadermiddlewares.robotstxt.RobotsTxtMiddleware': None,
 
     # Bandwidth tracker
-    # 'news_extractor.middlewares.InOutBandwithStats': 990,
+    'news_extractor.middlewares.InOutBandwithStats': 990,
 
     # Retry middleware
     'scrapy.downloadermiddlewares.retry.RetryMiddleware': 120,
@@ -77,10 +77,10 @@ DOWNLOADER_MIDDLEWARES = {
     
     'scrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware': 400,
     # 'scrapy.contrib.downloadermiddleware.httpproxy.HttpProxyMiddleware': 400,
-    # 'scrapy.resolver.CachingThreadedResolver',
+    # 'scrapy.resolver.CachingThreadedResolver': 400, # testing
 
     # SELENIUM
-    # 'scrapy_selenium.SeleniumMiddleware': 800,
+    # 'scrapy_selenium.SeleniumMiddleware',
 }
 
 ### SELENIUM ###
@@ -110,9 +110,9 @@ ITEM_PIPELINES = {
 }
 
 CONCURRENT_ITEMS = 200 # 100 # => Maximum number of concurrent items (per response) to process in parallel in item pipelines.
-CONCURRENT_REQUESTS = 200
+CONCURRENT_REQUESTS = 100
 CONCURRENT_REQUESTS_PER_DOMAIN = 200 #100
-AUTOTHROTTLE_ENABLED = False
+AUTOTHROTTLE_ENABLED = False # it should be false to scrape
 DOWNLOAD_TIMEOUT = 60 #120 # 2 Mins
 CONNECTION_TIMEOUT = 60 # 1 min
 RETRY_ENABLED = False
