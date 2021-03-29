@@ -1,5 +1,5 @@
 from ..items import StaticArticleItem
-from logzero import logfile, logger
+from logzero import logger
 import requests,os, datetime, json, scrapy
 from ..article_contents.news import News
 from ..article_contents.source.static import StaticSource
@@ -32,7 +32,6 @@ class ArticleStaticSpider(scrapy.Spider):
             try:
                 article_process(d['_id'], "article")  # update status to Process
                 if use_proxy == True:
-                    log.info("USING PROXY")
                     meta = {}
                     headers = {}
                     try:
@@ -115,12 +114,10 @@ class ArticleStaticSpider(scrapy.Spider):
 
     def errback_httpbin(self, failure):
         article = failure.request.cb_kwargs['article']
-        self.logger.error(repr(failure))
 
         if failure.check(HttpError):
             response = failure.value.response
             log.error("Retry: HttpError on %s", response.url)
-            self.logger.error('HttpError on %s', response.url)
             yield scrapy.Request(response.url,
                                  callback=self.parse,
                                  errback=self.errback_httpbin_final,
@@ -130,7 +127,6 @@ class ArticleStaticSpider(scrapy.Spider):
         elif failure.check(DNSLookupError):
             request = failure.request
             log.error("Retry: DNSLookupError on %s", request.url)
-            self.logger.error('DNSLookupError on %s', request.url)
             yield scrapy.Request(request.url,
                                  callback=self.parse,
                                  errback=self.errback_httpbin_final,
@@ -140,7 +136,6 @@ class ArticleStaticSpider(scrapy.Spider):
         elif failure.check(TimeoutError, TCPTimedOutError):
             request = failure.request
             log.error("Retry: TimeoutError on %s", request.url)
-            self.logger.error('TimeoutError on %s', request.url)
             yield scrapy.Request(request.url,
                                  callback=self.parse,
                                  errback=self.errback_httpbin_final,
@@ -167,7 +162,6 @@ class ArticleStaticSpider(scrapy.Spider):
             log.error("HttpError on %s", response.url)
             self.article_items['article_id'] = article['_id']
             self.article_items['article_source_url'] = article['website']['fqdn']
-            self.logger.error('HttpError on %s', response.url)
             self.article_items['http_err'] = 1
             self.article_items['dns_err'] = 0
             self.article_items['timeout_err'] = 0
@@ -183,7 +177,6 @@ class ArticleStaticSpider(scrapy.Spider):
         elif failure.check(DNSLookupError):
             request = failure.request
             log.error("DNSLookupError on %s", request.url)
-            self.logger.error('DNSLookupError on %s', request.url)
             self.article_items['article_source_url'] = article['website']['fqdn']
             self.article_items['http_err'] = 0
             self.article_items['dns_err'] = 1
@@ -201,7 +194,6 @@ class ArticleStaticSpider(scrapy.Spider):
         elif failure.check(TimeoutError, TCPTimedOutError):
             request = failure.request
             log.error("TimeoutError2 on %s", request.url)
-            self.logger.error('TimeoutError on %s', request.url)
             self.article_items['article_source_url'] = article['website']['fqdn']
             self.article_items['http_err'] = 0
             self.article_items['dns_err'] = 0

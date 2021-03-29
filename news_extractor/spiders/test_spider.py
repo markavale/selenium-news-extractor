@@ -1,10 +1,5 @@
 from ..items import StaticArticleItem
-from logzero import logfile, logger
-import requests
-import os
-import datetime
-import json
-import scrapy
+import requests, os, datetime, json, scrapy
 from scrapy import signals
 from ..article_contents.news import News
 from ..article_contents.source.static import StaticSource
@@ -14,6 +9,7 @@ from twisted.internet.error import TimeoutError, TCPTimedOutError
 from ..helpers.proxy import get_proxy
 from news_extractor.settings import PROXY
 from logs.main_log import init_log
+
 log = init_log('test_static_spider')
 
 
@@ -26,13 +22,6 @@ class TestSpider(scrapy.Spider):
     def __init__(self, urls=None):
         self.urls = urls
         self.article_items = StaticArticleItem()
-        self.http_error = 0
-        self.timeout_error = 0
-        self.dns_error = 0
-        self.base_error = 0
-        self.skip_url = 0
-        self.download_latency = 0
-        self.crawler_items = [] 
 
     @classmethod
     def from_crawler(cls, crawler, *args, **kwargs):
@@ -54,7 +43,11 @@ class TestSpider(scrapy.Spider):
         return item
 
     def start_requests(self):
-        log.debug(f"Spider started scraping || Total data: {len(self.urls)}")
+        log.info(f"Spider started scraping || Total data: {len(self.urls)}")
+        log.info("Using Proxy %s" %PROXY)
+        urls = [
+            "https://www.mixofeverything.net/2021/03/wearable-air-purifier-with-lg-puricare-and-new-air-conditioners.html"
+        ]
         for d in self.urls:
             try:
                 article = {
@@ -62,7 +55,6 @@ class TestSpider(scrapy.Spider):
                     "_id": "123123123123"
                 }
                 if PROXY:
-                    log.info("USING PROXY")
                     meta = {}
                     headers = {}
                     try:
@@ -81,7 +73,6 @@ class TestSpider(scrapy.Spider):
             except Exception as e:
                 log.exception(e)
                 log.error("Skip url: %s", url)
-                self.crawler_items['skip_url'] = 1
 
     def parse(self, response, article):
         src = StaticSource(response.url)
@@ -95,6 +86,7 @@ class TestSpider(scrapy.Spider):
         log.info(response.request.headers)
         log.debug(response.request.meta)
         articles = self.yeild_article_items(
+            article_source_url = article['website']['fqdn'],
             article_title=news.title,
             article_section=[],
             article_authors=news.authors,
@@ -124,33 +116,17 @@ class TestSpider(scrapy.Spider):
         )
 
         yield articles
-        # try:
-        #     log.debug(response.request.headers['User-Agent'])
-        #     log.debug(response.meta.get("proxy"))
-        # except Exception as e:
-        #     log.exception(e)
-        # log.debug(response.request.meta['User-Agent'])
-        # log.debug(response.request.meta['proxy'])
-        # self.article_items['user_agent'] = response.request.headers['User-Agent']
-        # self.article_items['ip'] = response.meta.get('proxy')
-
-        yield self.article_items
-        # log.debug(self.article_items)
-        yield self.crawler_items.append(self.article_items)
-
         print(
             f"------------------------------------ end parsing ---------------------------")
 
     def errback_httpbin(self, failure):
         article = failure.request.cb_kwargs['article']
-        self.logger.error(repr(failure))
 
         if failure.check(HttpError):
             # these exceptions come from HttpError spider middleware
             # you can get the non-200 response
             response = failure.value.response
             log.info("HTTP Error Retry to parsing on %s", response.url)
-            self.logger.error('HTTP Error Retry parsing on %s', response.url)
             yield scrapy.Request(response.url,
                                  callback=self.parse,
                                  errback=self.errback_httpbin_final,
@@ -161,8 +137,6 @@ class TestSpider(scrapy.Spider):
             # this is the original request
             request = failure.request
             log.info("DNSLookup Error Retry to parsing on %s", request.url)
-            self.logger.error(
-                'DNS Lookup Error Retry parsing on %s', request.url)
             yield scrapy.Request(request.url,
                                  callback=self.parse,
                                  errback=self.errback_httpbin_final,
@@ -172,8 +146,6 @@ class TestSpider(scrapy.Spider):
         elif failure.check(TimeoutError, TCPTimedOutError):
             request = failure.request
             log.info("Timeout Error Retry parsing on %s", request.url)
-            self.logger.error(
-                'Timeout Error Retry parsing on on %s', request.url)
             yield scrapy.Request(request.url,
                                  callback=self.parse,
                                  errback=self.errback_httpbin_final,
@@ -197,8 +169,8 @@ class TestSpider(scrapy.Spider):
         if failure.check(HttpError):
             response = failure.value.response
             log.error("HTTP Error on %s", response.url)
-            self.logger.error('HTTP Error on %s', response.url)
             articles = self.yeild_article_items(
+                article_source_url = article['website']['fqdn'],
                 article_title=None,
                 article_section=[],
                 article_authors=None,
@@ -231,8 +203,8 @@ class TestSpider(scrapy.Spider):
         elif failure.check(DNSLookupError):
             request = failure.request
             log.error("DNSLookupError2 on %s", request.url)
-            self.logger.error('DNSLookupError2 on %s', request.url)
             articles = self.yeild_article_items(
+                article_source_url = article['website']['fqdn'],
                 article_title=None,
                 article_section=[],
                 article_authors=None,
@@ -265,8 +237,8 @@ class TestSpider(scrapy.Spider):
         elif failure.check(TimeoutError, TCPTimedOutError):
             request = failure.request
             log.error("TimeoutError2 on %s", request.url)
-            self.logger.error('TimeoutError2 on %s', request.url)
             articles = self.yeild_article_items(
+                article_source_url = article['website']['fqdn'],
                 article_title=None,
                 article_section=[],
                 article_authors=None,
@@ -299,6 +271,7 @@ class TestSpider(scrapy.Spider):
             request = failure.request
             log.error("BaseError2 on %s", request.url)
             articles = self.yeild_article_items(
+                article_source_url = article['website']['fqdn'],
                 article_title=None,
                 article_section=[],
                 article_authors=None,
@@ -328,8 +301,8 @@ class TestSpider(scrapy.Spider):
             )
             yield articles
 
-
     def yeild_article_items(self, **kwargs):
+        self.article_items['article_source_url'] = kwargs['article_source_url']
         self.article_items['article_title'] = kwargs['article_title'] 
         self.article_items['article_section'] = kwargs['article_section'] 
         self.article_items['article_authors'] = kwargs['article_authors'] 

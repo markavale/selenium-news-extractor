@@ -13,10 +13,10 @@ USER_AGENT = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Ge
 # Obey robots.txt rules
 ROBOTSTXT_OBEY = False
 LOG_ENABLED = False
-# LOG_LEVEL = 'ERROR' 
+LOG_LEVEL = 'ERROR' 
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
-CONCURRENT_REQUESTS = 32
+# CONCURRENT_REQUESTS = 32
 
 # Configure a delay for requests for the same website (default: 0)
 # See https://docs.scrapy.org/en/latest/topics/settings.html#download-delay
@@ -67,7 +67,7 @@ DOWNLOADER_MIDDLEWARES = {
     # 'scrapy.downloadermiddlewares.robotstxt.RobotsTxtMiddleware': None,
 
     # Bandwidth tracker
-    'news_extractor.middlewares.InOutBandwithStats': 990,
+    # 'news_extractor.middlewares.InOutBandwithStats': 990,
 
     # Retry middleware
     'scrapy.downloadermiddlewares.retry.RetryMiddleware': 120,
@@ -134,7 +134,7 @@ RETRY_ENABLED = False
 # each remote server
 #AUTOTHROTTLE_TARGET_CONCURRENCY = 1.0
 # Enable showing throttling stats for every response received:
-AUTOTHROTTLE_DEBUG = True
+AUTOTHROTTLE_DEBUG = False
 
 # Enable and configure HTTP caching (disabled by default)
 # See https://docs.scrapy.org/en/latest/topics/downloader-middleware.html#httpcache-middleware-settings
