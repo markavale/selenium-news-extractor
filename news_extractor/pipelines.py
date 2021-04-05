@@ -28,8 +28,7 @@ class StaticExtractorPipeline:
             'Content-Type': 'application/json',
             'Authorization': 'Bearer {}'.format(TOKEN)
         }
-        # pprint(item)
-        # print(dict(item))
+        pprint(item)
         if dict(item)['article_status'] == "Error":
             req = api(method='PUT', url='{}article/{}'.format(_root_url,
                                                                     dict(item)['article_id']), body=dict(item), headers=headers)

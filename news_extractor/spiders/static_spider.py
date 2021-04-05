@@ -31,7 +31,9 @@ class ArticleStaticSpider(scrapy.Spider):
         for d in self.data:
             try:
                 article_process(d['_id'], "article")  # update status to Process
-                if use_proxy == True:
+                is_using_proxy = d['website']['is_using_proxy']
+                if bool(is_using_proxy) == True:
+                    print("Using proxy on ",d['article_url'])
                     meta = {}
                     headers = {}
                     try:
@@ -41,11 +43,13 @@ class ArticleStaticSpider(scrapy.Spider):
                         meta_proxy = f"http://{ip}:{port}"
                         headers['User-Agent'] = proxy['randomUserAgent']
                         meta['proxy'] = meta_proxy
+                        print(headers ,meta)
                     except Exception as e:
                         meta['proxy'] = 'http://103.105.212.106:53281'
                         headers['User-Agent'] = 'Mozilla/5.0 (Windows NT 6.0 rv:21.0) Gecko/20100101 Firefox/21.0'
                     yield scrapy.Request(d['article_url'], self.parse, headers=headers, meta=meta, errback=self.errback_httpbin, cb_kwargs={'article': d}, dont_filter=True)
                 else:
+                    print("Not using proxy on ", d['article_url'])
                     yield scrapy.Request(d['article_url'], callback=self.parse, errback=self.errback_httpbin, cb_kwargs={'article': d}, dont_filter=True)
             except Exception as e:
                 log.exception(e)
@@ -79,7 +83,7 @@ class ArticleStaticSpider(scrapy.Spider):
             print(e)
             log.error("Meida value %s", e)
             log.error("Media value error %s", response.url)
-            exit(0)
+            # exit(0)
         self.article_items['article_source_url'] = article['website']['fqdn']
         self.article_items['article_title'] = news.title
         self.article_items['article_section'] = [article['website']['website_category']]

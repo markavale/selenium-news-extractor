@@ -12,7 +12,7 @@ USER_AGENT = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Ge
 
 # Obey robots.txt rules
 ROBOTSTXT_OBEY = False
-LOG_ENABLED = False
+LOG_ENABLED = config("DEBUG", cast=bool)
 # LOG_LEVEL = 'ERROR' 
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
@@ -31,7 +31,7 @@ DOWNLOAD_DELAY = 3
 
 # Disable cookies (enabled by default)
 COOKIES_ENABLED = False
-
+COOKIES_DEBUG = False
 ### custom conf ###
 # LOG_ENABLED = True
 # LOG_LEVEL = 'ERROR'  # to only display errors
@@ -96,9 +96,9 @@ AJAXCRAWL_ENABLED = True
 
 # Enable or disable extensions
 # See https://docs.scrapy.org/en/latest/topics/extensions.html
-EXTENSIONS = {
-   'scrapy.extensions.telnet.TelnetConsole': None,
-}
+# EXTENSIONS = {
+#    'scrapy.extensions.telnet.TelnetConsole': None,
+# }
 
 # Configure item pipelines
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
@@ -110,16 +110,16 @@ ITEM_PIPELINES = {
 }
 
 CONCURRENT_ITEMS = 200 # 100 # => Maximum number of concurrent items (per response) to process in parallel in item pipelines.
-CONCURRENT_REQUESTS = 100
+CONCURRENT_REQUESTS = 200
 CONCURRENT_REQUESTS_PER_DOMAIN = 200 #100
-AUTOTHROTTLE_ENABLED = True # it should be false to scrape
+AUTOTHROTTLE_ENABLED = False # it should be false to scrape
 DOWNLOAD_TIMEOUT = 60 #120 # 2 Mins
 CONNECTION_TIMEOUT = 60 # 1 min
 RETRY_ENABLED = False
 # TELNETCONSOLE_ENABLED=False
 
-# REDIRECT_ENABLED = False
-# REDIRECT_MAX_TIMES = 4
+REDIRECT_ENABLED = True
+REDIRECT_MAX_TIMES = 1
 
 # LOG_LEVEL = 'ERROR'
 # The initial download delay
@@ -129,12 +129,12 @@ RETRY_ENABLED = False
     
 #AUTOTHROTTLE_START_DELAY = 5
 # The maximum download delay to be set in case of high latencies
-#AUTOTHROTTLE_MAX_DELAY = 60
+AUTOTHROTTLE_MAX_DELAY = 30
 # The average number of requests Scrapy should be sending in parallel to
 # each remote server
-#AUTOTHROTTLE_TARGET_CONCURRENCY = 1.0
+AUTOTHROTTLE_TARGET_CONCURRENCY = 100
 # Enable showing throttling stats for every response received:
-AUTOTHROTTLE_DEBUG = False
+AUTOTHROTTLE_DEBUG = config("DEBUG", cast=bool)
 
 # Enable and configure HTTP caching (disabled by default)
 # See https://docs.scrapy.org/en/latest/topics/downloader-middleware.html#httpcache-middleware-settings
@@ -150,7 +150,7 @@ AUTOTHROTTLE_DEBUG = False
 '''
 
 API_KEY = config('API_KEY')
-environment = config('PRODUCTION', default=bool)
+environment = config('PRODUCTION', cast=bool)
 TOKEN = config('TOKEN')
 
 # EMAIL CONFS

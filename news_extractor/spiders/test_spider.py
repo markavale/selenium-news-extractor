@@ -59,6 +59,7 @@ class TestSpider(scrapy.Spider):
                 }
                 if PROXY:
                     log.info("USING PROXY")
+                    print("Using proxy")
                     meta = {}
                     headers = {}
                     try:
@@ -68,9 +69,12 @@ class TestSpider(scrapy.Spider):
                         meta_proxy = f"http://{ip}:{port}"
                         headers['User-Agent'] = proxy['randomUserAgent']
                         meta['proxy'] = meta_proxy
+                        # meta['dont_merge_cookies'] = True
                     except Exception as e:
                         meta['proxy'] = 'http://103.105.212.106:53281'
                         headers['User-Agent'] = 'Mozilla/5.0 (Windows NT 6.0 rv:21.0) Gecko/20100101 Firefox/21.0'
+                    print(meta)
+                    print(headers)
                     yield scrapy.Request(d, self.parse, headers=headers, meta=meta, errback=self.errback_httpbin, cb_kwargs={'article': article}, dont_filter=True)
                 else:
                     yield scrapy.Request(d, callback=self.parse, errback=self.errback_httpbin, cb_kwargs={'article': article}, dont_filter=True)
@@ -83,6 +87,8 @@ class TestSpider(scrapy.Spider):
         text_format = src.text
         news = News(response.url, text_format)
         if news.title is None or news.content is None:
+            print("Content error")
+            print(news.content)
             log.error(news.title)
             log.error(news.content)
         # data = news.generate_data()
@@ -118,6 +124,8 @@ class TestSpider(scrapy.Spider):
             skip_url=0
         )
 
+        log.info(response.request.meta)
+        log.info(response.request.headers)
         yield articles
         print(
             f"------------------------------------ end parsing ---------------------------")
@@ -174,7 +182,7 @@ class TestSpider(scrapy.Spider):
     def errback_httpbin_final(self, failure):
         article = failure.request.cb_kwargs['article']
         log.exception("errback_httpbin_final triggered")
-        print("errror")
+        print("error")
         if failure.check(HttpError):
             response = failure.value.response
             log.error("HTTP Error on %s", response.url)

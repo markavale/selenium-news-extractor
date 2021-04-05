@@ -9,4 +9,4 @@ class ContentVariables:
 
     content_tags: List = field(default_factory=lambda: ['article','div'])
     content_keys: List = field(default_factory=lambda: ['content', 'main', 'article', 'body'])
-    tags_for_decompose: List = field(default_factory=lambda: ['script', 'nav', 'forms', 'button', 'aside', 'style', 'ul', 'select'])
+    tags_for_decompose: List = field(default_factory=lambda: ['script', 'nav', 'forms', 'button', 'aside', 'style', 'ul', 'select', 'footer'])

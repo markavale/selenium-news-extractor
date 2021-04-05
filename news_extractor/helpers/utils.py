@@ -67,9 +67,10 @@ def get_system_data(**kwargs):
         "select": "-main_sections -section_filter -article_filter -selectors -sub_sections -embedded_sections -code_snippet"
     }
     body_query = {
+        # "article_source_url": "manilanews.net"
         'article_status': 'Queued',
-        'created_by': CREATED_BY
-    }
+        'created_by': CREATED_BY    
+        }
     _fields = {
         'article_url': 1
     }

@@ -155,8 +155,8 @@ def run():
     crl_items = {}
     crl_items['crawler_items'] = crawler_items
 
-    file = open('scraper_object.json', 'w')
-    file.write(str(scraper))
+    # file = open('scraper_object.json', 'w')
+    # file.write(str(scraper))
 
     _url = PRODUCTION_ADMIN_API if environment else DEVELOPMENT_ADMIN_API
     if not TESTING:
@@ -170,7 +170,7 @@ def run():
         print(resp2)
     # pprint(scraper)
         # DELETE: delete logs after it successfully send it to ADMIN SCRAPER API
-        delete_all_logs(info_path, debug_path, error_path, json_path)
+        # delete_all_logs(info_path, debug_path, error_path, json_path)
 
 
 if __name__ == "__main__":
