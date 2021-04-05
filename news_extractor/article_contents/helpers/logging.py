@@ -67,7 +67,7 @@ logging_config = {
 }
 
 def disable_logs():
-    loggers = ['filelock', 'chardet.charserprober']
+    loggers = ['filelock']
 
     for logger in loggers:
         logging.getLogger(logger).disabled = True

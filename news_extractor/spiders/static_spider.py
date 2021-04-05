@@ -1,6 +1,6 @@
 from ..items import StaticArticleItem
 from logzero import logger
-import requests,os, datetime, json, scrapy
+import requests,os, datetime, json, scrapy, time
 from ..article_contents.news import News
 from ..article_contents.source.static import StaticSource
 from scrapy.spidermiddlewares.httperror import HttpError
@@ -13,6 +13,7 @@ from decouple import config
 from pprint import pprint
 from logs.main_log import init_log
 from news_extractor.settings import TOKEN, PROXY
+from news_extractor.helpers.utils import convert
 log = init_log('static_spider')
 use_proxy = PROXY
 
@@ -28,6 +29,7 @@ class ArticleStaticSpider(scrapy.Spider):
     def start_requests(self):
         log.info("Spider started scraping")
         log.info("Using Proxy %s" %use_proxy)
+        start_req_t1 = time.perf_counter()
         for d in self.data:
             try:
                 article_process(d['_id'], "article")  # update status to Process
@@ -67,23 +69,31 @@ class ArticleStaticSpider(scrapy.Spider):
                 self.article_items['skip_url'] = 0
 
                 yield self.article_items
-                
+        start_req_t2 = time.perf_counter()
+        log.info("Start Request: {}".format(convert(round(start_req_t2 - start_req_t1, 2))))        
     def parse(self, response, article):
+        global_parser_t1 = time.perf_counter()
         src = StaticSource(response.url)
         text_format = src.text
         news = News(response.url, text_format)
+        global_parser_t2 = time.perf_counter()
+        log.info("Global Parser: {}".format(convert(round(global_parser_t2 - global_parser_t1, 2))))
         if news.content is None:
             log.error("Content Error on %s", response.url)
         data = news.generate_data()
         
         try:
+            media_t1 = time.perf_counter()
             media = media_value(global_rank=article["website"]["alexa_rankings"]['global'], local_rank=article["website"]["alexa_rankings"]['local'],
                                 website_cost=article['website']["website_cost"], article_images=news.images, article_videos=news.videos, article_content=news.content)
+            media_t2 = time.perf_counter()
+            log.info('media value: {}'.format(convert(round(media_t2-media_t1, 2))))
         except Exception as e:
             print(e)
             log.error("Meida value %s", e)
             log.error("Media value error %s", response.url)
             # exit(0)
+        parse_t1 = time.perf_counter()
         self.article_items['article_source_url'] = article['website']['fqdn']
         self.article_items['article_title'] = news.title
         self.article_items['article_section'] = [article['website']['website_category']]
@@ -116,7 +126,8 @@ class ArticleStaticSpider(scrapy.Spider):
         self.article_items['skip_url'] = 0
 
         yield self.article_items
-
+        parse_t2 = time.perf_counter()
+        log.info("Parsing: {}".format(convert(round(parse_t2 - parse_t1, 2))))
     def errback_httpbin(self, failure):
         article = failure.request.cb_kwargs['article']
 

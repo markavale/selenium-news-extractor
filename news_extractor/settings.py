@@ -67,7 +67,7 @@ DOWNLOADER_MIDDLEWARES = {
     # 'scrapy.downloadermiddlewares.robotstxt.RobotsTxtMiddleware': None,
 
     # Bandwidth tracker
-    # 'news_extractor.middlewares.InOutBandwithStats': 990,
+    'news_extractor.middlewares.InOutBandwithStats': None,#990,
 
     # Retry middleware
     'scrapy.downloadermiddlewares.retry.RetryMiddleware': 120,
@@ -112,7 +112,7 @@ ITEM_PIPELINES = {
 CONCURRENT_ITEMS = 200 # 100 # => Maximum number of concurrent items (per response) to process in parallel in item pipelines.
 CONCURRENT_REQUESTS = 200
 CONCURRENT_REQUESTS_PER_DOMAIN = 200 #100
-AUTOTHROTTLE_ENABLED = False # it should be false to scrape
+AUTOTHROTTLE_ENABLED = True # it should be false to scrape
 DOWNLOAD_TIMEOUT = 60 #120 # 2 Mins
 CONNECTION_TIMEOUT = 60 # 1 min
 RETRY_ENABLED = False
@@ -129,7 +129,7 @@ REDIRECT_MAX_TIMES = 1
     
 #AUTOTHROTTLE_START_DELAY = 5
 # The maximum download delay to be set in case of high latencies
-AUTOTHROTTLE_MAX_DELAY = 30
+# AUTOTHROTTLE_MAX_DELAY = 30
 # The average number of requests Scrapy should be sending in parallel to
 # each remote server
 AUTOTHROTTLE_TARGET_CONCURRENCY = 100
