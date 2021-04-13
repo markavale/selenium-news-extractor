@@ -50,12 +50,6 @@ def save_all_logs(info_path, debug_path, error_path, json_path):
         [debug_log.append(line) for line in debug_file]
         [error_log.append(line) for line in erorr_file]
         [json_log.append(json.loads(line)) for line in json_file]
-    # except FileNotFoundError:
-    #     with open(str(info_path), 'r') as info_file, open(str(debug_path), 'r') as debug_file, open(str(error_path), 'r') as erorr_file, open(str(json_path)) as json_file:
-    #         [info_log.append(line) for line in info_file]
-    #         [debug_log.append(line) for line in debug_file]
-    #         [error_log.append(line) for line in erorr_file]
-    #         [json_log.append(json.loads(line)) for line in json_file]
     return info_log, debug_log, error_log, json_log
 
 
@@ -65,13 +59,11 @@ def save_all_logs(info_path, debug_path, error_path, json_path):
 def get_system_data(**kwargs):
     article_website_query = {
         "path": "website",
-        # "match": {
-        #     "is_dynamic_website": True
-        # },
         "select": "-main_sections -section_filter -article_filter -selectors -sub_sections -embedded_sections -code_snippet"
     }
     body_query = {
-        # "article_source_url": "morungexpress.com",
+        # "article_source_url": "inc.com",
+        # "article_url": "https://www.inc.com/mary-yang/envoy-zynga-hybrid-model-remote-work-survey.html",
         'article_status': 'Queued',
         "article_source_url": { "$ne": "news.google.com" },
         'created_by': CREATED_BY    

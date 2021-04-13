@@ -90,7 +90,7 @@ class TestSpider(scrapy.Spider):
                     article_media_type                  = 'Web',
                     article_status                      = "Error",
                     article_error_status                = "No content",
-                    article_url                         = response.url,
+                    article_url                         = article['article_url'],
                     date_updated                        = datetime.datetime.today().isoformat(),
                     created_by                          = "Python Global Scraper",
                     updated_by                          = "Python Global Scraper",
@@ -149,7 +149,7 @@ class TestSpider(scrapy.Spider):
                     article_media_type                  = 'Web',
                     article_status                      = "Error",
                     article_error_status                = "No content",
-                    article_url                         = response.url,
+                    article_url                         = article['article_url'],
                     date_updated                        = datetime.datetime.today().isoformat(),
                     created_by                          = "Python Global Scraper",
                     updated_by                          = "Python Global Scraper",
@@ -217,18 +217,17 @@ class TestSpider(scrapy.Spider):
     def errback_httpbin_final(self, failure):
         article = failure.request.cb_kwargs['article']
         log.exception("errback_httpbin_final triggered")
-        print("error")
         try:
             if failure.check(HttpError):
                 response = failure.value.response
                 log.error("HTTP Error on %s", response.url)
                 self.logger.error('HTTP Error on %s', response.url)
                 articles = self.yeild_article_items(
-                    article_source_url                  = "test_url",
+                    article_source_url                      = "test_url",
                     article_media_type                      = 'Web',
                     article_status                          = "Error",
                     article_error_status                    = "HTTP Error",
-                    article_url                             = response.url,
+                    article_url                             = article['article_url'],
                     date_updated                            = datetime.datetime.today().isoformat(),
                     created_by                              = "Python Global Scraper",
                     updated_by                              = "Python Global Scraper",
@@ -245,11 +244,11 @@ class TestSpider(scrapy.Spider):
                 log.error("DNSLookupError on %s", request.url)
                 self.logger.error('DNSLookupError on %s', request.url)
                 articles = self.yeild_article_items( 
-                    article_source_url                  = "test_url",
+                    article_source_url                      = "test_url",
                     article_media_type                      = 'Web',
                     article_status                          = "Error",
                     article_error_status                    = "DNS Error",
-                    article_url                             = request.url,
+                    article_url                             = article['article_url'],
                     date_updated                            = datetime.datetime.today().isoformat(),
                     created_by                              = "Python Global Scraper",
                     updated_by                              = "Python Global Scraper",
@@ -265,11 +264,11 @@ class TestSpider(scrapy.Spider):
                 log.error("TimeoutError on %s", request.url)
                 self.logger.error('TimeoutError on %s', request.url)
                 articles = self.yeild_article_items(
-                    article_source_url                  = "test_url",
+                    article_source_url                      = "test_url",
                     article_media_type                      = 'Web',
                     article_status                          = "Error",
                     article_error_status                    = "Timeout Error",
-                    article_url                             = request.url,
+                    article_url                             = article['article_url'],
                     date_updated                            = datetime.datetime.today().isoformat(),
                     created_by                              = "Python Global Scraper",
                     updated_by                              =" Python Global Scraper",

@@ -1,5 +1,6 @@
 from bs4 import BeautifulSoup, element as bs4Element
 from ..helpers import Compare, Stopwords, MediaURL, ContentVariables, catch
+import timeout_decorator
 # from pebble import concurrent
 from pprint import pprint
 
@@ -42,48 +43,47 @@ class Content:
             self.stop_words = set(getattr(stopwords, "en"))
         
         # TOKENIZE AND FILTER HEADLINE/TITLE
-        print("Tokenize and filter headline")
         self.filtered_headline_tokens = self.__tokenize(headline)
 
         # CREATE COMPARISON DATA
-        print("create comparison data")
         self.data = Compare(self.filtered_headline_tokens)
 
         self.div_strings = [] # CONTAINER OF STRINGS IN A DIV ELEMENT
         self.stripped_strings = []
 
         # CLEAN PAGE SOURCE
-        print("clean page source")
         self.__clean_html()
 
         # GET BODY TAG
-        print("get body tag")
         self.body_node = catch('None', lambda: self.soup.find('body'))
 
+        # AVOID CHOKE POINT
+        self._extract_content()
+
+    @timeout_decorator.timeout(15)
+    def _extract_content(self):
         # GET ALL DIV AND EXTRACT TEXT CONTENT
-        print("start get all div and extract content")
-        for tag in self.content_variables.content_tags:
-            blocks = self.body_node.find_all(tag) if self.body_node is not None else self.soup.find_all(tag)
-            
-            if not list(blocks):
-                continue
+        # Choke point
+        try:
+            for tag in self.content_variables.content_tags:
+                blocks = self.body_node.find_all(tag) if self.body_node is not None else self.soup.find_all(tag)
+                
+                if not list(blocks):
+                    continue
 
-            self.__iterate_tag(blocks)
+                self.__iterate_tag(blocks)
 
-            if self.text:
-                break
-
-    # def timeout_parser(self):
-    #     if self.start_time >= 15:
-    #         return None
-
+                if self.text:
+                    break
+        except Exception as e:
+            self.text = None
 
     def __iterate_tag(self, blocks):
         """
         Iterates bs4 blocks to find probable content
         """
         token_add_count = 1 # COUNTER LIMIT FOR ADDING TOKEN
- 
+
         for block in blocks:
             # GET HIGHEST STRIPPED STRINGS
             if len(self.stripped_strings) < len(list(block.stripped_strings)):
@@ -176,7 +176,9 @@ class Content:
         
         self.text = "\n\n".join(self.div_strings)
         return self.text
-
+        # except Exception as e:
+        #     print("return as None")
+        #     return None
     def __merge_containers(self):
         """
         Merge all possible containers with same class or attributes

@@ -35,17 +35,22 @@ class ArticleStaticSpider(scrapy.Spider):
     def start_requests(self):
         log.info("Spider started scraping")
         log.info("Using Proxy %s" %use_proxy)
-        start_req_t1 = time.perf_counter()
         for d in self.data:
             try:
-                # article_process(d['_id'], "article")  # update status to Process
+                article_process(d['_id'], "article")  # update status to Process
                 is_using_proxy      = d['website']['is_using_proxy']
                 needs_https         = d['website']['needs_https']
+                needs_endslash      = d['website']['needs_endslash']
+                # First: check if needs https or not
                 if bool(needs_https):
-                        http_split = d['article_url'].split('http')
-                        d['article_url'] = "https".join(http_split)
+                    http_split = d['article_url'].split(':')
+                    http_split[0] = "https"
+                    d['article_url'] = ":".join(http_split)
+                # Second: check if needs endslash
+                if bool(needs_endslash):
+                    d['article_url'] = d['article_url'] + "/"
+                # Last: check if url is using proxy
                 if bool(is_using_proxy) == True:
-                    print("Using proxy on ",d['article_url'])
                     meta = {}
                     headers = {}
                     try:
@@ -63,7 +68,6 @@ class ArticleStaticSpider(scrapy.Spider):
                     d['user_agent'] = headers['User-Agent']
                     yield scrapy.Request(d['article_url'], self.parse, headers=headers, meta=meta, errback=self.errback_httpbin, cb_kwargs={'article': d}, dont_filter=True)
                 else:
-                    print("Not using proxy on ", d['article_url'])
                     d['proxy'] = "MACHINE's IP"#DEFAULT_PROXY
                     d['user_agent'] = DEFAULT_USER_AGENT
                     yield scrapy.Request(d['article_url'], callback=self.parse, errback=self.errback_httpbin, cb_kwargs={'article': d}, dont_filter=True)
@@ -84,20 +88,15 @@ class ArticleStaticSpider(scrapy.Spider):
                     user_agent                          = article['user_agent']
                 )
                 yield articles
-
-        start_req_t2 = time.perf_counter()
-        log.info("Start Request: {}".format(convert(round(start_req_t2 - start_req_t1, 2))))  
-
     def parse(self, response, article):
         try:
             # Global Parser
             t1_time = time.perf_counter()
             news = NewsExtract(response.url, response.text)
-            print(f"Global parser: took {round(time.perf_counter() - t1_time, 2)} secs on {response.url}")
+            # print(f"Global parser: took {round(time.perf_counter() - t1_time, 2)} secs on {response.url}")
             log.info(f"Global parser took {round(time.perf_counter() - t1_time, 2)} secs on {article['article_url']}")
             if news.title is None or news.content is None:
                 log.error(f"Content error on {article['article_url']}")
-                print("Content error")
                 articles = self.yeild_article_items(
                     article_source_url                  = article['website']['fqdn'],
                     article_media_type                  = 'Web',
@@ -152,13 +151,14 @@ class ArticleStaticSpider(scrapy.Spider):
                     )
                     yield articles
                 except Exception as e:
-                    print("Exception hanlder for main parse")
-                    print(e)
+                    log.error(f"Yielding artilces might've bugs")
         except Exception as e:
-            print("Error on Global parser module")
+            log.error(f"{e} on {article['article_url']}")
+            # print("Error on Global parser module")
             try:
                 articles = self.yeild_article_items(  
                     article_source_url                  = article['website']['fqdn'],
+                    website                             = article['website']['_id'],
                     article_media_type                  = 'Web',
                     article_status                      = "Error",
                     article_error_status                = "No content",
@@ -227,6 +227,7 @@ class ArticleStaticSpider(scrapy.Spider):
                 self.logger.error('HTTP Error on %s', response.url)
                 articles = self.yeild_article_items(
                     article_source_url                      = article['website']['fqdn'],
+                    website                                 = article['website']['_id'],
                     article_media_type                      = 'Web',
                     article_status                          = "Error",
                     article_error_status                    = "HTTP Error",
@@ -247,6 +248,7 @@ class ArticleStaticSpider(scrapy.Spider):
                 self.logger.error('DNSLookupError on %s', request.url)
                 articles = self.yeild_article_items( 
                     article_source_url                      = article['website']['fqdn'],
+                    website                                 = article['website']['_id'],
                     article_media_type                      = 'Web',
                     article_status                          = "Error",
                     article_error_status                    = "DNS Error",
@@ -266,6 +268,7 @@ class ArticleStaticSpider(scrapy.Spider):
                 self.logger.error('TimeoutError on %s', request.url)
                 articles = self.yeild_article_items(
                     article_source_url                      = article['website']['fqdn'],
+                    website                                 = article['website']['_id'],
                     article_status                          = "Error",
                     article_error_status                    = "Timeout Error",
                     article_url                             = article['article_url'],#request.url,
@@ -282,6 +285,7 @@ class ArticleStaticSpider(scrapy.Spider):
                 log.error("BaseError on %s", request.url)
                 articles = self.yeild_article_items(
                     article_source_url                      = article['website']['fqdn'],
+                    website                                 = article['website']['_id'],
                     article_status                          = "Error",
                     article_error_status                    = "Base Error",
                     article_url                             = article['article_url'],#request.url,
@@ -309,9 +313,9 @@ class ArticleStaticSpider(scrapy.Spider):
         self.article_items['article_content']           = kwargs.get("article_content", None)
         self.article_items['article_videos']            = kwargs.get("article_videos", None)
         self.article_items['article_media_type']        = kwargs.get("article_media_type", "Web")
-        self.article_items['article_ad_value']          = kwargs.get("article_ad_value", None)
-        self.article_items['article_pr_value']          = kwargs.get("article_pr_value", None)
-        self.article_items['article_language']          = kwargs.get("article_language", None)
+        self.article_items['article_ad_value']          = kwargs.get("article_ad_value", 0)
+        self.article_items['article_pr_value']          = kwargs.get("article_pr_value", 0)
+        self.article_items['article_language']          = kwargs.get("article_language", 'en')
         self.article_items['article_status']            = kwargs.get("article_status", "Processing")
         self.article_items['article_error_status']      = kwargs.get("article_error_status", None)
         self.article_items['keyword']                   = kwargs.get("keyword", None)

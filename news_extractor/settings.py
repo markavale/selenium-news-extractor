@@ -111,9 +111,9 @@ ITEM_PIPELINES = {
     'news_extractor.pipelines.DynamicExtractorPipeline': 300
 }
 
-CONCURRENT_ITEMS = 150 # 100 # => Maximum number of concurrent items (per response) to process in parallel in item pipelines.
-CONCURRENT_REQUESTS = 150
-CONCURRENT_REQUESTS_PER_DOMAIN = 150 #100
+CONCURRENT_ITEMS = 200 # 100 # => Maximum number of concurrent items (per response) to process in parallel in item pipelines.
+CONCURRENT_REQUESTS = 200
+CONCURRENT_REQUESTS_PER_DOMAIN = 200 #100
 AUTOTHROTTLE_ENABLED = True # it should be false to scrape
 DOWNLOAD_TIMEOUT = 60 #120 # 2 Mins
 CONNECTION_TIMEOUT = 60 # 1 min
@@ -135,7 +135,7 @@ REDIRECT_MAX_TIMES = 1 # It must always be set to 1 to avoid redirecting in payw
 # AUTOTHROTTLE_MAX_DELAY = 30
 # The average number of requests Scrapy should be sending in parallel to
 # each remote server
-AUTOTHROTTLE_TARGET_CONCURRENCY = 100
+AUTOTHROTTLE_TARGET_CONCURRENCY = 150
 # Enable showing throttling stats for every response received:
 AUTOTHROTTLE_DEBUG = config("DEBUG", cast=bool)
 
@@ -173,12 +173,15 @@ HEADERS = {
 PROXY = config("USE_PROXY", cast=bool)
 
 # [ TESTING ]
-TESTING = config("TESTING", cast=bool)
+TESTING                     = config("TESTING", cast=bool)
 
 # [ ADMIN TOKEN ]
-ADMIN_TOKEN = config("ADMIN_TOKEN")
-PRODUCTION_ADMIN_API = config("PRODUCTION_ADMIN_API")
-DEVELOPMENT_ADMIN_API = config("DEVELOPMENT_ADMIN_API")
+ADMIN_TOKEN                 = config("ADMIN_TOKEN")
+PRODUCTION_ADMIN_API        = config("PRODUCTION_ADMIN_API")
+DEVELOPMENT_ADMIN_API       = config("DEVELOPMENT_ADMIN_API")
+USE_ADMIN_API               = config("USE_ADMIN_API", cast=bool)
 
-DEFAULT_PROXY = 'http://103.105.212.106:53281'
-DEFAULT_USER_AGENT = 'Mozilla/5.0 (Windows NT 6.0 rv:21.0) Gecko/20100101 Firefox/21.0'
+
+# [ DEFAULT PROXY AND HEADERS ]
+DEFAULT_PROXY               = 'http://103.105.212.106:53281'
+DEFAULT_USER_AGENT          = 'Mozilla/5.0 (Windows NT 6.0 rv:21.0) Gecko/20100101 Firefox/21.0'

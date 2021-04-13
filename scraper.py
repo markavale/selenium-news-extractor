@@ -7,7 +7,7 @@ from news_extractor.helpers.utils import (
     convert, delete_all_logs, save_all_logs, get_system_data)
 from news_extractor.helpers import global_link_articles, google_link_check_fqdn, admin_api
 from news_extractor.settings import (TESTING, TOKEN, PRODUCTION_ADMIN_API, DEVELOPMENT_ADMIN_API, environment, CREATED_BY, PAGE_OFFSET,
-                                     LIMIT)
+                                     LIMIT, USE_ADMIN_API)
 from logs.main_log import init_log
 log = init_log("news_extractor")
 # HEADERS
@@ -166,18 +166,17 @@ def run():
     # file.write(str(scraper))
 
     _url = PRODUCTION_ADMIN_API if environment else DEVELOPMENT_ADMIN_API
-    # if not TESTING:
-    #     print("SENDING JSON LOG DATA SET TO ADMIN SCRAPER API")
-    #     resp = admin_api(
-    #         method="POST", url="{}crawler-items/".format(_url), body=crl_items["crawler_items"])
-    #     print(resp)
-    #     print("SENDING SCRAPER OBJECT TO ADMIN SCRAPER API")
-    #     resp2 = admin_api(
-    #         method="POST", url="{}process-scraper/".format(_url), body=scraper)
-    #     print(resp2)
-    # pprint(scraper)
+    if USE_ADMIN_API:
+        print("SENDING JSON LOG DATA SET TO ADMIN SCRAPER API")
+        resp = admin_api(
+            method="POST", url="{}crawler-items/".format(_url), body=crl_items["crawler_items"])
+        print(resp)
+        print("SENDING SCRAPER OBJECT TO ADMIN SCRAPER API")
+        resp2 = admin_api(
+            method="POST", url="{}process-scraper/".format(_url), body=scraper)
+        print(resp2)
         # DELETE: delete logs after it successfully send it to ADMIN SCRAPER API
-        # delete_all_logs(info_path, debug_path, error_path, json_path)
+        delete_all_logs(info_path, debug_path, error_path, json_path)
 
 
 if __name__ == "__main__":

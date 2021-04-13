@@ -13,7 +13,7 @@ class PublishDate:
             html        -   news page source
     """
 
-    def __init__(self, html: str):
+    def __init__(self, html: str):  
         """
         Initialize method
         """
@@ -39,10 +39,12 @@ class PublishDate:
                 # FIND DATES IN STRING
                 matches = datefinder.find_dates(str(probab_date).replace(":", ""))
                 # GET MATCH IF LESS THAN DATE TODAY
+                today = datetime.today()
                 for match in matches:
-                    # if match < utc.localize(datetime.today()): # FIX THE ERROR for NoneType object of date
-                    if match < datetime.today(): # Original | Prone to error
+                    if match.year >= today.year -1 and match.year <= today.year: # Original | Prone to error
+                        # print(datetime.today())
                         self.date = match
+                        # print(match)
                         break
                     else:
                         self.date = None
@@ -76,7 +78,6 @@ class PublishDate:
 
                 if result:
                     possible_date = block.text.strip().replace("\n", " ")
-
                     return possible_date
 
     def __clean_html(self):

@@ -57,7 +57,7 @@ class NewsExtract:
         clean_html = self.__clean_html(self.html, js=js) if self.html else None
         #NEWSPAPER 3K
         article = catch('None', lambda: Article(self.url, request_timeout=30, MIN_WORD_COUNT=600))
-        # catch('None', lambda: article.download(input_html=clean_html))
+        catch('None', lambda: article.download(input_html=clean_html))
         catch('None', lambda: article.parse())
         catch('None', lambda: article.nlp())
 
@@ -78,10 +78,6 @@ class NewsExtract:
         content = catch('None', lambda: Content(clean_html, title_instance) if title 
                         else Content(clean_html, title_catcher) if article
                         else None)
-        # print("content: ", content)
-        # content.timeout_parser()
-        # if content is None:
-        #     print()
         # CLASS VARIABLES        
         self.title = self.__get_title(title_instance, article)
         self.authors = self.__get_authors(author.names, article)
@@ -93,13 +89,12 @@ class NewsExtract:
         self.images = self.__get_images(article)
 
         # Validation for content if not None
-        if content is None: 
-            print("Content is None")  
+        if content.text is None: 
             # NewsPlease Scraper
             newsplease = catch(
                 'None', lambda: NewsPlease.from_html(clean_html, url=None))
             content_instance = newsplease.maintext
-        elif content is not None:
+        elif content.text is not None:
             content_instance = content.text
         else:
             print("No content available | mightr be JS link")
@@ -109,8 +104,8 @@ class NewsExtract:
         self.videos = catch('list', lambda: article.movies if article.movies else [])
         
         # Logic is not corrent TODO: have an alternative logic for language extractor
-        # self.language = catch('None', lambda: article.meta_lang if not article.meta_lang or article.meta_lang != "" else 'en')
-        self.language = 'en'
+        self.language = catch('None', lambda: article.meta_lang if article.meta_lang is not None or article.meta_lang != "" else 'en')
+        # self.language = 'en'
 
         # BOOLEAN SCRAPED
         self.scraped = True
@@ -159,7 +154,6 @@ class NewsExtract:
             return None
         
         soup = BeautifulSoup(html, "html.parser")
-
         # REMOVE ALL UNRELATED TAGS FROM SOURCE
         tags_for_decompose = self.news_variables.tags_for_decompose
 
@@ -171,6 +165,8 @@ class NewsExtract:
         for div_class in soup.find_all("div", {"class": self.class_div_use_case}):
             div_class.decompose()
         
+        
+
         if js:
             for tag in soup.find_all(self.__is_invalid_tag):
                 tag.decompose()
