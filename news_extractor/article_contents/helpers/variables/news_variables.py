@@ -3,7 +3,7 @@ from typing import List
 
 @dataclass
 class NewsVariables:
-    invalid_keys: List = field(default_factory=lambda: ['privacy', 'newsletter', 'modal', 
+    invalid_keys: List = field(default_factory=lambda: ['privacy', 'newsletter', 'modal',
                                                 'subscription', 'related-articles', 'recommended-posts', 
                                                 'asset-below', 'card'])
     tags_for_decompose: List = field(default_factory=lambda: ['script', 'forms', 'button', 'aside'])

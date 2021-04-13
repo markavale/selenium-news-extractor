@@ -1,4 +1,5 @@
-import time, os, datetime, json
+import time, os, datetime, json, errno, signal
+from functools import wraps
 from news_extractor.settings import HEADERS, CREATED_BY, PAGE_OFFSET
 # from news_extractor.helpers import article_link_articles
 # from news_extractor.helpers import article_link_articles
@@ -64,11 +65,15 @@ def save_all_logs(info_path, debug_path, error_path, json_path):
 def get_system_data(**kwargs):
     article_website_query = {
         "path": "website",
+        # "match": {
+        #     "is_dynamic_website": True
+        # },
         "select": "-main_sections -section_filter -article_filter -selectors -sub_sections -embedded_sections -code_snippet"
     }
     body_query = {
-        # "article_source_url": "manilanews.net"
+        # "article_source_url": "morungexpress.com",
         'article_status': 'Queued',
+        "article_source_url": { "$ne": "news.google.com" },
         'created_by': CREATED_BY    
         }
     _fields = {
@@ -77,3 +82,5 @@ def get_system_data(**kwargs):
     data = article_link_articles(
         headers=HEADERS, body=body_query, fields=_fields, limit=kwargs['limit'], website_query=article_website_query, page_offset=PAGE_OFFSET)
     return data
+
+

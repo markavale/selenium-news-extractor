@@ -42,22 +42,26 @@ class Content:
             self.stop_words = set(getattr(stopwords, "en"))
         
         # TOKENIZE AND FILTER HEADLINE/TITLE
+        print("Tokenize and filter headline")
         self.filtered_headline_tokens = self.__tokenize(headline)
 
         # CREATE COMPARISON DATA
+        print("create comparison data")
         self.data = Compare(self.filtered_headline_tokens)
 
         self.div_strings = [] # CONTAINER OF STRINGS IN A DIV ELEMENT
         self.stripped_strings = []
 
         # CLEAN PAGE SOURCE
+        print("clean page source")
         self.__clean_html()
 
         # GET BODY TAG
+        print("get body tag")
         self.body_node = catch('None', lambda: self.soup.find('body'))
 
         # GET ALL DIV AND EXTRACT TEXT CONTENT
-        
+        print("start get all div and extract content")
         for tag in self.content_variables.content_tags:
             blocks = self.body_node.find_all(tag) if self.body_node is not None else self.soup.find_all(tag)
             
@@ -68,7 +72,12 @@ class Content:
 
             if self.text:
                 break
-            
+
+    # def timeout_parser(self):
+    #     if self.start_time >= 15:
+    #         return None
+
+
     def __iterate_tag(self, blocks):
         """
         Iterates bs4 blocks to find probable content
@@ -166,7 +175,6 @@ class Content:
                 self.div_strings.append(string)
         
         self.text = "\n\n".join(self.div_strings)
-
         return self.text
 
     def __merge_containers(self):
@@ -394,6 +402,10 @@ class Content:
         for key in self.content_variables.tags_for_decompose:
             for tag in self.soup.find_all(key):
                 tag.decompose()
+
+        # REMOVE UNRELATED CLASS NAMES
+        for c_name in self.soup.find_all('div', {"class": 'sidebar'}):
+            c_name.decompose()
 
     def __find_parent(self, tag):
         """

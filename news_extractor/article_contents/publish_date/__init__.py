@@ -2,8 +2,9 @@ from ..helpers import Compare, PubDateVariables, recursive_iterate
 
 from bs4 import BeautifulSoup
 from datetime import datetime
-import datefinder, re, time
+import datefinder, re, time, pytz
 
+utc=pytz.UTC
 
 class PublishDate:
     """
@@ -32,15 +33,22 @@ class PublishDate:
             probab_date = self.__iterate_tag(blocks)
 
             if probab_date:
+                # print("Probab_date true")
+                # print(probab_date)
+               
                 # FIND DATES IN STRING
                 matches = datefinder.find_dates(str(probab_date).replace(":", ""))
-
                 # GET MATCH IF LESS THAN DATE TODAY
                 for match in matches:
-                    if match < datetime.today():
+                    # if match < utc.localize(datetime.today()): # FIX THE ERROR for NoneType object of date
+                    if match < datetime.today(): # Original | Prone to error
                         self.date = match
                         break
-                
+                    else:
+                        self.date = None
+            else:
+                pass
+
     def __iterate_tag(self, blocks):     
         """
         Iterates bs4 blocks to find probable author

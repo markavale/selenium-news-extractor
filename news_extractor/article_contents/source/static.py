@@ -5,7 +5,7 @@ class StaticSource(Fetch):
     """
     Get static source
     """
-    def __init__(self, url: str='', timeout: int=30):
+    def __init__(self, url: str='', timeout: int=60):
 
         self.url = ArticleURL(url)
         self.timeout = timeout

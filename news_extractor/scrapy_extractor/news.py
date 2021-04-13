@@ -1,19 +1,21 @@
 import nltk, datetime, cloudscraper, time, platform, os, requests, pytz, re
 
-from .exceptions import *
-from .helpers import ArticleURL, rand_sleep, NewsVariables, Compare, catch, unicode
-from .author import Author
-from .publish_date import PublishDate
-from .title.title import Title
-from .content import Content
+from news_extractor.article_contents.exceptions import *
+from news_extractor.article_contents.author import Author
+from news_extractor.article_contents.publish_date import PublishDate
+from news_extractor.article_contents.title.title import Title
+from news_extractor.article_contents.content import Content
+from news_extractor.article_contents.helpers import ArticleURL, rand_sleep, NewsVariables, Compare, catch, unicode
+from .use_case import div_class_use_case
 
+# from newsfetch.utils import NewsPlease, get, unquote
+from newsplease import NewsPlease
 from newspaper import Article
 from bs4 import BeautifulSoup
 from dateutil.parser import parse
 from logs.main_log import init_log
-import time
-
-class News:
+log = init_log('global_parser')
+class NewsExtract:
     """
     Instantiate a news article object
         @params:
@@ -33,17 +35,17 @@ class News:
         self.news_variables = NewsVariables()
 
         # CLEAN URL
-        CLEAN_URL = ArticleURL(url)
+        # CLEAN_URL = ArticleURL(url)
         # print("sleeping...")
         # time.sleep(2)
         # rand_sleep(3, 5)
 
-        self.url = CLEAN_URL.url
+        self.url = url#CLEAN_URL.url
         self.html = source
         self.lang = lang
         self.timeout = timeout
         self.scraped = False
-
+        self.class_div_use_case = div_class_use_case()
         # PAGE SOURCE IS REQUIRED
         if not self.html:
             raise NewsError("No Page Source passed")
@@ -53,11 +55,11 @@ class News:
         
         # CLEAN HTML
         clean_html = self.__clean_html(self.html, js=js) if self.html else None
-
         #NEWSPAPER 3K
         article = catch('None', lambda: Article(self.url, request_timeout=30, MIN_WORD_COUNT=600))
         # catch('None', lambda: article.download(input_html=clean_html))
         catch('None', lambda: article.parse())
+        catch('None', lambda: article.nlp())
 
         # AUTHOR
         author = catch('None', lambda: Author(clean_html))
@@ -67,22 +69,48 @@ class News:
 
         # TITLE
         title = catch('None', lambda: Title(clean_html))
+        title_instance = None if title.text is None else title.text
 
         # CONTENT
-        content = catch('None', lambda: Content(clean_html, title.text) if title 
-                        else Content(clean_html, article.title) if article
+        title_catcher = None if article.title is None else article.title
+        
+        # start_time = int(time.perf_counter())
+        content = catch('None', lambda: Content(clean_html, title_instance) if title 
+                        else Content(clean_html, title_catcher) if article
                         else None)
-
-        # CLASS VARIABLES
-        self.title = self.__get_title(title.text, article)
+        # print("content: ", content)
+        # content.timeout_parser()
+        # if content is None:
+        #     print()
+        # CLASS VARIABLES        
+        self.title = self.__get_title(title_instance, article)
         self.authors = self.__get_authors(author.names, article)
-        self.publish_date = self.__get_publish_date(publish_date.date, article)
+
+        # Validation for publish_date if none
+        # print()
+        publish_date_instance = datetime.datetime.now().isoformat() if publish_date is None else publish_date.date
+        self.publish_date = self.__get_publish_date(publish_date_instance, article)
         self.images = self.__get_images(article)
-        self.content = self.__get_content(content.text, article, js=js)# or self.__get_title(title.text, article)
 
+        # Validation for content if not None
+        if content is None: 
+            print("Content is None")  
+            # NewsPlease Scraper
+            newsplease = catch(
+                'None', lambda: NewsPlease.from_html(clean_html, url=None))
+            content_instance = newsplease.maintext
+        elif content is not None:
+            content_instance = content.text
+        else:
+            print("No content available | mightr be JS link")
+            content_instance = None
 
+        self.content = self.__get_content(content_instance, article, js=js)# or self.__get_title(title.text, article)
         self.videos = catch('list', lambda: article.movies if article.movies else [])
-        self.language = catch('None', lambda: article.meta_lang if not article.meta_lang else 'en')
+        
+        # Logic is not corrent TODO: have an alternative logic for language extractor
+        # self.language = catch('None', lambda: article.meta_lang if not article.meta_lang or article.meta_lang != "" else 'en')
+        self.language = 'en'
 
         # BOOLEAN SCRAPED
         self.scraped = True
@@ -138,6 +166,10 @@ class News:
         for tag in tags_for_decompose:
             for _tag in soup(tag):
                 _tag.decompose()
+
+        # looping for all classes that have main-sidebar name on it
+        for div_class in soup.find_all("div", {"class": self.class_div_use_case}):
+            div_class.decompose()
         
         if js:
             for tag in soup.find_all(self.__is_invalid_tag):
@@ -220,19 +252,44 @@ class News:
 
         return authors
 
-    def __get_publish_date(self, _date, article: type(Article)):
+    def __get_publish_date_backup(self, _date, article: type(Article)):
         """
         Generate news publish date
         """
         pht = pytz.timezone('Asia/Singapore')
-
+        article_date = None
         try:
             article_date = article.meta_data['article']['published_time']
 
             if not isinstance(article_date, datetime.datetime):
                 article_date = parse(str(article_date))
 
-        except:
+        except Exception as e:
+            article_date = None
+
+        # GET BOTH DATES
+        dates = [_date, article_date]
+        # REPLACE TZINFO
+        datetime_dates = [date.replace(tzinfo=pht) for date in dates if date is not None]
+
+        # GET MIN DATE IF DATETIME_DATES IS NOT NONE
+        publish_date = datetime.datetime.now().isoformat() if not datetime_dates else min(datetime_dates).isoformat()
+
+        return publish_date
+
+    def __get_publish_date(self, _date, article: type(Article)):
+        """
+        Generate news publish date
+        """
+        pht = pytz.timezone('Asia/Singapore')
+        
+        try:
+            article_date = article.meta_data['article']['published_time']
+
+            if not isinstance(article_date, datetime.datetime):
+                article_date = parse(str(article_date))
+
+        except: 
             article_date = None
 
         # GET BOTH DATES
@@ -260,12 +317,10 @@ class News:
         """
         Generate news content
         """
-
         if js:
-            content = catch('None', lambda: unicode(' '.join(_content.replace('’', '').split())) if _content else None )
+            content = catch('None', lambda: unicode(' '.join(_content.replace('’', '').split())) if _content else None)
         else:
             content = catch('None', lambda: unicode(' '.join(_content.replace('’', '').split())) if _content
                             else  unicode(' '.join(article.text.replace('’', '').split())) if article.text
                             else None)
-
         return content

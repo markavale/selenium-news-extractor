@@ -80,13 +80,17 @@ def main(system_data, WORKERS):
 
 def run():
     system_links = list(map(lambda x: x.strip(), open(
-            'test-articles.txt').read().split('\n')))
+            'test-data/test-articles.txt').read().split('\n')))
     # Cheking first if for testing or production
     if not TESTING:
         try:
             data = get_system_data(limit=LIMIT)
+            # with open('test-data/mmi-data.json') as f:
+            #     data = json.loads(f.read())
+
             print("Getting data from system")
-            system_data = data['data']
+            system_data = data['data'] #* 5  # 
+
             if len(system_data) == 0:
                 print("No Data")
                 log.info('No data')
@@ -137,7 +141,10 @@ def run():
                     "dns_error": item['dns_err'],
                     "timeout_error": item['timeout_err'],
                     "base_error": item['base_err'],
-                    "skip_url": item['skip_url']
+                    "skip_url": item['skip_url'],
+                    "proxy": item['proxy'],
+                    "user_agent": item['user_agent'],
+                    "source_created_from": item['source_created_from']
                 }
             )
         except Exception as e:
@@ -159,15 +166,15 @@ def run():
     # file.write(str(scraper))
 
     _url = PRODUCTION_ADMIN_API if environment else DEVELOPMENT_ADMIN_API
-    if not TESTING:
-        print("SENDING JSON LOG DATA SET TO ADMIN SCRAPER API")
-        resp = admin_api(
-            method="POST", url="{}crawler-items/".format(_url), body=crl_items["crawler_items"])
-        print(resp)
-        print("SENDING SCRAPER OBJECT TO ADMIN SCRAPER API")
-        resp2 = admin_api(
-            method="POST", url="{}process-scraper/".format(_url), body=scraper)
-        print(resp2)
+    # if not TESTING:
+    #     print("SENDING JSON LOG DATA SET TO ADMIN SCRAPER API")
+    #     resp = admin_api(
+    #         method="POST", url="{}crawler-items/".format(_url), body=crl_items["crawler_items"])
+    #     print(resp)
+    #     print("SENDING SCRAPER OBJECT TO ADMIN SCRAPER API")
+    #     resp2 = admin_api(
+    #         method="POST", url="{}process-scraper/".format(_url), body=scraper)
+    #     print(resp2)
     # pprint(scraper)
         # DELETE: delete logs after it successfully send it to ADMIN SCRAPER API
         # delete_all_logs(info_path, debug_path, error_path, json_path)

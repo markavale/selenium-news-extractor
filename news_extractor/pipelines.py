@@ -28,13 +28,14 @@ class StaticExtractorPipeline:
             'Content-Type': 'application/json',
             'Authorization': 'Bearer {}'.format(TOKEN)
         }
+        # print("Download latency: ",item['download_latency'])
         pprint(item)
-        if dict(item)['article_status'] == "Error":
-            req = api(method='PUT', url='{}article/{}'.format(_root_url,
-                                                                    dict(item)['article_id']), body=dict(item), headers=headers)
-        else:
-            req = api(method='PUT', url='{}article/{}'.format(_root_url,
-                                                                  dict(item)['article_id']), body=dict(item), headers=headers)
+        # if dict(item)['article_status'] == "Error":
+        #     req = api(method='PUT', url='{}article/{}'.format(_root_url,
+        #                                                             dict(item)['article_id']), body=dict(item), headers=headers)
+        # else:
+        #     req = api(method='PUT', url='{}article/{}'.format(_root_url,
+        #                                                           dict(item)['article_id']), body=dict(item), headers=headers)
         return item
 
 

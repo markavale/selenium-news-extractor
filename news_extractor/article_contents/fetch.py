@@ -18,7 +18,7 @@ class Fetch:
             agent       -   User agent to be passed in requests if any
             **kwargs    -   Additional arguments to extend to options
     """
-
+    # Treating page source as url, Please keep that in mind :)
     def __init__(self, url: str="", method='GET', headers: dict={}, body: dict={},
                 options=None, timeout: int=30, max_retries: int=2, agent: str='random', **kwargs):
         """
@@ -104,7 +104,7 @@ class Fetch:
         response = catch('None', lambda: cs.get(self.url, timeout=timeout))
 
         # TRY REQUESTS IF NO RESPONSE
-        if not response:
+        if not self.url:
             response = catch('None', lambda: requests.request(self.method, self.url, headers=self.headers, timeout=timeout))
 
         # RAISE ERROR IF NO RESPONSE
@@ -118,4 +118,5 @@ class Fetch:
         self.is_html = self.__is_html(self.page_headers)
         self.r_url = response.url
         self.status_code = response.status_code
-        self.text = response.content
+
+        self.text = response.text

@@ -72,6 +72,8 @@ DOWNLOADER_MIDDLEWARES = {
     # Retry middleware
     'scrapy.downloadermiddlewares.retry.RetryMiddleware': 120,
 
+    'scrapy.downloadermiddlewares.httpcompression.HttpCompressionMiddleware':120,
+
     # 'news_extractor.middlewares.NewsExtractorDownloaderMiddleware': 543,
     # 'news_extractor.middlewares.CustomProxyMiddleware': 350,
     
@@ -109,17 +111,18 @@ ITEM_PIPELINES = {
     'news_extractor.pipelines.DynamicExtractorPipeline': 300
 }
 
-CONCURRENT_ITEMS = 200 # 100 # => Maximum number of concurrent items (per response) to process in parallel in item pipelines.
-CONCURRENT_REQUESTS = 200
-CONCURRENT_REQUESTS_PER_DOMAIN = 200 #100
+CONCURRENT_ITEMS = 150 # 100 # => Maximum number of concurrent items (per response) to process in parallel in item pipelines.
+CONCURRENT_REQUESTS = 150
+CONCURRENT_REQUESTS_PER_DOMAIN = 150 #100
 AUTOTHROTTLE_ENABLED = True # it should be false to scrape
 DOWNLOAD_TIMEOUT = 60 #120 # 2 Mins
 CONNECTION_TIMEOUT = 60 # 1 min
 RETRY_ENABLED = False
 # TELNETCONSOLE_ENABLED=False
 
+# Redirect must enabled to parse all google links
 REDIRECT_ENABLED = True
-REDIRECT_MAX_TIMES = 1
+REDIRECT_MAX_TIMES = 1 # It must always be set to 1 to avoid redirecting in paywall page.
 
 # LOG_LEVEL = 'ERROR'
 # The initial download delay
@@ -176,3 +179,6 @@ TESTING = config("TESTING", cast=bool)
 ADMIN_TOKEN = config("ADMIN_TOKEN")
 PRODUCTION_ADMIN_API = config("PRODUCTION_ADMIN_API")
 DEVELOPMENT_ADMIN_API = config("DEVELOPMENT_ADMIN_API")
+
+DEFAULT_PROXY = 'http://103.105.212.106:53281'
+DEFAULT_USER_AGENT = 'Mozilla/5.0 (Windows NT 6.0 rv:21.0) Gecko/20100101 Firefox/21.0'

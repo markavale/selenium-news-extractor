@@ -18,7 +18,8 @@ class Author:
         self.soup = BeautifulSoup(html, "html.parser")
         self.names = []
         self.stop_words = set(stopwords.words('english'))
-
+        self.full_date_names = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+        self.letter_date_names = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
         #CLEAN DOM
         self.__clean_html()
 
@@ -31,6 +32,20 @@ class Author:
             author = self.__iterate_tag(blocks)
 
             if author:
+                # Author name entity logic :) MAV
+                split_author_name = author.title().split()
+                cleaned_name = list(map(lambda name:re.sub(r"[^a-zA-Z.]", r' ', name), split_author_name))
+                cleaned_name_join = " ".join(cleaned_name)
+                temp = cleaned_name_join.split()
+                author_names = []
+                for author in temp:
+                    if author in self.full_date_names or author in self.letter_date_names:
+                        pass
+                    else:
+                        author_names.append(author)
+                author = " ".join(author_names)
+                if author == "":
+                    author = "No - Author"
                 self.names = [author]
                 break
 
@@ -67,7 +82,6 @@ class Author:
                             possible_auth_tokens = nltk.word_tokenize(possible_auth)
                             filtered_auth = [word for word in possible_auth_tokens if word.lower() not in self.stop_words]
                             filtered_auth = [word for word in filtered_auth if word.lower() not in string.punctuation]
-
                             possible_auth = " ".join(filtered_auth)
 
                             return possible_auth
@@ -108,6 +122,10 @@ class Author:
         for key in self.author_variables.tags_for_decompose:
             for tag in self.soup.find_all(key):
                 tag.decompose()
+
+        # REMOVE UNRELATED CLASS NAMES FOR AUTHOR ELEMENTS
+        for c_name in self.soup.find_all("div", {"class": re.compile(r'auth-wall|author-description|author-url')}):
+            c_name.decompose()
     
     def __is_invalid_tag(self, tag):
         """
