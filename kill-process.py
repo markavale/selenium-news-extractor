@@ -32,8 +32,14 @@ for i in output.splitlines():
 
             t_hour = int(t_result.seconds / 3600)
 
-            if t_hour > 1:
+            if t_hour >= 1:
 
                 os.kill(int(p[1]), 9)
 
                 print('killing',p[1], p[8], t_hour)
+
+        elif p[8].find(":") == -1:
+
+            os.kill(int(p[1]), 9)
+
+            print('Killing process', p[1])
