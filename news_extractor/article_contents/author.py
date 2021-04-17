@@ -113,6 +113,9 @@ class Author:
         for key in self.author_variables.tags_for_decompose:
             for tag in self.soup.find_all(key):
                 tag.decompose()
+        
+        for c_name in self.soup.find_all("footer"):
+            c_name.decompose()
     
     def __is_invalid_tag(self, tag):
         """

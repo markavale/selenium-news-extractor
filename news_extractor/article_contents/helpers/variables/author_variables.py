@@ -7,5 +7,5 @@ class AuthorVariables:
     footer_keys: List = field(default_factory=lambda: ["FOOTER", "SOCIAL", "SHARE", "FACEBOOK", "TWITTER"])
     author_keys: List = field(default_factory=lambda: ["AUTHOR", "BYLINE"])
 
-    tags_for_decompose: List = field(default_factory=lambda: ["nav", "script", "time"])
+    tags_for_decompose: List = field(default_factory=lambda: ["nav", "script", "time", "footer"])
     author_tags: List = field(default_factory=lambda: ["span", "a", "p", "div"])

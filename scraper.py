@@ -31,16 +31,20 @@ def spider(data):
     spiders = []
     # CHUNK SPIDER
     divisible_n = math.ceil(len(data) / 3)
+    
     spider_data = [data[i:i + divisible_n]
                    for i in range(0, len(data), divisible_n)]
 
     # SPIDER CRAWLER
     process = CrawlerProcess(get_project_settings())
     if TESTING:
+        print("Total thread spider(s): {}".format(len(spider_data)))
+        log.info("Total thread spider(s) {}".format(len(spider_data)))
+        # print("Divisible_n:", divisible_n)
         for spider in spider_data:
             process.crawl('test_spider', spider)
             spiders.append({
-                'thread_crawlers': [{"url": data, "article_id": "605abf51d7ca3f780d2163f4"} for data in spider]
+                'thread_crawlers': len(spider)#[{"url": data, "article_id": "605abf51d7ca3f780d2163f4"} for data in spider]
             })
     else:
         print("Total thread spider(s): {}".format(len(spider_data)))
@@ -52,7 +56,7 @@ def spider(data):
             })
     log.info("Spider links: {}".format(len(spider_data)))
     process.start()  # Do not stop reactor after spider closes
-
+    
     return spiders
 
 
@@ -66,6 +70,7 @@ def main(system_data, WORKERS):
 
     # LOGGING ---------------------------
     print("Total URL(s): {}".format(len(system_data)))
+    print("Chunked Data for multiprocessing: ", list(map(lambda d:len(d), data)))
     print("Total Spider(s) / Worker(s): {}".format(MAX_WORKERS))
     log.info("Total URL(s): {} ".format(len(system_data)))
     log.info("Total Spider(s) / Worker(s): {} ".format(MAX_WORKERS))

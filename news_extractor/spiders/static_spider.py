@@ -34,7 +34,7 @@ class ArticleStaticSpider(scrapy.Spider):
 
     def start_requests(self):
         log.info("Spider started scraping")
-        log.info("Using Proxy %s" %use_proxy)
+        # log.info("Using Proxy %s" %use_proxy)
         for d in self.data:
             try:
                 article_process(d['_id'], "article")  # update status to Process
@@ -43,11 +43,13 @@ class ArticleStaticSpider(scrapy.Spider):
                 needs_endslash      = d['website']['needs_endslash']
                 # First: check if needs https or not
                 if bool(needs_https):
+                    print("Using https")
                     http_split = d['article_url'].split(':')
                     http_split[0] = "https"
                     d['article_url'] = ":".join(http_split)
                 # Second: check if needs endslash
                 if bool(needs_endslash):
+                    print("using endslash")
                     d['article_url'] = d['article_url'] + "/"
                 # Last: check if url is using proxy
                 if bool(is_using_proxy) == True:
@@ -154,7 +156,6 @@ class ArticleStaticSpider(scrapy.Spider):
                     log.error(f"Yielding artilces might've bugs")
         except Exception as e:
             log.error(f"{e} on {article['article_url']}")
-            # print("Error on Global parser module")
             try:
                 articles = self.yeild_article_items(  
                     article_source_url                  = article['website']['fqdn'],
@@ -174,7 +175,7 @@ class ArticleStaticSpider(scrapy.Spider):
                 yield articles
             except Exception as e:
                 log.error(f"Code error: {e}")
-                print("Last Exception :( there must be an error when yielding items")
+                print("There must be an error when yielding items")
                 print(e)
             # TODO: write error catch to yield and save status as error
             print(e)

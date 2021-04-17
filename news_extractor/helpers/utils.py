@@ -66,7 +66,8 @@ def get_system_data(**kwargs):
         # "article_url": "https://www.inc.com/mary-yang/envoy-zynga-hybrid-model-remote-work-survey.html",
         'article_status': 'Queued',
         "article_source_url": { "$ne": "news.google.com" },
-        'created_by': CREATED_BY    
+        'created_by': CREATED_BY,
+        "date_created": {"$gte": "2021-04-15T16:00:00.000Z"}
         }
     _fields = {
         'article_url': 1

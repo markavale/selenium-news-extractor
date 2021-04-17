@@ -116,7 +116,6 @@ class News:
                 'created_by': "Python Global Scraper",
                 'updated_by': "Python Global Scraper"
             }
-        
         return data
     
     def __clean_html(self, html: str=None, js: bool=False):

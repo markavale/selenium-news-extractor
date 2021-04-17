@@ -90,17 +90,24 @@ class NewsExtract:
 
         # Validation for content if not None
         if content.text is None: 
+            print("main parser", content.text)
+            print("went to news please")
+            # content_instance = None
             # NewsPlease Scraper
             newsplease = catch(
                 'None', lambda: NewsPlease.from_html(clean_html, url=None))
             content_instance = newsplease.maintext
+            print("news please", content_instance)
         elif content.text is not None:
+            print("went to main parser")
             content_instance = content.text
         else:
             print("No content available | mightr be JS link")
             content_instance = None
 
         self.content = self.__get_content(content_instance, article, js=js)# or self.__get_title(title.text, article)
+        # print("The final content is: ", self.content)
+        print("newspaper3k:", article)
         self.videos = catch('list', lambda: article.movies if article.movies else [])
         
         # Logic is not corrent TODO: have an alternative logic for language extractor
@@ -109,6 +116,8 @@ class NewsExtract:
 
         # BOOLEAN SCRAPED
         self.scraped = True
+
+        
 
     def generate_data(self):
         """
@@ -142,6 +151,25 @@ class NewsExtract:
         
         return data
     
+    def __clean_html_for_news_please(self):
+        """
+        Clean up page source
+        """
+        soup = BeautifulSoup(html, "html.parser")
+        # DECOMPOSE TAGS WITH INVALID KEY OR MATCHING INVALID KEY
+        for tag in soup.find_all(self.__is_invalid_tag):
+            if self.__is_valid_tag(tag): continue
+            tag.decompose()
+
+        # REMOVE UNRELATED TAGS
+        for key in self.content_variables.tags_for_decompose:
+            for tag in self.soup.find_all(key):
+                tag.decompose()
+
+        for c_name in self.soup.find_all("div", {"class": re.compile(r'list-label-widget-content|widget-content')}):
+            # log.error(f'{c_name}')
+            c_name.decompose()
+
     def __clean_html(self, html: str=None, js: bool=False):
         """
         Private method to clean page source
@@ -164,12 +192,20 @@ class NewsExtract:
         # looping for all classes that have main-sidebar name on it
         for div_class in soup.find_all("div", {"class": self.class_div_use_case}):
             div_class.decompose()
+
+        for id_name in soup.find_all("div", {"id": re.compile(r'main-sidebar|header-wide|sidebar|primary|Header1|header-wide')}):
+            id_name.decompose()
         
+        for c_name in soup.find_all("div", {"class", re.compile(r'widget-content')}):
+            c_name.decompose()
         
+        # for 
 
         if js:
             for tag in soup.find_all(self.__is_invalid_tag):
                 tag.decompose()
+                
+        # print(soup)
 
         return str(soup)
     
@@ -313,10 +349,12 @@ class NewsExtract:
         """
         Generate news content
         """
+        # print("article newspaper3k: ", article.text)
+        # print(f"content is {_content} when generating...")
         if js:
             content = catch('None', lambda: unicode(' '.join(_content.replace('’', '').split())) if _content else None)
         else:
-            content = catch('None', lambda: unicode(' '.join(_content.replace('’', '').split())) if _content
+            content = catch('None', lambda: unicode(' '.join(_content.replace('’', '').split())) if _content is not None
                             else  unicode(' '.join(article.text.replace('’', '').split())) if article.text
                             else None)
         return content

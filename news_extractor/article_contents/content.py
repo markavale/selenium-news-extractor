@@ -395,6 +395,10 @@ class Content:
             for tag in self.soup.find_all(key):
                 tag.decompose()
 
+        for c_name in self.soup.find_all("div": {"class": re.compile(r'list-label-widget-content')}):
+            # log.error(f'{c_name}')
+            c_name.decompose()
+
     def __find_parent(self, tag):
         """
         Find parent of a tag

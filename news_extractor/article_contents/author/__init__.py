@@ -124,7 +124,7 @@ class Author:
                 tag.decompose()
 
         # REMOVE UNRELATED CLASS NAMES FOR AUTHOR ELEMENTS
-        for c_name in self.soup.find_all("div", {"class": re.compile(r'auth-wall|author-description|author-url')}):
+        for c_name in self.soup.find_all("div", {"class": re.compile(r'auth-wall|author-description|author-url|timestamp-entry')}):
             c_name.decompose()
     
     def __is_invalid_tag(self, tag):

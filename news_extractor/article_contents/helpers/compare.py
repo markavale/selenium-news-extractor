@@ -47,7 +47,7 @@ class Compare:
     self.__to_trigram(word, callback)
 
 
-  def eval(self, word, _callback = None):
+  def eval(self, word, _callback = None): 
     """
     Evaluate word or phrase
     """

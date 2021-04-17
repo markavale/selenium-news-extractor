@@ -28,8 +28,6 @@ class TestSpider(scrapy.Spider):
     def __init__(self, urls=None):
         self.urls = urls
         self.article_items = StaticArticleItem()
-        self.article_items['article_source_url']    = None
-        self.article_items['website']               = None
 
     @classmethod
     def from_crawler(cls, crawler, *args, **kwargs):

@@ -60,7 +60,7 @@ class Content:
         # AVOID CHOKE POINT
         self._extract_content()
 
-    @timeout_decorator.timeout(15)
+    @timeout_decorator.timeout(60)
     def _extract_content(self):
         # GET ALL DIV AND EXTRACT TEXT CONTENT
         # Choke point
@@ -408,6 +408,9 @@ class Content:
         # REMOVE UNRELATED CLASS NAMES
         for c_name in self.soup.find_all('div', {"class": 'sidebar'}):
             c_name.decompose()
+
+        for id_name in self.soup.find_all('div', {"id": 'header-section'}):
+            id_name.decompose()
 
     def __find_parent(self, tag):
         """

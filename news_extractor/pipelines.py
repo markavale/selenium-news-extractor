@@ -28,19 +28,20 @@ class StaticExtractorPipeline:
             'Content-Type': 'application/json',
             'Authorization': 'Bearer {}'.format(TOKEN)
         }
-        # print("Download latency: ",item['download_latency'])
-        # pprint(item)
+        print("Download latency: ",item['download_latency'])
+        pprint(item)
         try:
             if dict(item)['article_status'] == "Error":
                 req = api(method='PUT', url='{}article/{}'.format(_root_url,
-                                                                  dict(item)['article_id']), body=dict(item), headers=headers)
+                                                                dict(item)['article_id']), body=dict(item), headers=headers)
             else:
                 req = api(method='PUT', url='{}article/{}'.format(_root_url,
-                                                                  dict(item)['article_id']), body=dict(item), headers=headers)
-            # print("went here")
+                                                                dict(item)['article_id']), body=dict(item), headers=headers)
             # pprint(req.json())
-        except Exception as e: 
+            # print("went here")
+        except Exception as e:
             print(e)
+        
         return item
 
 
@@ -60,7 +61,7 @@ class TestStaticPipeline:
         try:
             print("Pipeline Extractor ------------------------------------------------------------------------------------------")
             self.exporter.export_item(item)
-            pprint(item)
+            # pprint(item)
             return item
         except:
             print("error on pipeline")
