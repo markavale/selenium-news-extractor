@@ -117,7 +117,8 @@ class NewsExtract:
         # BOOLEAN SCRAPED
         self.scraped = True
 
-        
+        soup = BeautifulSoup(html, "html.parser")
+        print(soup.select("ul"))
 
     def generate_data(self):
         """
