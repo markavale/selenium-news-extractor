@@ -149,7 +149,8 @@ def run():
                     "skip_url": item['skip_url'],
                     "proxy": item['proxy'],
                     "user_agent": item['user_agent'],
-                    "source_created_from": item['source_created_from']
+                    "source_created_from": item['source_created_from'],
+                    "parser": item['parser']
                 }
             )
         except Exception as e:

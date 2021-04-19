@@ -49,6 +49,7 @@ class StaticArticleItem(scrapy.Item):
     proxy                   = scrapy.Field()
     user_agent              = scrapy.Field()
     source_created_from     = scrapy.Field()
+    parser                  = scrapy.Field()
 
 class DynamicArticleItem(scrapy.Item):
     article_source_url = scrapy.Field()

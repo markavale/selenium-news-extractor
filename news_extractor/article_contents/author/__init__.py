@@ -32,6 +32,7 @@ class Author:
             author = self.__iterate_tag(blocks)
 
             if author:
+                # print(author)
                 # Author name entity logic :) MAV
                 split_author_name = author.title().split()
                 cleaned_name = list(map(lambda name:re.sub(r"[^a-zA-Z.]", r' ', name), split_author_name))
@@ -89,7 +90,7 @@ class Author:
                     continue
 
                 result = self.author_data.eval(attr_val)
-
+                
                 if result:
                     similarity = int(re.search(r'\d+', result[0]['similarity']).group())
 
@@ -100,7 +101,7 @@ class Author:
                     
                     if possible_auth == "":
                         continue
-            
+                    # print(possible_auth)
                     possible_auth_tokens = nltk.word_tokenize(possible_auth)
                     filtered_auth = [word for word in possible_auth_tokens if word.lower() not in self.stop_words]
                     filtered_auth = [word for word in filtered_auth if word.lower() not in string.punctuation]

@@ -95,9 +95,9 @@ class ArticleStaticSpider(scrapy.Spider):
             # Global Parser
             t1_time = time.perf_counter()
             news = NewsExtract(response.url, response.text)
-            # print(f"Global parser: took {round(time.perf_counter() - t1_time, 2)} secs on {response.url}")
+            # print(f"Global parser: took {round(time.perf_counter() - t1_time, 2)} secs on {article['article_url']}")
             log.info(f"Global parser took {round(time.perf_counter() - t1_time, 2)} secs on {article['article_url']}")
-            if news.title is None or news.content is None:
+            if news.title is None or news.content is None or news.content == "":
                 log.error(f"Content error on {article['article_url']}")
                 articles = self.yeild_article_items(
                     article_source_url                  = article['website']['fqdn'],
@@ -141,7 +141,7 @@ class ArticleStaticSpider(scrapy.Spider):
                         article_language                = news.language,
                         article_status                  = "Done",
                         keyword                         = [],
-                        article_url                     = article['article_url'],#news.url,
+                        article_url                     = article['article_url'],
                         date_created                    = datetime.datetime.today().isoformat(),
                         date_updated                    = datetime.datetime.today().isoformat(),
                         created_by                      = "Python Global Scraper",
@@ -149,7 +149,8 @@ class ArticleStaticSpider(scrapy.Spider):
                         article_id                      = article['_id'],
                         download_latency                = response.request.meta['download_latency'],
                         proxy                           = article['proxy'],
-                        user_agent                      = article['user_agent']
+                        user_agent                      = article['user_agent'],
+                        parser                          = news.parser
                     )
                     yield articles
                 except Exception as e:
@@ -335,5 +336,5 @@ class ArticleStaticSpider(scrapy.Spider):
         self.article_items['proxy']                     = kwargs.get("proxy", None)
         self.article_items['user_agent']                = kwargs.get("user_agent", None)
         self.article_items['source_created_from']       = source_created_from
-
+        self.article_items['parser']                    = kwargs.get("parser", None)
         return self.article_items

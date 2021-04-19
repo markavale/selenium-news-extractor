@@ -6,6 +6,6 @@ class NewsVariables:
     invalid_keys: List = field(default_factory=lambda: ['privacy', 'newsletter', 'modal',
                                                 'subscription', 'related-articles', 'recommended-posts', 
                                                 'asset-below', 'card'])
-    tags_for_decompose: List = field(default_factory=lambda: ['script', 'forms', 'button', 'aside', 'ul'])
+    tags_for_decompose: List = field(default_factory=lambda: ['script', 'forms', 'button', 'aside', 'ul', 'nav', 'footer', 'form', 'style'])
 
     invalid_title_keys: List = field(default_factory=lambda: ["page not found", "attention required!", "Página no encontrada"])

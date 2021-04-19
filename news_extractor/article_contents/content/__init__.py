@@ -3,8 +3,6 @@ from ..helpers import Compare, Stopwords, MediaURL, ContentVariables, catch
 import timeout_decorator
 # from pebble import concurrent
 from pprint import pprint
-
-
 import nltk, re, string, time, math
 
 stopwords = Stopwords()
@@ -23,7 +21,6 @@ class Content:
         Initialize method
         """
         self.content_variables = ContentVariables()
-
         self.soup = BeautifulSoup(html, 'html.parser')
         self.headline = headline
         self.images = []
@@ -32,7 +29,7 @@ class Content:
         self.no_child_containers = []
         self.iteration = 0
         self.last_divs = []
-
+        
         # SETUP STOPWORDS
         if lang != "en":
             sw_lang = set(getattr(stopwords, lang))
@@ -50,16 +47,14 @@ class Content:
 
         self.div_strings = [] # CONTAINER OF STRINGS IN A DIV ELEMENT
         self.stripped_strings = []
-
         # CLEAN PAGE SOURCE
         self.__clean_html()
-
         # GET BODY TAG
         self.body_node = catch('None', lambda: self.soup.find('body'))
 
         # AVOID CHOKE POINT
         self._extract_content()
-
+        
     @timeout_decorator.timeout(60)
     def _extract_content(self):
         # GET ALL DIV AND EXTRACT TEXT CONTENT
@@ -67,15 +62,13 @@ class Content:
         try:
             for tag in self.content_variables.content_tags:
                 blocks = self.body_node.find_all(tag) if self.body_node is not None else self.soup.find_all(tag)
-                
                 if not list(blocks):
                     continue
-
                 self.__iterate_tag(blocks)
-
                 if self.text:
                     break
         except Exception as e:
+            print(e)
             self.text = None
 
     def __iterate_tag(self, blocks):
@@ -179,6 +172,7 @@ class Content:
         # except Exception as e:
         #     print("return as None")
         #     return None
+    
     def __merge_containers(self):
         """
         Merge all possible containers with same class or attributes
@@ -394,24 +388,23 @@ class Content:
         """
         Clean up page source
         """
-
         # DECOMPOSE TAGS WITH INVALID KEY OR MATCHING INVALID KEY
         for tag in self.soup.find_all(self.__is_invalid_tag):
             if self.__is_valid_tag(tag): continue
             tag.decompose()
+            # REMOVE UNRELATED TAGS
 
-        # REMOVE UNRELATED TAGS
         for key in self.content_variables.tags_for_decompose:
             for tag in self.soup.find_all(key):
                 tag.decompose()
 
         # REMOVE UNRELATED CLASS NAMES
-        for c_name in self.soup.find_all('div', {"class": 'sidebar'}):
+        for c_name in self.soup.find_all('div', {"class": re.compile(r'sidebar')}):
             c_name.decompose()
 
-        for id_name in self.soup.find_all('div', {"id": 'header-section'}):
+        for id_name in self.soup.find_all("div", {"id": re.compile(r'main-sidebar|sidebar|header-section|magone-labels|site-footer-container|asset-admin-bar')}):
             id_name.decompose()
-
+        
     def __find_parent(self, tag):
         """
         Find parent of a tag

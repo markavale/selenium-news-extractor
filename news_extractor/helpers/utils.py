@@ -62,12 +62,12 @@ def get_system_data(**kwargs):
         "select": "-main_sections -section_filter -article_filter -selectors -sub_sections -embedded_sections -code_snippet"
     }
     body_query = {
-        # "article_source_url": "inc.com",
-        # "article_url": "https://www.inc.com/mary-yang/envoy-zynga-hybrid-model-remote-work-survey.html",
+        # "article_source_url": "ekathimerini.com",
+        # "article_url": "http://www.ekathimerini.com/economy/1158061/extra-boost-of-700-mln-euros",
         'article_status': 'Queued',
         "article_source_url": { "$ne": "news.google.com" },
         'created_by': CREATED_BY,
-        "date_created": {"$gte": "2021-04-15T16:00:00.000Z"}
+        # "date_created": {"$gte": "2021-04-15T16:00:00.000Z"}
         }
     _fields = {
         'article_url': 1

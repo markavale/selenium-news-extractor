@@ -1,6 +1,6 @@
 import re
 
-def div_class_use_case():
+def get_invalid_keys():
     use_case = [
         re.compile(r'main-sidebar|emailRejected|masterMcWrap'), re.compile(r'pay-wall')
     ]

@@ -1,14 +1,11 @@
 import nltk, datetime, cloudscraper, time, platform, os, requests, pytz, re
-
 from news_extractor.article_contents.exceptions import *
 from news_extractor.article_contents.author import Author
 from news_extractor.article_contents.publish_date import PublishDate
 from news_extractor.article_contents.title.title import Title
 from news_extractor.article_contents.content import Content
-from news_extractor.article_contents.helpers import ArticleURL, rand_sleep, NewsVariables, Compare, catch, unicode
-from .use_case import div_class_use_case
-
-# from newsfetch.utils import NewsPlease, get, unquote
+from news_extractor.article_contents.helpers import ArticleURL, rand_sleep, NewsVariables, Compare, catch, unicode, ContentVariables
+from .use_case import get_invalid_keys
 from newsplease import NewsPlease
 from newspaper import Article
 from bs4 import BeautifulSoup
@@ -40,12 +37,15 @@ class NewsExtract:
         # time.sleep(2)
         # rand_sleep(3, 5)
 
-        self.url = url#CLEAN_URL.url
-        self.html = source
-        self.lang = lang
-        self.timeout = timeout
-        self.scraped = False
-        self.class_div_use_case = div_class_use_case()
+        self.url                = url#CLEAN_URL.url
+        self.html               = source
+        self.lang               = lang
+        self.timeout            = timeout
+        self.scraped            = False
+        self.attr_invalid_keys  = get_invalid_keys()
+        self.content_variables  = ContentVariables()
+        self.parser             = None
+
         # PAGE SOURCE IS REQUIRED
         if not self.html:
             raise NewsError("No Page Source passed")
@@ -55,70 +55,95 @@ class NewsExtract:
         
         # CLEAN HTML
         clean_html = self.__clean_html(self.html, js=js) if self.html else None
+        soup = BeautifulSoup(clean_html, "html.parser")
+
         #NEWSPAPER 3K
-        article = catch('None', lambda: Article(self.url, request_timeout=30, MIN_WORD_COUNT=600))
-        catch('None', lambda: article.download(input_html=clean_html))
-        catch('None', lambda: article.parse())
-        catch('None', lambda: article.nlp())
-
-        # AUTHOR
+        article = self.__get_newspaper3k_extract(str(clean_html))
         author = catch('None', lambda: Author(clean_html))
-
         # PUBLISH DATE
         publish_date = catch('None', lambda: PublishDate(clean_html))
 
-        # TITLE
+        # TITLE | Python Global Parser
         title = catch('None', lambda: Title(clean_html))
-        title_instance = None if title.text is None else title.text
+        title_instance = None if title.text is None else title.text # Successful catch
 
-        # CONTENT
-        title_catcher = None if article.title is None else article.title
-        
-        # start_time = int(time.perf_counter())
-        content = catch('None', lambda: Content(clean_html, title_instance) if title 
-                        else Content(clean_html, title_catcher) if article
-                        else None)
+        # TITLE | Newspaper3k Parser
+        title_catcher = None if article.title is None else article.title # Successful catch
+
+        content = Content(clean_html, title_instance) if title.text is not None else Content(clean_html, title_catcher) if article.title else None # Succesful catch
+
         # CLASS VARIABLES        
         self.title = self.__get_title(title_instance, article)
+
         self.authors = self.__get_authors(author.names, article)
 
         # Validation for publish_date if none
-        # print()
         publish_date_instance = datetime.datetime.now().isoformat() if publish_date is None else publish_date.date
         self.publish_date = self.__get_publish_date(publish_date_instance, article)
         self.images = self.__get_images(article)
 
-        # Validation for content if not None
-        if content.text is None: 
-            print("main parser", content.text)
-            print("went to news please")
-            # content_instance = None
-            # NewsPlease Scraper
-            newsplease = catch(
-                'None', lambda: NewsPlease.from_html(clean_html, url=None))
-            content_instance = newsplease.maintext
-            print("news please", content_instance)
-        elif content.text is not None:
-            print("went to main parser")
-            content_instance = content.text
-        else:
-            print("No content available | mightr be JS link")
-            content_instance = None
+        # VALIDATE: validation of content parser for choosing the right parser
+        content_instance = self.__get_and_validate_content_parser(content, article, clean_html)
 
         self.content = self.__get_content(content_instance, article, js=js)# or self.__get_title(title.text, article)
         # print("The final content is: ", self.content)
-        print("newspaper3k:", article)
         self.videos = catch('list', lambda: article.movies if article.movies else [])
         
         # Logic is not corrent TODO: have an alternative logic for language extractor
         self.language = catch('None', lambda: article.meta_lang if article.meta_lang is not None or article.meta_lang != "" else 'en')
-        # self.language = 'en'
-
         # BOOLEAN SCRAPED
         self.scraped = True
 
-        soup = BeautifulSoup(html, "html.parser")
-        print(soup.select("ul"))
+    def __get_newspaper3k_extract(self, page_source):
+        if page_source is not None:
+            clean_html = self.__clean_html_parser(str(page_source))
+            article = Article(' ')
+            article.set_html(page_source)
+            article.parse()
+            article.nlp()
+            return article
+        else:
+            return None
+
+    def __get_and_validate_content_parser(self, content, newspaper3k_article, clean_html):
+        '''
+            FUNCTION: This function with get and validate all 3 python parsers.
+            The order of returning the content is from Python GLobal Parser => NewsPaper3k Extractor => NewsPlease Extractor => None
+        '''
+        try:
+            if content.text is None or content.text == "": 
+                # Newspaper3k extractor
+                if newspaper3k_article.text is not None and newspaper3k_article.text != "":
+                    print("using newspaper3k for parsing")
+                    self.parser = "NewsPaper3k Parser"
+                    return newspaper3k_article.text
+
+                # NewsPlease extractor
+                elif newspaper3k_article.text is None or newspaper3k_article.text == "":
+                    ## Clean html for news please 
+                    page_source = self.__clean_html_parser(clean_html) if clean_html is not None else None
+                    newsplease = NewsPlease.from_html(str(page_source), url=None)
+                    if newsplease.maintext is None or newsplease.maintext == "":
+                        self.parser = None
+                        return None
+                    else:
+                        self.parser = "NewsPlease Parser"
+                        return newsplease.maintext
+                else:
+                    self.parser = None
+                    return None
+            
+            # Python Global Parser
+            elif content.text is not None:
+                self.parser = "Python Global Parser"
+                return  content.text
+            else:
+                self.parser = None
+                return None
+        except Exception as e:
+            print(e)
+            print("exception!!!")
+            return None
 
     def generate_data(self):
         """
@@ -152,24 +177,31 @@ class NewsExtract:
         
         return data
     
-    def __clean_html_for_news_please(self):
+    def __clean_html_parser(self, page_source=None):
         """
         Clean up page source
         """
-        soup = BeautifulSoup(html, "html.parser")
-        # DECOMPOSE TAGS WITH INVALID KEY OR MATCHING INVALID KEY
-        for tag in soup.find_all(self.__is_invalid_tag):
-            if self.__is_valid_tag(tag): continue
-            tag.decompose()
+        if page_source is not None:
+            soup = BeautifulSoup(page_source, "html.parser")
+            # # DECOMPOSE TAGS WITH INVALID KEY OR MATCHING INVALID KEY
+            # for tag in soup.find_all(self.__is_invalid_tag):
+            #     if self.__is_valid_tag(tag): continue
+            #     tag.decompose()
 
-        # REMOVE UNRELATED TAGS
-        for key in self.content_variables.tags_for_decompose:
-            for tag in self.soup.find_all(key):
-                tag.decompose()
+            # REMOVE UNRELATED TAGS
+            for key in self.content_variables.tags_for_decompose:
+                for tag in soup.find_all(key):
+                    tag.decompose()
 
-        for c_name in self.soup.find_all("div", {"class": re.compile(r'list-label-widget-content|widget-content')}):
-            # log.error(f'{c_name}')
-            c_name.decompose()
+            # REMOVE UNRELATED CLASS NAMES
+            for c_name in soup.find_all('div', {"class": 'sidebar'}):
+                c_name.decompose()
+
+            for id_name in soup.find_all('div', {"id": re.compile(r'magone-labels')}):
+                id_name.decompose()
+
+            return soup
+        return None
 
     def __clean_html(self, html: str=None, js: bool=False):
         """
@@ -189,24 +221,15 @@ class NewsExtract:
         for tag in tags_for_decompose:
             for _tag in soup(tag):
                 _tag.decompose()
-
         # looping for all classes that have main-sidebar name on it
-        for div_class in soup.find_all("div", {"class": self.class_div_use_case}):
+        for div_class in soup.find_all("div", {"class": self.attr_invalid_keys}):
             div_class.decompose()
 
-        for id_name in soup.find_all("div", {"id": re.compile(r'main-sidebar|header-wide|sidebar|primary|Header1|header-wide')}):
+        for id_name in soup.find_all("div", {"id": re.compile(r'main-sidebar|sidebar|magone-labels|site-container')}):
             id_name.decompose()
-        
-        for c_name in soup.find_all("div", {"class", re.compile(r'widget-content')}):
-            c_name.decompose()
-        
-        # for 
-
         if js:
             for tag in soup.find_all(self.__is_invalid_tag):
                 tag.decompose()
-                
-        # print(soup)
 
         return str(soup)
     
@@ -273,7 +296,7 @@ class NewsExtract:
         Generate news authors
         """
 
-        if article:
+        if article is not None:
             authors = catch('list', lambda: _author if _author
                             else article.authors if len(article.authors) != 0
                             else ['No - Author'])
@@ -350,12 +373,11 @@ class NewsExtract:
         """
         Generate news content
         """
-        # print("article newspaper3k: ", article.text)
-        # print(f"content is {_content} when generating...")
         if js:
             content = catch('None', lambda: unicode(' '.join(_content.replace('’', '').split())) if _content else None)
+            return content
         else:
-            content = catch('None', lambda: unicode(' '.join(_content.replace('’', '').split())) if _content is not None
-                            else  unicode(' '.join(article.text.replace('’', '').split())) if article.text
-                            else None)
-        return content
+            if _content is not None:
+                return unicode(' '.join(_content.replace('’', '').split()))
+            else:
+                return None

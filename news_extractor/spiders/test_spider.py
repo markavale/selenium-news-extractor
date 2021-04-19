@@ -80,7 +80,7 @@ class TestSpider(scrapy.Spider):
             news = NewsExtract(response.url, response.text)
             print(f"Global parser: {round(time.perf_counter() - t1_time, 2)} secs")
             log.info(f"Global parser took {round(time.perf_counter() - t1_time, 2)} secs on {article['article_url']}")
-            if news.title is None or news.content is None:
+            if news.title is None or news.content is None or news.content == "":
                 print(news.title)
                 print(news.content)
                 print("Content error")
@@ -99,7 +99,6 @@ class TestSpider(scrapy.Spider):
                 )
                 yield articles
             else:
-                print("Article have content")
                 try:
                     print("--------------------------------------------------------------------------------")
                     log.info(response.request.headers)
@@ -128,7 +127,8 @@ class TestSpider(scrapy.Spider):
                         article_id                      = article['_id'],
                         download_latency                = response.request.meta['download_latency'],
                         proxy                           = article['proxy'],
-                        user_agent                      = article['user_agent']
+                        user_agent                      = article['user_agent'],
+                        parser                          = news.parser
                     )
                     log.info(response.request.meta)
                     log.info(response.request.headers)
@@ -330,5 +330,6 @@ class TestSpider(scrapy.Spider):
         self.article_items['proxy']                     = kwargs.get("proxy", None)
         self.article_items['user_agent']                = kwargs.get("user_agent", None)
         self.article_items['source_created_from']       = source_created_from
+        self.article_items['parser']                    = kwargs.get("parser", None)
 
         return self.article_items
