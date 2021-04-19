@@ -114,7 +114,7 @@ class NewsExtract:
             if content.text is None or content.text == "": 
                 # Newspaper3k extractor
                 if newspaper3k_article.text is not None and newspaper3k_article.text != "":
-                    print("using newspaper3k for parsing")
+                    # print("using newspaper3k for parsing")
                     self.parser = "NewsPaper3k Parser"
                     return newspaper3k_article.text
 
@@ -142,7 +142,7 @@ class NewsExtract:
                 return None
         except Exception as e:
             print(e)
-            print("exception!!!")
+            # print("exception!!!")
             return None
 
     def generate_data(self):
