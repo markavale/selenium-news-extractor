@@ -26,20 +26,41 @@ class PublishDate:
         # SET UP DATA FOR DATE KEY COMPARISON
         self.pub_date_data = Compare(self.pub_date_variables.date_keys)
 
-        # FIND ALL PROBABLE TAG FOR PUB DATE
-        for tag in self.pub_date_variables.pub_date_tags:
-            blocks = self.soup.find_all(tag)
-            probab_date = self.__iterate_tag(blocks)
 
+        # FIND ALL PROBABLE TAG FOR PUB DATE
+        # for tag in self.pub_date_variables.pub_date_tags:
+        blocks = map(lambda tag:tag, self.soup.find_all(self.pub_date_variables.pub_date_tags))
+        # blocks = self.soup.find_all(block_map)
+        # print(blocks)
+        for block in blocks:
+            probab_date = self.__iterate_tag(block)
+        
             if probab_date:
+                # print("Probdate", probab_date)
                 # FIND DATES IN STRING
                 matches = datefinder.find_dates(str(probab_date).replace(":", ""))
-
+                # print("matches", matches)
                 # GET MATCH IF LESS THAN DATE TODAY
                 for match in matches:
                     if match < datetime.today():
                         self.date = match
                         break
+
+        # # FIND ALL PROBABLE TAG FOR PUB DATE
+        # for tag in self.pub_date_variables.pub_date_tags:
+        #     blocks = self.soup.find_all(tag)
+        #     probab_date = self.__iterate_tag(blocks)
+            
+        #     if probab_date:
+        #         print("Probdate", probab_date)
+        #         # FIND DATES IN STRING
+        #         matches = datefinder.find_dates(str(probab_date).replace(":", ""))
+        #         print("matches", matches)
+        #         # GET MATCH IF LESS THAN DATE TODAY
+        #         for match in matches:
+        #             if match < datetime.today():
+        #                 self.date = match
+        #                 break
                 
     def __iterate_tag(self, blocks):     
         """

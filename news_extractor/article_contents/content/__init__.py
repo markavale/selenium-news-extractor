@@ -68,7 +68,7 @@ class Content:
                 if self.text:
                     break
         except Exception as e:
-            print(e)
+            print("_extract_content",e)
             self.text = None
 
     def __iterate_tag(self, blocks):

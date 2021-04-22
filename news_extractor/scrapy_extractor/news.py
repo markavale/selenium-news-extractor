@@ -4,12 +4,13 @@ from news_extractor.article_contents.author import Author
 from news_extractor.article_contents.publish_date import PublishDate
 from news_extractor.article_contents.title.title import Title
 from news_extractor.article_contents.content import Content
-from news_extractor.article_contents.helpers import ArticleURL, rand_sleep, NewsVariables, Compare, catch, unicode, ContentVariables
+from news_extractor.article_contents.helpers import ArticleURL, rand_sleep, NewsVariables, Compare, catch, unicode, ContentVariables, PubDateVariables
 from .use_case import get_invalid_keys
 from newsplease import NewsPlease
 from newspaper import Article
 from bs4 import BeautifulSoup
 from dateutil.parser import parse
+from pprint import pprint
 from logs.main_log import init_log
 log = init_log('global_parser')
 class NewsExtract:
@@ -54,47 +55,68 @@ class NewsExtract:
             raise NewsError("Page source required for dynamic pages.")
         
         # CLEAN HTML
+        # print("Cleaning of main HTML")
         clean_html = self.__clean_html(self.html, js=js) if self.html else None
         soup = BeautifulSoup(clean_html, "html.parser")
 
-        #NEWSPAPER 3K
+        # NEWSPAPER 3K
+        # print("Extracting Data for newspaper3k")
         article = self.__get_newspaper3k_extract(str(clean_html))
+        
+        # print("Author Extractor")
         author = catch('None', lambda: Author(clean_html))
+
         # PUBLISH DATE
+        # print("Publish Date Extractor")
         publish_date = catch('None', lambda: PublishDate(clean_html))
 
         # TITLE | Python Global Parser
+        # print("Title Extractor | Global Parser")
         title = catch('None', lambda: Title(clean_html))
         title_instance = None if title.text is None else title.text # Successful catch
 
         # TITLE | Newspaper3k Parser
+        # print("Title catcher for NoneType")
         title_catcher = None if article.title is None else article.title # Successful catch
-
+        # print("Content catcher for Nonetype")
         content = Content(clean_html, title_instance) if title.text is not None else Content(clean_html, title_catcher) if article.title else None # Succesful catch
 
         # CLASS VARIABLES        
+        # print("Get title instance")
         self.title = self.__get_title(title_instance, article)
 
+        # print("Get author instance")
         self.authors = self.__get_authors(author.names, article)
 
         # Validation for publish_date if none
+        # print("Publish Date Extractor")
         publish_date_instance = datetime.datetime.now().isoformat() if publish_date is None else publish_date.date
         self.publish_date = self.__get_publish_date(publish_date_instance, article)
+
+        # EXTRACT IMAGE
+        # print("Image Extractor")
         self.images = self.__get_images(article)
 
         # VALIDATE: validation of content parser for choosing the right parser
+        # print("Content Instance validator")
         content_instance = self.__get_and_validate_content_parser(content, article, clean_html)
 
+        # CLEAN CONTENT 
+        # print("Content Instance")
         self.content = self.__get_content(content_instance, article, js=js)# or self.__get_title(title.text, article)
-        # print("The final content is: ", self.content)
+
+        # print("Videos Extractor")
         self.videos = catch('list', lambda: article.movies if article.movies else [])
         
-        # Logic is not corrent TODO: have an alternative logic for language extractor
+        # Newspaper3k Language extractor
+        # print("Language Extractor")
         self.language = catch('None', lambda: article.meta_lang if article.meta_lang is not None or article.meta_lang != "" else 'en')
+
         # BOOLEAN SCRAPED
         self.scraped = True
 
     def __get_newspaper3k_extract(self, page_source):
+        # try:
         if page_source is not None:
             clean_html = self.__clean_html_parser(str(page_source))
             article = Article(' ')
@@ -103,7 +125,24 @@ class NewsExtract:
             article.nlp()
             return article
         else:
+            print("News paper is none")
             return None
+        # except Exception as e:
+        #     print(e)
+        #     print("Exception in newspapaer 3k")
+
+    def __clean_html_for_pub_date(self, page_source):
+        """
+        Clean up page source
+        """
+        soup = BeautifulSoup(page_source, 'html.parser')
+
+        pub_date_variables = PubDateVariables()
+
+        # REMOVE UNRELATED TAGS
+        for tag in soup.find_all(map(lambda key:key, pub_date_variables.tags_for_decompose)):
+            tag.decompose()
+        return soup
 
     def __get_and_validate_content_parser(self, content, newspaper3k_article, clean_html):
         '''
@@ -141,8 +180,7 @@ class NewsExtract:
                 self.parser = None
                 return None
         except Exception as e:
-            print(e)
-            # print("exception!!!")
+            print("__get_and_validate_content_parser",e)
             return None
 
     def generate_data(self):
@@ -338,24 +376,34 @@ class NewsExtract:
         Generate news publish date
         """
         pht = pytz.timezone('Asia/Singapore')
-        
         try:
-            article_date = article.meta_data['article']['published_time']
-
-            if not isinstance(article_date, datetime.datetime):
-                article_date = parse(str(article_date))
-
-        except: 
+            if article.meta_data['article']:
+                article_date = article.meta_data['article']['published_time']
+                if not isinstance(article_date, datetime.datetime):
+                    article_date = parse(str(article_date))
+            else:
+                article_date = None
+        except Exception as e: 
+            print("__get_publish_date func", e)
             article_date = None
 
         # GET BOTH DATES
-        dates = [_date, article_date]
-        # REPLACE TZINFO
-        datetime_dates = [date.replace(tzinfo=pht) for date in dates if date is not None]
-
-        # GET MIN DATE IF DATETIME_DATES IS NOT NONE
-        publish_date = datetime.datetime.now().isoformat() if not datetime_dates else min(datetime_dates).isoformat()
-
+        newspaper3k_pub_date = article_date.replace(tzinfo=pht) if article_date is not None else None
+        global_parser_pub_date = _date.replace(tzinfo=pht) if _date is not None else None
+        if newspaper3k_pub_date is not None:
+            # print("using newspaper3k")
+            publish_date = newspaper3k_pub_date.isoformat()
+        elif newspaper3k_pub_date is None:
+            if global_parser_pub_date is not None:
+                # print("using global parser")
+                publish_date = global_parser_pub_date.isoformat()
+            else:
+                # print("Using date now")
+                publish_date = datetime.datetime.now().isoformat()
+        else:
+            # print("Using date now")
+            publish_date = datetime.datetime.now().isoformat()
+        # print("the date is", publish_date)
         return publish_date
 
     def __get_images(self, article: type(Article)):

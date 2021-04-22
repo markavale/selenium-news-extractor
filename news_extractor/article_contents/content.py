@@ -391,12 +391,10 @@ class Content:
             tag.decompose()
 
         # REMOVE UNRELATED TAGS
-        for key in self.content_variables.tags_for_decompose:
-            for tag in self.soup.find_all(key):
-                tag.decompose()
+        for tag in self.soup.find_all(map(lambda key: key, self.content_variables.tags_for_decompose)):
+            tag.decompose()
 
-        for c_name in self.soup.find_all("div": {"class": re.compile(r'list-label-widget-content')}):
-            # log.error(f'{c_name}')
+        for c_name in self.soup.find_all("div", {"class": re.compile(r'list-label-widget-content')}):
             c_name.decompose()
 
     def __find_parent(self, tag):

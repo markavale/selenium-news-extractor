@@ -63,8 +63,10 @@ class TestStaticPipeline:
             print("Pipeline Extractor ------------------------------------------------------------------------------------------")
             self.exporter.export_item(item)
             pprint(item)
-            # print(item['article_authors'])
+            # print(item['article_url'])
+            # print(item['article_publish_date'])
             # print(item['parser'])
+            # print("status and message: ", item['article_status'],item['article_error_status'])
             return item
         except:
             print("error on pipeline")

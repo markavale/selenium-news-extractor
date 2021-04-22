@@ -43,13 +43,13 @@ class ArticleStaticSpider(scrapy.Spider):
                 needs_endslash      = d['website']['needs_endslash']
                 # First: check if needs https or not
                 if bool(needs_https):
-                    print("Using https")
+                    # print("Using https")
                     http_split = d['article_url'].split(':')
                     http_split[0] = "https"
                     d['article_url'] = ":".join(http_split)
                 # Second: check if needs endslash
                 if bool(needs_endslash):
-                    print("using endslash")
+                    # print("using endslash")
                     d['article_url'] = d['article_url'] + "/"
                 # Last: check if url is using proxy
                 if bool(is_using_proxy) == True:
@@ -121,7 +121,7 @@ class ArticleStaticSpider(scrapy.Spider):
                     media_t2 = time.perf_counter()
                     log.info('media value: {}'.format(convert(round(media_t2-media_t1, 2))))
                 except Exception as e:
-                    print(e)
+                    print("Media value API",e)
                     log.error("Meida value %s", e)
                     log.error("Media value error %s", response.url)
                 try:
@@ -176,8 +176,7 @@ class ArticleStaticSpider(scrapy.Spider):
                 yield articles
             except Exception as e:
                 log.error(f"Code error: {e}")
-                print("There must be an error when yielding items")
-                print(e)
+                print("yielding error",e)
             # TODO: write error catch to yield and save status as error
             print(e)
 
@@ -244,7 +243,7 @@ class ArticleStaticSpider(scrapy.Spider):
                 yield articles
 
             elif failure.check(DNSLookupError):
-                print("Network Error")
+                # print("Network Error")
                 request = failure.request
                 log.error("DNSLookupError on %s", request.url)
                 self.logger.error('DNSLookupError on %s', request.url)

@@ -67,7 +67,7 @@ def get_system_data(**kwargs):
         'article_status': 'Queued',
         "article_source_url": { "$ne": "news.google.com" },
         'created_by': CREATED_BY,
-        # "date_created": {"$gte": "2021-04-15T16:00:00.000Z"}
+        "date_created": {"$gte": "2021-04-15T16:00:00.000Z"}
         }
     _fields = {
         'article_url': 1

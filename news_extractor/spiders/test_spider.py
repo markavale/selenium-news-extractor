@@ -77,7 +77,7 @@ class TestSpider(scrapy.Spider):
     def parse(self, response, article):
         try:
             t1_time = time.perf_counter()
-            news = NewsExtract(response.url, response.text)
+            news = NewsExtract(article["article_url"], response.text)
             print(f"Global parser: {round(time.perf_counter() - t1_time, 2)} secs")
             log.info(f"Global parser took {round(time.perf_counter() - t1_time, 2)} secs on {article['article_url']}")
             if news.title is None or news.content is None or news.content == "":
@@ -140,6 +140,7 @@ class TestSpider(scrapy.Spider):
                     print(e)
         except Exception as e:
             print("Error on Global parser module")
+            print("Global parser error on", article['article_url'])
             log.error(f"Global parser error on: {article['article_url']}")
             try:
                 articles = self.yeild_article_items(  
