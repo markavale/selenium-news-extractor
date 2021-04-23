@@ -62,15 +62,21 @@ def get_system_data(**kwargs):
         "select": "-main_sections -section_filter -article_filter -selectors -sub_sections -embedded_sections -code_snippet"
     }
     body_query = {
-        # "article_source_url": "ekathimerini.com",
-        # "article_url": "http://www.ekathimerini.com/economy/1158061/extra-boost-of-700-mln-euros",
+        # "article_source_url": "inquirer.com",
+        # "article_source_url": "carmudi.com.ph",
+        # "article_url": "https://menafn.com/1101887807/Focusing-on-Africas-Growth-and-the-potential-of-the-Blue-Economy-By-Mr-Mokrane-SABRI",
         'article_status': 'Queued',
         "article_source_url": { "$ne": "news.google.com" },
-        'created_by': CREATED_BY
-        # "date_created": {"$gte": "2021-04-15T16:00:00.000Z"}
+        'created_by': CREATED_BY,
+        "date_created": {"$gte": "2021-04-20T16:00:00.000Z"}
         }
     _fields = {
-        'article_url': 1
+        'article_url': 1,
+        "article_source_from":1,
+        "article_source_url": 1,
+        "created_by": 1,
+        "date_created": 1
+
     }
     data = article_link_articles(
         headers=HEADERS, body=body_query, fields=_fields, limit=kwargs['limit'], website_query=article_website_query, page_offset=PAGE_OFFSET)

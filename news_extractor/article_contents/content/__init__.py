@@ -29,6 +29,7 @@ class Content:
         self.no_child_containers = []
         self.iteration = 0
         self.last_divs = []
+        self.page_source = html
         
         # SETUP STOPWORDS
         if lang != "en":
@@ -61,11 +62,22 @@ class Content:
         # Choke point
         try:
             # print("went here1")
+            # soup = BeautifulSoup(self.page_source, "html.parser")
+            # divs = soup.find_all("div")
+            # print("divs")
+            # print(divs)
+            # test_blocks = list(map(lambda block:block, self.soup.find_all(self.content_variables.content_tags)))
+            # print("test blocks")
+            # print(test_blocks)
             for tag in self.content_variables.content_tags:
                 # print("went here2")
                 # print(tag)
                 try:
+                    # print("try block")
+                    # print(self.body_node)
+                    
                     blocks = self.body_node.find_all(tag) if self.body_node is not None else self.soup.find_all(tag)
+                    # print(blocks)
                 except Exception as e:
                     blocks = None
                     print("blocks None", e)

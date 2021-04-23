@@ -227,12 +227,13 @@ class NewsExtract:
             #     tag.decompose()
 
             # REMOVE UNRELATED TAGS
-            for key in self.content_variables.tags_for_decompose:
-                for tag in soup.find_all(key):
-                    tag.decompose()
+            # for key in self.content_variables.tags_for_decompose:
+            for tag in soup.find_all(self.content_variables.tags_for_decompose):
+                tag.decompose()
+
 
             # REMOVE UNRELATED CLASS NAMES
-            for c_name in soup.find_all('div', {"class": 'sidebar'}):
+            for c_name in soup.find_all('div', {"class": re.compile(r'sidebar|jeg_postblock_9')}):
                 c_name.decompose()
 
             for id_name in soup.find_all('div', {"id": re.compile(r'magone-labels')}):

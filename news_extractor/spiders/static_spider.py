@@ -68,6 +68,7 @@ class ArticleStaticSpider(scrapy.Spider):
                     # add proxy and user agent to dict for cb_kwargs
                     d['proxy'] = meta['proxy']
                     d['user_agent'] = headers['User-Agent']
+                    
                     yield scrapy.Request(d['article_url'], self.parse, headers=headers, meta=meta, errback=self.errback_httpbin, cb_kwargs={'article': d}, dont_filter=True)
                 else:
                     d['proxy'] = "MACHINE's IP"#DEFAULT_PROXY
@@ -78,16 +79,19 @@ class ArticleStaticSpider(scrapy.Spider):
                 log.error("Skip url: %s", d['article_url'])
                 articles = self.yeild_article_items(
                     article_source_url                  = d['website']['fqdn'],
+                    website                             = d['website']['_id'],
                     article_media_type                  = 'Web',
                     article_status                      = "Error",
                     article_error_status                = "Skip URL",
                     article_url                         = d['article_source_url'],
+                    date_created                        = d['date_created'],
                     date_updated                        = datetime.datetime.today().isoformat(),
+                    created_by                          = d['created_by'],
                     updated_by                          = "Python Global Scraper",
-                    article_id                          = article['_id'],
+                    article_id                          = d['_id'],
                     base_url                            = 1,
-                    proxy                               = article['proxy'],
-                    user_agent                          = article['user_agent']
+                    proxy                               = d['proxy'],
+                    user_agent                          = d['user_agent']
                 )
                 yield articles
     def parse(self, response, article):
@@ -101,11 +105,14 @@ class ArticleStaticSpider(scrapy.Spider):
                 log.error(f"Content error on {article['article_url']}")
                 articles = self.yeild_article_items(
                     article_source_url                  = article['website']['fqdn'],
+                    website                             = article['website']['_id'],
                     article_media_type                  = 'Web',
                     article_status                      = "Error",
                     article_error_status                = "No content",
                     article_url                         = article['article_url'],
+                    date_created                        = article['date_created'],
                     date_updated                        = datetime.datetime.today().isoformat(),
+                    created_by                          = article['created_by'],
                     updated_by                          = "Python Global Scraper",
                     article_id                          = article['_id'],
                     base_err                            = 1,
@@ -156,6 +163,7 @@ class ArticleStaticSpider(scrapy.Spider):
                 except Exception as e:
                     log.error(f"Yielding artilces might've bugs")
         except Exception as e:
+            print("news extractor error", e)
             log.error(f"{e} on {article['article_url']}")
             try:
                 articles = self.yeild_article_items(  
@@ -164,9 +172,10 @@ class ArticleStaticSpider(scrapy.Spider):
                     article_media_type                  = 'Web',
                     article_status                      = "Error",
                     article_error_status                = "No content",
-                    article_url                         = response.url,
+                    article_url                         = article['article_url'],
+                    date_created                        = article['date_created'],
                     date_updated                        = datetime.datetime.today().isoformat(),
-                    created_by                          = "Python Global Scraper",
+                    created_by                          = article['created_by'],
                     updated_by                          = "Python Global Scraper",
                     article_id                          = article['_id'],
                     base_err                            = 1,
@@ -233,7 +242,9 @@ class ArticleStaticSpider(scrapy.Spider):
                     article_status                          = "Error",
                     article_error_status                    = "HTTP Error",
                     article_url                             = article['article_url'],#response.url,
+                    date_created                            = article['date_created'],
                     date_updated                            = datetime.datetime.today().isoformat(),
+                    created_by                              = article['created_by'],
                     updated_by                              = "Python Global Scraper",
                     article_id                              = article['_id'],
                     http_err                                = 1,
@@ -254,7 +265,9 @@ class ArticleStaticSpider(scrapy.Spider):
                     article_status                          = "Error",
                     article_error_status                    = "DNS Error",
                     article_url                             = article['article_url'],#request.url,
+                    date_created                            = article['date_created'],
                     date_updated                            = datetime.datetime.today().isoformat(),
+                    created_by                              = article['created_by'],
                     updated_by                              = "Python Global Scraper",
                     article_id                              = article['_id'],
                     dns_err                                 = 1,
@@ -273,7 +286,9 @@ class ArticleStaticSpider(scrapy.Spider):
                     article_status                          = "Error",
                     article_error_status                    = "Timeout Error",
                     article_url                             = article['article_url'],#request.url,
+                    date_created                            = article['date_created'],
                     date_updated                            = datetime.datetime.today().isoformat(),
+                    created_by                              = article['created_by'],
                     updated_by                              =" Python Global Scraper",
                     article_id                              = article['_id'],
                     timeout_err                             = 1,
@@ -290,7 +305,9 @@ class ArticleStaticSpider(scrapy.Spider):
                     article_status                          = "Error",
                     article_error_status                    = "Base Error",
                     article_url                             = article['article_url'],#request.url,
+                    date_created                            = article['date_created'],
                     date_updated                            = datetime.datetime.today().isoformat(),
+                    created_by                              = article['created_by'],
                     updated_by                              = "Python Global Scraper",
                     article_id                              = article['_id'],
                     base_err                                = 1,
@@ -321,7 +338,7 @@ class ArticleStaticSpider(scrapy.Spider):
         self.article_items['article_error_status']      = kwargs.get("article_error_status", None)
         self.article_items['keyword']                   = kwargs.get("keyword", None)
         self.article_items['article_url']               = kwargs.get("article_url", None)
-        self.article_items['date_created']              = kwargs.get("date_created", None)
+        self.article_items['date_created']              = kwargs.get("date_created", datetime.datetime.today().isoformat())
         self.article_items['date_updated']              = kwargs.get("date_updated", None)
         self.article_items['created_by']                = kwargs.get("created_by", "System")
         self.article_items['updated_by']                = kwargs.get("updated_by", None)
