@@ -29,6 +29,7 @@ class PublishDate:
         
          # FIND ALL PROBABLE TAG FOR PUB DATE
         blocks = self.soup.find_all(map(lambda pub_date_variables : pub_date_variables, self.pub_date_variables.pub_date_tags))
+        # print(blocks)
         probab_date = self.__iterate_tag(blocks)
         # print("---------------------------------")
         # print("Prob date",probab_date)

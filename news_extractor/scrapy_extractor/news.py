@@ -46,7 +46,6 @@ class NewsExtract:
         self.attr_invalid_keys  = get_invalid_keys()
         self.content_variables  = ContentVariables()
         self.parser             = None
-
         # PAGE SOURCE IS REQUIRED
         if not self.html:
             raise NewsError("No Page Source passed")
@@ -91,7 +90,7 @@ class NewsExtract:
         # Validation for publish_date if none
         # print("Publish Date Extractor")
         publish_date_instance = datetime.datetime.now().isoformat() if publish_date is None else publish_date.date
-        self.publish_date = self.__get_publish_date(publish_date_instance, article)
+        self.publish_date = self.__get_publish_date(publish_date_instance, article, clean_html)
 
         # EXTRACT IMAGE
         # print("Image Extractor")
@@ -181,6 +180,7 @@ class NewsExtract:
                 return None
         except Exception as e:
             print("__get_and_validate_content_parser",e)
+            log.error("__get_and_validate_content_parser",e)
             return None
 
     def generate_data(self):
@@ -371,18 +371,18 @@ class NewsExtract:
 
         return publish_date
 
-    def __get_publish_date(self, _date, article: type(Article)):
+    def __get_publish_date(self, _date, article: type(Article), page_source):
         """
         Generate news publish date
         """
         pht = pytz.timezone('Asia/Singapore')
         try:
-            if article.meta_data['article']:
+            if article.meta_data.get('article', None) is None or article.meta_data['article'] == {} or article.meta_data['article'].get('published_time', None) is None:
+                article_date = None
+            else:
                 article_date = article.meta_data['article']['published_time']
                 if not isinstance(article_date, datetime.datetime):
                     article_date = parse(str(article_date))
-            else:
-                article_date = None
         except Exception as e: 
             print("__get_publish_date func", e)
             article_date = None
@@ -391,12 +391,21 @@ class NewsExtract:
         newspaper3k_pub_date = article_date.replace(tzinfo=pht) if article_date is not None else None
         global_parser_pub_date = _date.replace(tzinfo=pht) if _date is not None else None
         if newspaper3k_pub_date is not None:
-            # print("using newspaper3k")
+            # print("using newspaper3k date extractor")
             publish_date = newspaper3k_pub_date.isoformat()
         elif newspaper3k_pub_date is None:
-            if global_parser_pub_date is not None:
-                # print("using global parser")
-                publish_date = global_parser_pub_date.isoformat()
+            newsplease = NewsPlease.from_html(str(page_source), self.url)
+            # print("newsplease pub date is", newsplease.date_publish)
+            if newsplease.date_publish is not None:
+                # print("using newsplease date extractor")
+                publish_date = newsplease.date_publish.isoformat()
+            elif newsplease.date_publish is None:
+                if global_parser_pub_date is not None:
+                    # print("using global parser date extractor")
+                    publish_date = global_parser_pub_date.isoformat()
+                else:
+                    # print("using date now")
+                    publish_date = datetime.datetime.now().isoformat()
             else:
                 # print("Using date now")
                 publish_date = datetime.datetime.now().isoformat()
@@ -406,6 +415,12 @@ class NewsExtract:
         # print("the date is", publish_date)
         return publish_date
 
+    def extract_date(self):
+        date =  re.findall(r'/(\d{4})/(\d{1,2})/(\d{1,2})/', self.url)
+        if date == [] or date is None:
+            return None
+        else:
+            return date[0]
     def __get_images(self, article: type(Article)):
         """
         Generate news images

@@ -60,16 +60,37 @@ class Content:
         # GET ALL DIV AND EXTRACT TEXT CONTENT
         # Choke point
         try:
+            # print("went here1")
             for tag in self.content_variables.content_tags:
-                blocks = self.body_node.find_all(tag) if self.body_node is not None else self.soup.find_all(tag)
+                # print("went here2")
+                # print(tag)
+                try:
+                    blocks = self.body_node.find_all(tag) if self.body_node is not None else self.soup.find_all(tag)
+                except Exception as e:
+                    blocks = None
+                    print("blocks None", e)
                 if not list(blocks):
+                    # print("went here3")
                     continue
                 self.__iterate_tag(blocks)
+                # print("went here4")
                 if self.text:
+                    # print("went here5")
                     break
         except Exception as e:
             print("_extract_content",e)
             self.text = None
+        # try:
+        #     for tag in self.content_variables.content_tags:
+        #         blocks = self.body_node.find_all(tag) if self.body_node is not None else self.soup.find_all(tag)
+        #         if not list(blocks):
+        #             continue
+        #         self.__iterate_tag(blocks)
+        #         if self.text:
+        #             break
+        # except Exception as e:
+        #     print("_extract_content",e)
+        #     self.text = None
 
     def __iterate_tag(self, blocks):
         """
