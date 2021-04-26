@@ -1,30 +1,88 @@
-import scrapy
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from logzero import logfile, logger
 # from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.firefox.options import Options
 from scrapy.selector import Selector
-from ..items import DynamicArticleItem
-import time
-# from .static_spider import get_proxy
+from ..items import StaticArticleItem, DynamicArticleItem
+# from logzero import logger
+import requests,os, datetime, json, scrapy, time
 from ..article_contents.news import News
+from ..article_contents.source.static import StaticSource
+from scrapy.spidermiddlewares.httperror import HttpError
+from twisted.internet.error import DNSLookupError
+from twisted.internet.error import TimeoutError, TCPTimedOutError
+from ..helpers.api import  article_process, article_error
+from ..helpers.media_value_helper import media_value
+from ..helpers.proxy import get_proxy
+from decouple import config
+from pprint import pprint
+from logs.main_log import init_log
+from news_extractor.settings import TOKEN, PROXY, CREATED_BY, DEFAULT_PROXY, DEFAULT_USER_AGENT
+from news_extractor.scrapy_extractor.news import NewsExtract
+from news_extractor.helpers.utils import convert
+log = init_log('dynamic_spider')
+use_proxy = PROXY
 
+if CREATED_BY == "System":
+    source_created_from = "System Link"
+else:
+    source_created_from = "Global Link"
 
 class ArticleDyamicSpider(scrapy.Spider):
-    # Initializing log file
     name = "article_dynamic"
-    # allowed_domains = ["toscrape.com"]
     custom_settings = {
         'ITEM_PIPELINES': {'news_extractor.pipelines.DynamicExtractorPipeline': 300},
     }
 
+    # Init variables that accepts data from main script file
+    def __init__(self, data=None):
+        self.data = data
+        self.article_items = StaticArticleItem()
 
+    # Scrapy Initial Request
     def start_requests(self):
-        for url in self.urls:
-            yield scrapy.Request(url, self.parse_article)
+        log.info("Spider started scraping")
+        for d in self.data:
+            try:
+                article_process(d['_id'], "article")  # update status to Process
+                is_using_proxy      = d['website']['is_using_proxy']
+                needs_https         = d['website']['needs_https']
+                needs_endslash      = d['website']['needs_endslash']
+                # First: check if needs https or not
+                if bool(needs_https):
+                    # print("Using https")
+                    http_split = d['article_url'].split(':')
+                    http_split[0] = "https"
+                    d['article_url'] = ":".join(http_split)
+                # Second: check if needs endslash
+                if bool(needs_endslash):
+                    # print("using endslash")
+                    d['article_url'] = d['article_url'] + "/"
+                # Last: check if url is using proxy
+                if bool(is_using_proxy) == True:
+                    meta = {}
+                    headers = {}
+                    try:
+                        proxy = get_proxy()
+                        ip = proxy['ip']
+                        port = proxy['port']
+                        meta_proxy = f"http://{ip}:{port}"
+                        headers['User-Agent'] = proxy['randomUserAgent']
+                        meta['proxy'] = meta_proxy
+                    except Exception as e:
+                        meta['proxy'] = DEFAULT_PROXY
+                        headers['User-Agent'] = DEFAULT_USER_AGENT
+                    # add proxy and user agent to dict for cb_kwargs
+                    d['proxy'] = meta['proxy']
+                    d['user_agent'] = headers['User-Agent']
+                    
+                    yield scrapy.Request(d['article_url'], self.parse, headers=headers, meta=meta, errback=self.errback_httpbin, cb_kwargs={'article': d}, dont_filter=True)
+                else:
+                    d['proxy'] = "MACHINE's IP"#DEFAULT_PROXY
+                    d['user_agent'] = DEFAULT_USER_AGENT
+                    yield scrapy.Request(d['article_url'], callback=self.parse, errback=self.errback_httpbin, cb_kwargs={'article': d}, dont_filter=True)
 
     def parse(self, response):
         print()
