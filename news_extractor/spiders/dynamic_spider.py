@@ -21,28 +21,6 @@ class ArticleDyamicSpider(scrapy.Spider):
         'ITEM_PIPELINES': {'news_extractor.pipelines.DynamicExtractorPipeline': 300},
     }
 
-    def __init__(self, urls=None):
-
-        # self.driver = webdriver.Chrome(executable_path='C:/dev/web-driver/chromedriver.exe')
-        # self.items = DynamicArticleItem()
-        self.urls = urls
-        # self.links = [
-        #     "https://www.scmp.com/week-asia/politics/article/3123643/scepticism-over-chinas-sinovac-jab-philippines-rolls-out",
-        # ]
-
-    # Using a dummy website to start scrapy request
-    # def start_requests(self):
-    #     # url = "http://quotes.toscrape.com"
-    #     # url = "https://www.scmp.com/week-asia/politics/article/3123643/scepticism-over-chinas-sinovac-jab-philippines-rolls-out"
-    #     for url in self.urls:
-    #         data = get_proxies(self)
-    #         headers = {
-    #             "User-Agent": data['randomUserAgent']
-    #         }
-    #         meta = {
-    #             "proxy": data['proxy']
-    #         }
-    #         yield scrapy.Request(url=url, callback=self.parse_article, headers=headers, meta=meta)
 
     def start_requests(self):
         for url in self.urls:
@@ -91,13 +69,6 @@ class ArticleDyamicSpider(scrapy.Spider):
             "//h1[contains(@class, 'story_links')]/text()").extract()
         # Using Scrapy's yield to store output instead of explicitly writing to a JSON file
         # yield countries
-        for title in headline:
-            yield {
-                "headline": title,
-            }
-        logger.info(response.request.headers)
-        logger.debug(response.headers)
-        logger.debug(response.request.meta)
         driver.quit()
         logger.info("Logger dynamic finished......")
         # Using Scrapy's yield to store output instead of explicitly writing to a JSON file

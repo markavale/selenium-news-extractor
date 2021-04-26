@@ -28,13 +28,15 @@ class ArticleStaticSpider(scrapy.Spider):
     custom_settings = {
         'ITEM_PIPELINES': {'news_extractor.pipelines.StaticExtractorPipeline': 300},
     }
+
+    # Init variables that accepts data from main script file
     def __init__(self, data=None):
         self.data = data
         self.article_items = StaticArticleItem()
 
+    # Scrapy Initial Request
     def start_requests(self):
         log.info("Spider started scraping")
-        # log.info("Using Proxy %s" %use_proxy)
         for d in self.data:
             try:
                 article_process(d['_id'], "article")  # update status to Process
@@ -74,6 +76,8 @@ class ArticleStaticSpider(scrapy.Spider):
                     d['proxy'] = "MACHINE's IP"#DEFAULT_PROXY
                     d['user_agent'] = DEFAULT_USER_AGENT
                     yield scrapy.Request(d['article_url'], callback=self.parse, errback=self.errback_httpbin, cb_kwargs={'article': d}, dont_filter=True)
+
+            # Exception handler for handling initial request errors
             except Exception as e:
                 log.exception(e)
                 log.error("Skip url: %s", d['article_url'])
@@ -94,13 +98,17 @@ class ArticleStaticSpider(scrapy.Spider):
                     user_agent                          = d['user_agent']
                 )
                 yield articles
+
+    # Callback function for parsing an article
     def parse(self, response, article):
+        # TRY: Main process of parse function. If error exists, Base error will return
         try:
-            # Global Parser
             t1_time = time.perf_counter()
             news = NewsExtract(response.url, response.text)
             # print(f"Global parser: took {round(time.perf_counter() - t1_time, 2)} secs on {article['article_url']}")
             log.info(f"Global parser took {round(time.perf_counter() - t1_time, 2)} secs on {article['article_url']}")
+
+            # If block for yielding no content items
             if news.title is None or news.content is None or news.content == "":
                 log.error(f"Content error on {article['article_url']}")
                 articles = self.yeild_article_items(
@@ -120,7 +128,10 @@ class ArticleStaticSpider(scrapy.Spider):
                     user_agent                          = article['user_agent']
                 )
                 yield articles
+
+            # Else block for yielding successful items
             else:
+                
                 try:
                     media_t1 = time.perf_counter()
                     media = media_value(global_rank=article["website"]["alexa_rankings"]['global'], local_rank=article["website"]["alexa_rankings"]['local'],
@@ -162,6 +173,8 @@ class ArticleStaticSpider(scrapy.Spider):
                     yield articles
                 except Exception as e:
                     log.error(f"Yielding artilces might've bugs")
+
+        # Exception handler for handling parser issue(Bugs) 
         except Exception as e:
             print("news extractor error", e)
             log.error(f"{e} on {article['article_url']}")
@@ -189,6 +202,7 @@ class ArticleStaticSpider(scrapy.Spider):
             # TODO: write error catch to yield and save status as error
             print(e)
 
+    # Initial Error callback function for retrying error items
     def errback_httpbin(self, failure):
         article = failure.request.cb_kwargs['article']
         if failure.check(HttpError):
@@ -228,6 +242,7 @@ class ArticleStaticSpider(scrapy.Spider):
                                  cb_kwargs={'article': article}
                                  )
 
+    # Final Error callback function for yielding error items
     def errback_httpbin_final(self, failure):
         article = failure.request.cb_kwargs['article']
         try:
@@ -315,11 +330,13 @@ class ArticleStaticSpider(scrapy.Spider):
                     user_agent                              = article['user_agent']
                 )
                 yield articles
+        # Exception handler if scrapy have errors
         except Exception as e:
             log.error(f"Code error {e}")
             print(e)
             print("Beyond scrapy error handler")
 
+    # DRY: Varibales handler for setting default if missing any variables in parameters when being called
     def yeild_article_items(self, **kwargs):
         self.article_items['article_source_url']        = kwargs.get('article_source_url', None)
         self.article_items['website']                   = kwargs.get('website', None)

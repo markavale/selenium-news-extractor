@@ -76,7 +76,6 @@ def get_system_data(**kwargs):
         "article_source_url": 1,
         "created_by": 1,
         "date_created": 1
-
     }
     data = article_link_articles(
         headers=HEADERS, body=body_query, fields=_fields, limit=kwargs['limit'], website_query=article_website_query, page_offset=PAGE_OFFSET)
